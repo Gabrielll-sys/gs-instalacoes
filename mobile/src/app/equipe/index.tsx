@@ -1,10 +1,11 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, View } from 'react-native';
+import { FlatList, RefreshControl, StyleSheet, View } from 'react-native';
 import { Button, FAB, Text, TouchableRipple } from 'react-native-paper';
 import type { Conta } from '../../api';
 import { BarraGestor, useBaseDoFab } from '../../componentes/BarraGestor';
 import { EstadoVazio } from '../../componentes/EstadoVazio';
+import { Esqueleto } from '../../componentes/Listas';
 import { useContas } from '../../equipe';
 import { cor, temaFab } from '../../tema';
 
@@ -47,7 +48,12 @@ export default function Equipe() {
     setPuxando(false);
   };
 
-  if (contas.isLoading) return <ActivityIndicator style={estilos.carregando} size="large" color={cor.marinho} />;
+  if (contas.isLoading)
+    return (
+      <View style={estilos.tela}>
+        <Esqueleto />
+      </View>
+    );
 
   return (
     <View style={estilos.tela}>
@@ -89,7 +95,6 @@ export default function Equipe() {
 
 const estilos = StyleSheet.create({
   tela: { flex: 1, backgroundColor: cor.branco },
-  carregando: { marginTop: 56 },
   linha: {
     paddingHorizontal: 16,
     paddingVertical: 14,

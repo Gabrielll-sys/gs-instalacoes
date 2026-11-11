@@ -1,0 +1,253 @@
+/* Mundo "Placa de Serviço" do DESIGN.md, na web. Só tema claro: tema escuro é decisão em aberto. */
+:root {
+  --marinho: #00265f;
+  --marinho-hover: #0b3a80;
+  --dourado: #eab827;
+  --dourado-hover: #d9a81c;
+  --branco: #ffffff;
+  --fundo: #f1f4f8;
+  --texto: #10213d;
+  --texto-suave: #47566c;
+  --filete: #dde3ec;
+  --contorno: #7a889c;
+  --atencao: #5c4500;
+  --atencao-fundo: #fff6d9;
+  --envio-fundo: #e3eaf5;
+  --erro: #b42318;
+  --erro-fundo: #fdecea;
+  --carimbo-fundo: rgba(0, 38, 95, 0.82);
+  --sobre-marinho-suave: rgba(255, 255, 255, 0.8);
+  --saida-exponencial: cubic-bezier(0.16, 1, 0.3, 1);
+  --entrada-material: cubic-bezier(0.2, 0, 0, 1);
+  color-scheme: light;
+  font-family: Overpass, system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--texto);
+  -webkit-text-size-adjust: 100%;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--fundo);
+  min-height: 100dvh;
+}
+
+h1,
+h2,
+h3,
+p,
+dl,
+dd,
+figure {
+  margin: 0;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+a {
+  color: var(--marinho);
+}
+
+::selection {
+  background: var(--envio-fundo);
+  color: var(--texto);
+}
+
+:focus-visible {
+  outline: 3px solid var(--marinho);
+  outline-offset: 2px;
+}
+
+.trilho :focus-visible,
+.gaveta-topo :focus-visible,
+.login-marca :focus-visible,
+.faixa-simples :focus-visible {
+  outline-color: var(--branco);
+}
+
+.so-leitor {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.suave {
+  color: var(--texto-suave);
+}
+
+.carregando {
+  padding: 24px 32px;
+}
+
+.erro {
+  color: var(--erro);
+  background: var(--erro-fundo);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.erro-texto {
+  color: var(--erro);
+}
+
+.atencao-texto {
+  color: var(--atencao);
+  font-weight: 600;
+  font-size: 13px;
+}
+
+/* Botões: alvos de 48px, cantos firmes de placa (15px). */
+.botao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 20px;
+  border-radius: 15px;
+  border: 1px solid transparent;
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 20px;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 150ms, border-color 150ms;
+}
+
+.botao:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.botao-ouro {
+  background: var(--dourado);
+  color: var(--marinho);
+}
+
+.botao-ouro:hover:not(:disabled) {
+  background: var(--dourado-hover);
+}
+
+.botao-marinho {
+  background: var(--marinho);
+  color: var(--branco);
+}
+
+.botao-marinho:hover:not(:disabled) {
+  background: var(--marinho-hover);
+}
+
+.botao-contorno {
+  background: var(--branco);
+  border-color: var(--contorno);
+  color: var(--marinho);
+}
+
+.botao-contorno:hover:not(:disabled),
+.botao-texto:hover:not(:disabled) {
+  background: var(--fundo);
+}
+
+.botao-texto {
+  background: transparent;
+  color: var(--marinho);
+}
+
+.botao-perigo {
+  background: var(--erro);
+  color: var(--branco);
+}
+
+.botao-perigo:hover:not(:disabled) {
+  background: #8f1c13;
+}
+
+/* Confirmação: caixa pequena no centro, por cima de qualquer gaveta. */
+.confirmacao {
+  width: min(400px, calc(100vw - 32px));
+  padding: 24px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--branco);
+  color: var(--texto);
+  box-shadow: 0 12px 32px rgba(16, 33, 61, 0.24);
+}
+
+.confirmacao::backdrop {
+  background: rgba(16, 33, 61, 0.45);
+}
+
+.confirmacao h2 {
+  font-weight: 800;
+  font-size: 20px;
+  line-height: 26px;
+}
+
+.confirmacao p {
+  margin: 8px 0 24px;
+  color: var(--texto-suave);
+}
+
+.botao-largo {
+  width: 100%;
+  min-height: 52px;
+}
+
+.botao-icone {
+  display: inline-grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  flex: none;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--texto-suave);
+  cursor: pointer;
+}
+
+.botao-icone:hover {
+  background: var(--fundo);
+}
+
+.botao-icone.claro {
+  color: var(--branco);
+}
+
+.botao-icone.claro:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.linha-botoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.linha-botoes > .botao {
+  flex: 1;
+}

@@ -1,21 +1,18 @@
-using System.Runtime.CompilerServices;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
-using static OrdemServico.Api.RelatorioPdf;
+using static OrdemServico.Api.MarcaPdf;
 
 namespace OrdemServico.Api;
 
 // Mesmo mundo do relatório da OS: o total aparece na faixa, de relance, e os itens vêm logo abaixo do cliente.
 public static class OrcamentoPdf
 {
-    // Fontes e licença são registradas pelo relatório; garante isso mesmo que nenhum relatório tenha saído antes.
-    static OrcamentoPdf() => RuntimeHelpers.RunClassConstructor(typeof(RelatorioPdf).TypeHandle);
-
     public static string Numero(int numero) => numero.ToString("D4");
 
     public static byte[] Gerar(Orcamento orcamento)
     {
+        Preparar();
         var numero = Numero(orcamento.Numero);
         var cliente = orcamento.Cliente;
         var emitido = TimeZoneInfo.ConvertTime(orcamento.CriadoEm, Brasilia).ToString("dd/MM/yyyy", PtBr);

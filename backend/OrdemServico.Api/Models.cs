@@ -71,6 +71,7 @@ public class Orcamento
     public string Observacoes { get; set; } = "";
     public DateTimeOffset CriadoEm { get; set; }
     public string? CriadoPor { get; set; }
+    public string Situacao { get; set; } = Situacoes.Aberto;
     public decimal Total => Itens.Sum(i => i.Total);
 }
 
@@ -84,6 +85,13 @@ public class ItemOrcamento
     public decimal Total => Math.Round(Quantidade * PrecoUnitario, 2, MidpointRounding.AwayFromZero);
 }
 
+// Último número usado: excluir o orçamento mais recente não devolve o número dele para o próximo.
+public class Contador
+{
+    public required string Nome { get; set; }
+    public int Valor { get; set; }
+}
+
 public class AppDb(DbContextOptions<AppDb> options) : DbContext(options)
 {
     public DbSet<Ordem> Ordens => Set<Ordem>();
@@ -91,11 +99,13 @@ public class AppDb(DbContextOptions<AppDb> options) : DbContext(options)
     public DbSet<Usuario> Usuarios => Set<Usuario>();
     public DbSet<Cliente> Clientes => Set<Cliente>();
     public DbSet<Orcamento> Orcamentos => Set<Orcamento>();
+    public DbSet<Contador> Contadores => Set<Contador>();
 
     protected override void OnModelCreating(ModelBuilder b)
     {
         b.Entity<Usuario>().HasIndex(u => u.Login).IsUnique();
         b.Entity<Orcamento>().HasIndex(o => o.Numero).IsUnique();
+        b.Entity<Contador>().HasKey(c => c.Nome);
         b.Entity<Orcamento>().OwnsMany(o => o.Itens, i => i.ToJson());
         // Cliente com orçamento não some: a API recusa a exclusão antes.
         b.Entity<Orcamento>().HasOne(o => o.Cliente).WithMany().OnDelete(DeleteBehavior.Restrict);
@@ -114,6 +124,7 @@ public record OrdemRequest(string? Cliente, List<string?>? Responsaveis, string?
 public record UploadRequest(string? ContentType);
 public record ClienteRequest(string? Nome, string? Telefone, string? Email, string? Documento, string? Endereco);
 public record ItemRequest(string? Descricao, decimal? Quantidade, string? Unidade, decimal? PrecoUnitario);
+public record SituacaoRequest(string? Situacao);
 public record OrcamentoRequest(Guid? ClienteId, List<ItemRequest?>? Itens, string? Pagamento, string? Prazo, string? Observacoes);
 public record FotoRequest(string? Secao, string? ContentType, DateTimeOffset? CriadaEm);
 
@@ -123,7 +134,25 @@ public record SessaoDto(string Token, string Nome, string Papel, bool TrocarSenh
 public record UsuarioDto(Guid Id, string Login, string Nome, string Papel, bool Ativo, bool TrocarSenha);
 public record ClienteDto(Guid Id, string Nome, string Telefone, string Email, string Documento, string Endereco);
 public record ItemDto(string Descricao, decimal Quantidade, string Unidade, decimal PrecoUnitario, decimal Total);
-public record OrcamentoDto(Guid Id, int Numero, Guid ClienteId, string ClienteNome, DateTimeOffset CriadoEm, List<ItemDto> Itens, decimal Total, string Pagamento, string Prazo, string Observacoes);
+public record OrcamentoDto(Guid Id, int Numero, Guid ClienteId, string ClienteNome, DateTimeOffset CriadoEm, List<ItemDto> Itens, decimal Total, string Pagamento, string Prazo, string Observacoes, string Situacao);
+
+// Acompanhamento do orçamento depois de montado; não muda nada do que vai no PDF.
+public static class Situacoes
+{
+    public const string Aberto = "aberto";
+    public const string Enviado = "enviado";
+    public const string Aprovado = "aprovado";
+    public const string Recusado = "recusado";
+    public static bool Valida(string? situacao) => situacao is Aberto or Enviado or Aprovado or Recusado;
+}
+
+public static class Listas
+{
+    // shortcut: busca e filtros só olham o que já foi carregado; buscar no servidor se o histórico passar de alguns milhares.
+    public const int Padrao = 200;
+    public const int Maximo = 2000;
+    public static int Limite(int? pedido) => Math.Clamp(pedido ?? Padrao, 1, Maximo);
+}
 
 public static class Papeis
 {

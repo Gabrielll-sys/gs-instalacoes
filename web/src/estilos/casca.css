@@ -1,0 +1,362 @@
+/* Casca: trilho marinho fixo à esquerda e área de trabalho. */
+.casca {
+  display: grid;
+  grid-template-columns: 232px minmax(0, 1fr);
+  min-height: 100dvh;
+}
+
+.trilho {
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 24px 12px 16px;
+  background: var(--marinho);
+  color: var(--branco);
+}
+
+.trilho-marca {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0 12px 24px;
+}
+
+.trilho-carro {
+  width: 112px;
+}
+
+.trilho-nome {
+  width: 168px;
+}
+
+.trilho-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.trilho-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--branco);
+  font-weight: 600;
+  font-size: 15px;
+  text-decoration: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.trilho-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.trilho-item[aria-current='page'] {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.trilho-item.pequeno {
+  min-height: 44px;
+  font-size: 14px;
+}
+
+.trilho-conta {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.trilho-quem {
+  display: flex;
+  flex-direction: column;
+  padding: 0 12px 8px;
+}
+
+.trilho-quem strong {
+  font-weight: 800;
+  font-size: 16px;
+}
+
+.trilho-quem span {
+  color: var(--sobre-marinho-suave);
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.trabalho {
+  min-width: 0;
+}
+
+.topo-trabalho {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 32px;
+  background: var(--branco);
+  border-bottom: 1px solid var(--filete);
+}
+
+.topo-trabalho h1 {
+  flex: 1;
+  font-weight: 900;
+  font-size: 30px;
+  line-height: 34px;
+  letter-spacing: -0.3px;
+}
+
+.busca {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: min(360px, 100%);
+  height: 48px;
+  padding: 0 16px;
+  border-radius: 28px;
+  border: 1px solid var(--contorno);
+  background: var(--fundo);
+  color: var(--texto-suave);
+}
+
+.busca:focus-within {
+  border-color: var(--marinho);
+  box-shadow: inset 0 0 0 1px var(--marinho);
+}
+
+.busca input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  outline: none;
+  color: var(--texto);
+}
+
+.busca input::placeholder {
+  color: var(--texto-suave);
+}
+
+/* Chips: filtros, responsáveis e papel. */
+.filtros,
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filtros {
+  padding: 12px 32px;
+  background: var(--branco);
+  border-bottom: 1px solid var(--filete);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 42px;
+  padding: 0 14px;
+  border: 1px solid var(--contorno);
+  border-radius: 6px;
+  background: var(--branco);
+  color: var(--texto-suave);
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.chip:hover:not(:disabled) {
+  background: var(--fundo);
+}
+
+.chip.ativo,
+.chip.marcado {
+  background: var(--marinho);
+  border-color: var(--marinho);
+  color: var(--branco);
+}
+
+.chip.marcado {
+  font-weight: 800;
+}
+
+.chip:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.chip:not(.marcado) svg {
+  color: var(--marinho);
+}
+
+.numero {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Lista em linhas com filete, não em cartões. */
+.lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: var(--branco);
+}
+
+.linha {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 32px;
+  border-bottom: 1px solid var(--filete);
+  background: var(--branco);
+  color: inherit;
+  text-decoration: none;
+  transition: background-color 150ms;
+}
+
+a.linha:hover {
+  background: #f8fafc;
+}
+
+.linha.selecionada {
+  background: var(--envio-fundo);
+}
+
+.info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.info strong {
+  font-weight: 800;
+  font-size: 18px;
+  line-height: 23px;
+}
+
+.info span {
+  color: var(--texto-suave);
+  font-size: 14px;
+  line-height: 20px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.info span.atencao-texto {
+  color: var(--atencao);
+}
+
+.esqueleto {
+  pointer-events: none;
+}
+
+.barra-esqueleto {
+  display: block;
+  height: 12px;
+  border-radius: 4px;
+  background: var(--fundo);
+}
+
+.placa-esqueleto {
+  width: 118px;
+  height: 56px;
+  border-radius: 9px;
+  background: var(--fundo);
+}
+
+.dica-lista {
+  padding: 16px 32px;
+  color: var(--texto-suave);
+  font-size: 14px;
+}
+
+.estado-vazio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 56px 24px;
+  text-align: center;
+}
+
+.estado-vazio h3 {
+  font-weight: 800;
+  font-size: 20px;
+  line-height: 26px;
+}
+
+.estado-vazio p {
+  color: var(--texto-suave);
+  margin-bottom: 8px;
+}
+
+/* A placa: painel marinho com filete branco interno, legendas e número tabular. */
+.placa {
+  min-width: 118px;
+  flex: none;
+  padding: 3px;
+  border-radius: 9px;
+  background: var(--marinho);
+  color: var(--branco);
+}
+
+.placa-filete {
+  padding: 4px 10px;
+  border: 1.5px solid var(--branco);
+  border-radius: 7px;
+}
+
+.placa-linha {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.placa-rotulo {
+  flex: 1;
+  font-weight: 800;
+  font-size: 13px;
+  line-height: 19px;
+  letter-spacing: 0.4px;
+}
+
+.placa-numero {
+  font-weight: 900;
+  font-size: 16px;
+  line-height: 21px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Assinatura: o número nasce dourado quando entra a primeira foto, segura e volta ao branco. */
+.placa-numero.nasce {
+  animation: nasce 450ms var(--saida-exponencial);
+}
+
+@keyframes nasce {
+  0%,
+  33% {
+    color: var(--dourado);
+  }
+  100% {
+    color: var(--branco);
+  }
+}
+
+.losango {
+  width: 9px;
+  height: 9px;
+  background: var(--dourado);
+  transform: rotate(45deg);
+}

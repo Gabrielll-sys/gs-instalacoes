@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from './api';
 import { queryClient } from './sync/motor';
+import { LIMITES, PASSO_DA_LISTA } from './tipos';
 
 const CHAVE_CLIENTES = ['clientes'];
 const CHAVE_ORCAMENTOS = ['orcamentos'];
@@ -18,13 +19,9 @@ export const recarregarClientes = () =>
   ]);
 export const recarregarOrcamentos = () => queryClient.invalidateQueries({ queryKey: CHAVE_ORCAMENTOS });
 
-// Cliente cadastrado de dentro do formulário de orçamento: ao voltar, ele já vem escolhido.
-let clienteCriado: string | null = null;
-export const lembrarClienteCriado = (id: string) => {
-  clienteCriado = id;
-};
-export const usarClienteCriado = () => {
-  const id = clienteCriado;
-  clienteCriado = null;
-  return id;
+
+// Pede mais itens da lista à API; a busca e os filtros passam a valer sobre o que veio.
+export const mostrarMais = (lista: keyof typeof LIMITES) => {
+  LIMITES[lista] += PASSO_DA_LISTA;
+  return queryClient.invalidateQueries({ queryKey: [lista] });
 };

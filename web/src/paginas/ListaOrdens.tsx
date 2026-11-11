@@ -1,11 +1,12 @@
 import { mdiMagnify, mdiPlus } from '@mdi/js';
 import { useMemo, useState } from 'react';
 import { Link, Outlet, useParams } from 'react-router';
-import { EstadoVazio } from '../componentes/Estado';
+import { EstadoVazio, ListaEsqueleto, MostrarMais } from '../componentes/Estado';
 import { Icone } from '../componentes/Icone';
 import { Placa } from '../componentes/Placa';
-import { useOrdens } from '../consultas';
-import { contarFotos, filtrarOrdens, formatarData, LIMITE_ORDENS, type Filtro } from '../regras';
+import { mostrarMais, useOrdens } from '../consultas';
+import { contarFotos, filtrarOrdens, formatarData, type Filtro } from '../regras';
+import { LIMITES } from '../tipos';
 
 const FILTROS: { valor: Filtro; rotulo: string }[] = [
   { valor: 'todas', rotulo: 'Todas' },
@@ -14,7 +15,7 @@ const FILTROS: { valor: Filtro; rotulo: string }[] = [
 ];
 
 export function ListaOrdens() {
-  const { data: ordens = [], isLoading, isError, refetch } = useOrdens();
+  const { data: ordens = [], isLoading, isError, isFetching, refetch } = useOrdens();
   const { id } = useParams();
   const [busca, setBusca] = useState('');
   const [filtro, setFiltro] = useState<Filtro>('todas');
@@ -25,7 +26,8 @@ export function ListaOrdens() {
     () => Object.fromEntries(FILTROS.map(({ valor }) => [valor, filtrarOrdens(ordens, busca, valor).length])) as Record<Filtro, number>,
     [ordens, busca],
   );
-  const mais = ordens.length >= LIMITE_ORDENS ? '+' : '';
+  const cheia = ordens.length >= LIMITES.ordens;
+  const mais = cheia ? '+' : '';
 
   return (
     <>
@@ -51,17 +53,7 @@ export function ListaOrdens() {
       </div>
 
       {isLoading ? (
-        <ul className="lista" aria-busy="true" aria-label="Carregando ordens de serviço">
-          {[0, 1, 2, 3].map((i) => (
-            <li key={i} className="linha esqueleto">
-              <div className="info">
-                <span className="barra-esqueleto" style={{ width: '40%', height: 18 }} />
-                <span className="barra-esqueleto" style={{ width: '28%' }} />
-              </div>
-              <span className="placa-esqueleto" />
-            </li>
-          ))}
-        </ul>
+        <ListaEsqueleto rotulo="Carregando ordens de serviço" placa />
       ) : isError && ordens.length === 0 ? (
         <EstadoVazio titulo="Não foi possível carregar as OS" texto="Confira a conexão e tente de novo.">
           <button type="button" className="botao botao-contorno" onClick={() => void refetch()}>
@@ -96,6 +88,7 @@ export function ListaOrdens() {
           ))}
         </ul>
       )}
+      {!isLoading && <MostrarMais cheia={cheia} carregando={isFetching} aoPedir={() => void mostrarMais('ordens')} />}
 
       <Outlet />
     </>

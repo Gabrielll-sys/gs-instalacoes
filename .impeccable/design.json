@@ -450,7 +450,7 @@
       }
     ],
     "dos": [
-      "Do usar `cor` e `familia` de `mobile/src/tema.ts` e os controles temados do Paper antes de criar uma peça nova; na web, as variáveis de `web/src/estilos.css`.",
+      "Do usar `cor` e `familia` de `mobile/src/tema.ts` e os controles temados do Paper antes de criar uma peça nova; na web, as variáveis de `web/src/estilos/` (base, casca, gaveta, formularios, orcamentos e responsivo, nessa ordem).",
       "Do manter dourado com texto e ícone marinho em todo preenchimento.",
       "Do mostrar a contagem de fotos de ANTES e DEPOIS sempre com a placa.",
       "Do dizer o estado de envio com ícone e texto, usando os tons de Atenção, Enviando e Erro.",

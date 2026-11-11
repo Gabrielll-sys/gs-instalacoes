@@ -10,6 +10,7 @@ import { GuardaAlteracoes } from '../componentes/Guardas';
 import { Icone } from '../componentes/Icone';
 import { confirmar, DESCARTAR } from '../confirmar';
 import { recarregarClientes, useClientes } from '../consultas';
+import { mascararDocumento, mascararTelefone } from '../valores';
 
 const VAZIO: DadosCliente = { nome: '', telefone: '', email: '', documento: '', endereco: '' };
 const CAMPOS = Object.keys(VAZIO) as (keyof DadosCliente)[];
@@ -121,11 +122,11 @@ export function FormCliente({
         <Campo rotulo="Nome" erro={tentou && semNome ? 'Informe o nome do cliente.' : undefined} dica="Pessoa ou empresa, como vai aparecer no orçamento.">
           {(props) => <input {...props} {...campo('nome')} maxLength={200} data-foco={!cliente || undefined} autoComplete="off" />}
         </Campo>
-        <Campo rotulo="Telefone">{(props) => <input {...props} {...campo('telefone')} type="tel" maxLength={30} autoComplete="off" />}</Campo>
+        <Campo rotulo="Telefone">{(props) => <input {...props} {...campo('telefone')} onBlur={(e) => setDados((d) => ({ ...d, telefone: mascararTelefone(e.target.value) }))} type="tel" maxLength={30} autoComplete="off" />}</Campo>
         <Campo rotulo="E-mail" erro={tentou && emailInvalido ? 'Confira o e-mail.' : undefined}>
           {(props) => <input {...props} {...campo('email')} type="email" maxLength={200} autoComplete="off" />}
         </Campo>
-        <Campo rotulo="CPF ou CNPJ">{(props) => <input {...props} {...campo('documento')} maxLength={20} autoComplete="off" />}</Campo>
+        <Campo rotulo="CPF ou CNPJ">{(props) => <input {...props} {...campo('documento')} onBlur={(e) => setDados((d) => ({ ...d, documento: mascararDocumento(e.target.value) }))} maxLength={20} autoComplete="off" />}</Campo>
         <Campo rotulo="Endereço" dica="Rua, número, complemento, bairro, cidade e CEP, do jeito que deve sair no orçamento.">
           {(props) => <textarea {...props} {...campo('endereco')} maxLength={500} rows={3} />}
         </Campo>

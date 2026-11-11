@@ -1,16 +1,21 @@
 import { mdiMagnify, mdiPlus } from '@mdi/js';
 import { useMemo, useState } from 'react';
 import { Link, Outlet, useParams } from 'react-router';
-import { EstadoVazio } from '../componentes/Estado';
+import { EstadoVazio, ListaEsqueleto, MostrarMais } from '../componentes/Estado';
 import { Icone } from '../componentes/Icone';
-import { useOrcamentos } from '../consultas';
-import { filtrarOrcamentos, formatarDia, formatarMoeda, numeroDoOrcamento } from '../valores';
+import { mostrarMais, useOrcamentos } from '../consultas';
+import { LIMITES } from '../tipos';
+import { filtrarOrcamentos, formatarDia, formatarMoeda, numeroDoOrcamento, rotuloDaSituacao, SITUACOES, type Situacao } from '../valores';
 
 export function Orcamentos() {
-  const { data: orcamentos = [], isLoading, isError, refetch } = useOrcamentos();
+  const { data: orcamentos = [], isLoading, isError, isFetching, refetch } = useOrcamentos();
   const { id } = useParams();
   const [busca, setBusca] = useState('');
-  const visiveis = useMemo(() => filtrarOrcamentos(orcamentos, busca), [orcamentos, busca]);
+  const [situacao, setSituacao] = useState<Situacao | 'todas'>('todas');
+  const visiveis = useMemo(() => filtrarOrcamentos(orcamentos, busca, situacao), [orcamentos, busca, situacao]);
+  const cheia = orcamentos.length >= LIMITES.orcamentos;
+  // Contagens seguem a busca, como nas OS, para baterem com a lista.
+  const contagem = (valor: Situacao | 'todas') => `${filtrarOrcamentos(orcamentos, busca, valor).length}${cheia ? '+' : ''}`;
 
   return (
     <>
@@ -27,8 +32,16 @@ export function Orcamentos() {
         </Link>
       </header>
 
+      <div className="filtros" role="group" aria-label="Filtrar por situação">
+        {[{ valor: 'todas' as const, rotulo: 'Todos' }, ...SITUACOES].map(({ valor, rotulo }) => (
+          <button key={valor} type="button" className={`chip${situacao === valor ? ' ativo' : ''}`} aria-pressed={situacao === valor} onClick={() => setSituacao(valor)}>
+            {rotulo} <span className="numero">{contagem(valor)}</span>
+          </button>
+        ))}
+      </div>
+
       {isLoading ? (
-        <p className="suave carregando">Carregando…</p>
+        <ListaEsqueleto rotulo="Carregando orçamentos" />
       ) : isError ? (
         <EstadoVazio titulo="Não foi possível carregar os orçamentos" texto="Confira a conexão e tente de novo.">
           <button type="button" className="botao botao-contorno" onClick={() => void refetch()}>
@@ -36,8 +49,8 @@ export function Orcamentos() {
           </button>
         </EstadoVazio>
       ) : visiveis.length === 0 ? (
-        busca ? (
-          <EstadoVazio titulo="Nenhum orçamento encontrado" texto="Busque pelo nome do cliente ou pelo número." />
+        busca || situacao !== 'todas' ? (
+          <EstadoVazio titulo="Nenhum orçamento encontrado" texto="Busque pelo nome do cliente ou pelo número, ou mude o filtro." />
         ) : (
           <EstadoVazio titulo="Nenhum orçamento ainda" texto="Use Novo orçamento para montar o primeiro." />
         )
@@ -52,12 +65,16 @@ export function Orcamentos() {
                     Nº {numeroDoOrcamento(orcamento.numero)} – {formatarDia(orcamento.criadoEm)}
                   </span>
                 </div>
-                <span className="valor-linha">{formatarMoeda(orcamento.total)}</span>
+                <div className="valor-e-situacao">
+                  <span className="valor-linha">{formatarMoeda(orcamento.total)}</span>
+                  <span className={`situacao situacao-${orcamento.situacao}`}>{rotuloDaSituacao(orcamento.situacao)}</span>
+                </div>
               </Link>
             </li>
           ))}
         </ul>
       )}
+      {!isLoading && <MostrarMais cheia={cheia} carregando={isFetching} aoPedir={() => void mostrarMais('orcamentos')} />}
 
       <Outlet />
     </>

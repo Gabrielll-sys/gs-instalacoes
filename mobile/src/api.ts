@@ -1,25 +1,10 @@
 import { sessao, type Papel, type Sessao } from './sessao';
+import { LIMITES, type Cliente, type DadosCliente, type DadosOrcamento, type Orcamento } from './tipos';
+import type { Situacao } from './valores';
 import { ErroApi, type DadosOrdem, type Ordem, type Secao } from './sync/regras';
 
 export type Conta = { id: string; login: string; nome: string; papel: Papel; ativo: boolean; trocarSenha: boolean };
-export type DadosCliente = { nome: string; telefone: string; email: string; documento: string; endereco: string };
-export type Cliente = DadosCliente & { id: string };
-export type ItemOrcamento = { descricao: string; quantidade: number; unidade: string; precoUnitario: number; total: number };
-export type DadosOrcamento = {
-  clienteId: string;
-  itens: Omit<ItemOrcamento, 'total'>[];
-  pagamento: string;
-  prazo: string;
-  observacoes: string;
-};
-export type Orcamento = Omit<DadosOrcamento, 'itens'> & {
-  id: string;
-  numero: number;
-  clienteNome: string;
-  criadoEm: string;
-  itens: ItemOrcamento[];
-  total: number;
-};
+export type { Cliente, DadosCliente, DadosOrcamento, ItemOrcamento, Orcamento } from './tipos';
 
 export const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:5202';
 const TEMPO_LIMITE_MS = 20_000;
@@ -67,7 +52,7 @@ export const api = {
   criarConta: (conta: { login: string; nome: string; papel: Papel }) => chamar<Conta>('/usuarios', 'POST', conta),
   salvarConta: (id: string, conta: { nome: string; papel: Papel; ativo: boolean }) => chamar<Conta>(`/usuarios/${id}`, 'PUT', conta),
   redefinirSenha: (id: string) => chamar<Conta>(`/usuarios/${id}/senha`, 'PUT', {}),
-  listarOrdens: () => chamar<Ordem[]>('/ordens'),
+  listarOrdens: () => chamar<Ordem[]>(`/ordens?limite=${LIMITES.ordens}`),
   salvarOrdem: (ordem: DadosOrdem) => chamar(`/ordens/${ordem.id}`, 'PUT', ordem),
   excluirOrdem: (id: string) => chamar(`/ordens/${id}`, 'DELETE'),
   urlDeUpload: (ordemId: string, fotoId: string, contentType: string) =>
@@ -82,7 +67,8 @@ export const api = {
   criarCliente: (cliente: DadosCliente) => chamar<Cliente>('/clientes', 'POST', cliente),
   salvarCliente: (id: string, cliente: DadosCliente) => chamar<Cliente>(`/clientes/${id}`, 'PUT', cliente),
   excluirCliente: (id: string) => chamar(`/clientes/${id}`, 'DELETE'),
-  listarOrcamentos: () => chamar<Orcamento[]>('/orcamentos'),
+  listarOrcamentos: () => chamar<Orcamento[]>(`/orcamentos?limite=${LIMITES.orcamentos}`),
+  mudarSituacao: (id: string, situacao: Situacao) => chamar<Orcamento>(`/orcamentos/${id}/situacao`, 'PUT', { situacao }),
   criarOrcamento: (orcamento: DadosOrcamento) => chamar<Orcamento>('/orcamentos', 'POST', orcamento),
   salvarOrcamento: (id: string, orcamento: DadosOrcamento) => chamar<Orcamento>(`/orcamentos/${id}`, 'PUT', orcamento),
   excluirOrcamento: (id: string) => chamar(`/orcamentos/${id}`, 'DELETE'),

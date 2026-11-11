@@ -1,10 +1,9 @@
 using System.Buffers.Binary;
 using System.Globalization;
-using System.Reflection;
-using QuestPDF.Drawing;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
+using static OrdemServico.Api.MarcaPdf;
 using Imagem = QuestPDF.Infrastructure.Image;
 
 namespace OrdemServico.Api;
@@ -12,24 +11,12 @@ namespace OrdemServico.Api;
 // Primeira página com o par antes e depois; as demais fotos seguem nas próximas, sem repetir as da capa.
 public static class RelatorioPdf
 {
-    internal const string Marinho = "#00265F";
-    internal const string Branco = "#FFFFFF";
     private const string Dourado = "#EAB827";
-    internal const string Fundo = "#F1F4F8";
-    internal const string Texto = "#10213D";
-    internal const string TextoSuave = "#47566C";
-    internal const string Filete = "#DDE3EC";
     private const string Atencao = "#5C4500";
     private const string AtencaoFundo = "#FFF6D9";
     // Marinho a 82%, em ARGB, igual ao carimbo do app.
     private const string CarimboFundo = "#D100265F";
 
-    internal const string Regular = "Overpass-400";
-    internal const string Semi = "Overpass-600";
-    internal const string Extra = "Overpass-800";
-    internal const string Black = "Overpass-900";
-
-    internal const float Margem = 36;
     private const float AlturaFotoCapa = 430;
     private const float AlturaFotoGrade = 305;
     // Foto em pé ao lado de foto deitada: mais baixa, para as duas terem presença parecida.
@@ -38,26 +25,13 @@ public static class RelatorioPdf
     private static readonly string Losango =
         $"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 9 9"><path d="M4.5 0 9 4.5 4.5 9 0 4.5Z" fill="{Dourado}"/></svg>""";
 
-    internal static readonly CultureInfo PtBr = CultureInfo.GetCultureInfo("pt-BR");
-    internal static readonly TimeZoneInfo Brasilia = TimeZoneInfo.FindSystemTimeZoneById("America/Sao_Paulo");
-    internal static readonly byte[] LogoCarro = Recurso("logo-gs-carro.png");
-    internal static readonly byte[] LogoNome = Recurso("logo-gs-nome.png");
-
     private sealed record FotoDoRelatorio(Foto Foto, string Numero, Imagem? Imagem, bool? EmPe);
-
-    static RelatorioPdf()
-    {
-        QuestPDF.Settings.License = LicenseType.Community;
-        FontManager.RegisterFontWithCustomName(Regular, new MemoryStream(Recurso("Overpass_400Regular.ttf")));
-        FontManager.RegisterFontWithCustomName(Semi, new MemoryStream(Recurso("Overpass_600SemiBold.ttf")));
-        FontManager.RegisterFontWithCustomName(Extra, new MemoryStream(Recurso("Overpass_800ExtraBold.ttf")));
-        FontManager.RegisterFontWithCustomName(Black, new MemoryStream(Recurso("Overpass_900Black.ttf")));
-    }
 
     public static string Codigo(Guid id) => id.ToString("N")[..8].ToUpperInvariant();
 
     public static byte[] Gerar(Ordem ordem, IReadOnlyDictionary<Guid, byte[]?> arquivos, string emitidoPor, DateTimeOffset agora)
     {
+        Preparar();
         List<FotoDoRelatorio> Secao(string secao, string prefixo) => ordem.Fotos
             .Where(f => f.Secao == secao)
             .OrderBy(f => f.CriadaEm)
@@ -271,12 +245,6 @@ public static class RelatorioPdf
         if (ordem.Observacoes != "") coluna.Item().EnsureSpace(50).MaxWidth(360).Element(x => Dado(x, "Observações", ordem.Observacoes));
     });
 
-    internal static void Dado(IContainer c, string rotulo, string valor) => c.Column(coluna =>
-    {
-        coluna.Item().Text(rotulo).FontFamily(Semi).FontSize(8.5f).FontColor(TextoSuave);
-        coluna.Item().Text(valor).FontSize(10.5f);
-    });
-
     private static void Grade(ColumnDescriptor c, string rotulo, List<FotoDoRelatorio> fotos)
     {
         var resto = fotos.Skip(1).ToList();
@@ -356,13 +324,5 @@ public static class RelatorioPdf
                 return BinaryPrimitives.ReadUInt16BigEndian(d.AsSpan(i + 5)) > BinaryPrimitives.ReadUInt16BigEndian(d.AsSpan(i + 7));
         }
         return null;
-    }
-
-    private static byte[] Recurso(string nome)
-    {
-        using var origem = Assembly.GetExecutingAssembly().GetManifestResourceStream(nome)!;
-        using var memoria = new MemoryStream();
-        origem.CopyTo(memoria);
-        return memoria.ToArray();
     }
 }

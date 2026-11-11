@@ -1,0 +1,140 @@
+/* Telas estreitas: o trilho vira barra no topo e a gaveta ocupa a tela. */
+@media (max-width: 899px) {
+  .casca {
+    display: block;
+  }
+
+  .trilho {
+    position: sticky;
+    z-index: 2;
+    height: auto;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 8px 8px 12px;
+    overflow-x: auto;
+  }
+
+  .trilho-marca {
+    padding: 0 8px 0 0;
+  }
+
+  .trilho-carro {
+    width: 56px;
+  }
+
+  .trilho-nome,
+  .trilho-quem {
+    display: none;
+  }
+
+  .trilho-nav {
+    flex-direction: row;
+  }
+
+  .trilho-item {
+    padding: 0 10px;
+    gap: 8px;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+
+  .so-largo {
+    display: none;
+  }
+
+  .trilho-conta {
+    flex-direction: row;
+    margin: 0 0 0 auto;
+    padding: 0;
+    border: 0;
+  }
+
+  .trilho-conta .trilho-item span {
+    display: none;
+  }
+
+  .topo-trabalho {
+    flex-wrap: wrap;
+    padding: 16px;
+  }
+
+  .topo-trabalho h1 {
+    font-size: 24px;
+    line-height: 30px;
+  }
+
+  .busca {
+    order: 3;
+    width: 100%;
+  }
+
+  .filtros {
+    padding: 12px 16px;
+  }
+
+  .linha {
+    padding: 14px 16px;
+  }
+
+  .dica-lista {
+    padding: 16px;
+  }
+
+  .bloco-branco,
+  .secao-fotos {
+    padding: 16px;
+  }
+
+  .login {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+
+  .login-marca {
+    padding: 48px 24px 32px;
+  }
+
+  .login-painel {
+    justify-content: flex-start;
+    padding: 24px 20px 32px;
+    border-radius: 24px 24px 0 0;
+  }
+
+  .faixa-simples {
+    padding: 12px 16px;
+  }
+}
+
+/* Com as quatro áreas do gestor, só a área aberta mantém o nome; as outras ficam no ícone. */
+@media (max-width: 699px) {
+  .trilho-nav:has(> :nth-child(3)) .trilho-item:not([aria-current='page']) span {
+    display: none;
+  }
+}
+
+/* Celular: para o nome da área aberta caber, a barra do gestor deixa o carro do logo. O técnico, com uma área só, mantém tudo. */
+@media (max-width: 519px) {
+  .trilho:has(.trilho-nav > :nth-child(3)) .trilho-marca {
+    display: none;
+  }
+}
+
+@media (max-width: 419px) {
+  .trilho-item {
+    padding: 0 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .placa-numero.nasce,
+  .gaveta[open] {
+    animation: none;
+  }
+
+  .miniatura img,
+  .interruptor input,
+  .interruptor input::before {
+    transition: none;
+  }
+}

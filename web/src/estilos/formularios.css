@@ -1,0 +1,261 @@
+/* Formulários. */
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.campo label,
+.campo legend {
+  padding: 0;
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 20px;
+}
+
+.campo legend {
+  margin-bottom: 8px;
+}
+
+.campo input,
+.campo textarea {
+  width: 100%;
+  min-height: 48px;
+  padding: 11px 14px;
+  border: 1px solid var(--contorno);
+  border-radius: 3px;
+  background: var(--fundo);
+  color: var(--texto);
+}
+
+.campo textarea {
+  resize: vertical;
+  line-height: 24px;
+}
+
+.campo input:focus,
+.campo textarea:focus {
+  outline: none;
+  border-color: var(--marinho);
+  box-shadow: inset 0 0 0 1px var(--marinho);
+}
+
+.campo.com-erro input,
+.campo.com-erro textarea {
+  border-color: var(--erro);
+}
+
+.campo-ajuda {
+  min-height: 18px;
+  color: var(--texto-suave);
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.campo.com-erro .campo-ajuda {
+  color: var(--erro);
+}
+
+.campo-com-botao {
+  position: relative;
+}
+
+.campo-com-botao input {
+  padding-right: 52px;
+}
+
+.campo-com-botao .botao-icone {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.abertura {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--fundo);
+  color: var(--marinho);
+}
+
+.abertura div {
+  display: flex;
+  flex-direction: column;
+  color: var(--texto);
+}
+
+.abertura strong {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.abertura span {
+  color: var(--texto-suave);
+  font-size: 14px;
+}
+
+.leitura {
+  display: flex;
+  flex-direction: column;
+}
+
+.leitura span {
+  color: var(--texto-suave);
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.marcar {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.marcar input {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--marinho);
+}
+
+.interruptor {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 4px 0;
+}
+
+.interruptor > div {
+  flex: 1;
+}
+
+.interruptor label {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.interruptor p {
+  color: var(--texto-suave);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.interruptor input {
+  appearance: none;
+  position: relative;
+  flex: none;
+  width: 52px;
+  height: 32px;
+  margin: 0;
+  border: 2px solid var(--contorno);
+  border-radius: 16px;
+  background: var(--filete);
+  cursor: pointer;
+  transition: background-color 150ms, border-color 150ms;
+}
+
+.interruptor input::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--contorno);
+  transition: transform 150ms var(--saida-exponencial), background-color 150ms;
+}
+
+.interruptor input:checked {
+  background: var(--marinho);
+  border-color: var(--marinho);
+}
+
+.interruptor input:checked::before {
+  transform: translateX(20px);
+  background: var(--branco);
+}
+
+.interruptor input:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+/* Login: marca no marinho e o painel branco ao lado; sem título, a marca já diz onde se está. */
+.login {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  min-height: 100dvh;
+  background: var(--marinho);
+}
+
+.login-marca {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 48px;
+  color: var(--branco);
+  text-align: center;
+}
+
+.login-carro {
+  width: min(360px, 80%);
+}
+
+.login-nome {
+  width: min(420px, 90%);
+}
+
+.login-painel {
+  align-self: stretch;
+  justify-content: center;
+  padding: 48px max(32px, calc((100% - 400px) / 2));
+  background: var(--branco);
+}
+
+/* Troca de senha: página simples com faixa marinho. */
+.faixa-simples {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 32px;
+  background: var(--marinho);
+  color: var(--branco);
+}
+
+.faixa-simples img {
+  width: 72px;
+}
+
+.faixa-simples h1 {
+  font-weight: 800;
+  font-size: 22px;
+  line-height: 28px;
+}
+
+.pagina-simples {
+  min-height: 100dvh;
+  background: var(--branco);
+}
+
+.pagina-simples-corpo {
+  max-width: 440px;
+  margin: 32px auto;
+  padding: 0 16px;
+}

@@ -1,0 +1,338 @@
+/* Orçamentos e clientes: mesmas linhas, gavetas e campos das OS. */
+.valor-linha {
+  flex: none;
+  color: var(--marinho);
+  font-weight: 800;
+  font-size: 17px;
+  line-height: 22px;
+  font-variant-numeric: tabular-nums;
+}
+
+.dado-extra {
+  display: block;
+  color: var(--texto-suave);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.titulo-secao {
+  color: var(--marinho);
+  font-weight: 800;
+  font-size: 18px;
+  line-height: 23px;
+}
+
+.itens-lista {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+}
+
+.itens-lista li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--filete);
+}
+
+.itens-lista li > div {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-wrap: anywhere;
+}
+
+.itens-lista li > div span + span {
+  color: var(--texto-suave);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.itens-lista strong {
+  flex: none;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+/* O total do orçamento: painel marinho sem filete, que é só da placa. */
+.faixa-total {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 12px 16px;
+  border-radius: 9px;
+  background: var(--marinho);
+  color: var(--branco);
+}
+
+.faixa-total span {
+  flex: 1;
+  font-weight: 800;
+  font-size: 13px;
+  line-height: 19px;
+  letter-spacing: 0.4px;
+}
+
+.faixa-total strong {
+  font-weight: 900;
+  font-size: 22px;
+  line-height: 28px;
+  font-variant-numeric: tabular-nums;
+}
+
+.secoes-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.alinha-inicio {
+  align-self: flex-start;
+}
+
+.seletor-cliente,
+.aviso-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.aviso-campo {
+  align-items: flex-start;
+}
+
+.busca.busca-larga {
+  width: 100%;
+}
+
+.opcoes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.opcao {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 12px;
+  border: 0;
+  border-bottom: 1px solid var(--filete);
+  background: none;
+  color: var(--texto);
+  text-align: left;
+  cursor: pointer;
+}
+
+.opcao:hover {
+  background: #f8fafc;
+}
+
+.opcao strong {
+  font-weight: 600;
+}
+
+.opcao span,
+.cliente-escolhido span {
+  color: var(--texto-suave);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.cliente-escolhido {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 8px 8px 14px;
+  border-radius: 3px;
+  background: var(--fundo);
+}
+
+.cliente-escolhido div {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.cliente-escolhido strong {
+  font-weight: 600;
+}
+
+.itens-editor {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.item-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--filete);
+}
+
+.item-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 48px;
+  color: var(--texto-suave);
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.item-numeros {
+  display: grid;
+  grid-template-columns: 1fr 84px 1.6fr;
+  gap: 8px;
+}
+
+.campo-rotulo {
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 20px;
+}
+
+.com-prefixo {
+  position: relative;
+  display: block;
+}
+
+.com-prefixo span {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  transform: translateY(-50%);
+  color: var(--texto-suave);
+  pointer-events: none;
+}
+
+.campo .com-prefixo input {
+  padding-left: 40px;
+}
+
+.item-total,
+.item-erro {
+  min-height: 20px;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.item-total {
+  text-align: right;
+  color: var(--texto-suave);
+  font-variant-numeric: tabular-nums;
+}
+
+.item-erro {
+  color: var(--erro);
+}
+
+.rodape-total {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.rodape-total div {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.rodape-total span {
+  color: var(--texto-suave);
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.rodape-total strong {
+  color: var(--marinho);
+  font-weight: 900;
+  font-size: 22px;
+  line-height: 28px;
+  font-variant-numeric: tabular-nums;
+}
+
+.rodape-total .botao {
+  min-height: 52px;
+}
+
+.mostrar-mais {
+  display: flex;
+  justify-content: center;
+  padding: 16px;
+}
+
+.valor-e-situacao {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+/* Situação do orçamento: selo pequeno, sem dourado; aprovado é o único preenchido em marinho. */
+.situacao {
+  padding: 1px 8px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.situacao-aberto {
+  background: var(--fundo);
+  color: var(--texto-suave);
+}
+
+.situacao-enviado {
+  background: var(--envio-fundo);
+  color: var(--marinho);
+}
+
+.situacao-aprovado {
+  background: var(--marinho);
+  color: var(--branco);
+}
+
+.situacao-recusado {
+  background: var(--erro-fundo);
+  color: var(--erro);
+}
+
+.situacao-campo {
+  margin-top: 8px;
+}
+
+.linha-botoes.contato {
+  margin: 4px 0 8px;
+}
+
+.item-acoes {
+  display: flex;
+}
+
+.item-acoes .botao-icone:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* Arrastar fotos do computador: a seção inteira vira alvo. */
+.secao-fotos.arrastando {
+  outline: 2px dashed var(--marinho);
+  outline-offset: -6px;
+  background: var(--envio-fundo);
+}

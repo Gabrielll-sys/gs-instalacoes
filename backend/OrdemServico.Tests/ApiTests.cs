@@ -682,4 +682,31 @@ public class ApiTests(Api api) : IClassFixture<Api>
         Assert.Contains($"ordens/{ordemId}/{fotoId}.jpg", api.R2.Excluidas);
         Assert.Equal(HttpStatusCode.NoContent, (await gestor.DeleteAsync($"/api/ordens/{ordemId}")).StatusCode);
     }
+
+    [Fact]
+    public async Task Situacao_muda_sozinha_e_numero_excluido_nao_volta()
+    {
+        var gestor = await api.ClienteGestor();
+        var clienteId = await CriarCliente(gestor, "Situação Teste");
+        var item = new { descricao = "Mat", quantidade = 1, unidade = "un", precoUnitario = 10m };
+        var a = await (await gestor.PostAsJsonAsync("/api/orcamentos", NovoOrcamento(clienteId, item))).Content.ReadFromJsonAsync<JsonElement>();
+        Assert.Equal("aberto", a.GetProperty("situacao").GetString());
+
+        var id = a.GetProperty("id").GetGuid();
+        Assert.Equal(HttpStatusCode.BadRequest, (await gestor.PutAsJsonAsync($"/api/orcamentos/{id}/situacao", new { situacao = "qualquer" })).StatusCode);
+        var aprovado = await (await gestor.PutAsJsonAsync($"/api/orcamentos/{id}/situacao", new { situacao = "aprovado" })).Content.ReadFromJsonAsync<JsonElement>();
+        Assert.Equal("aprovado", aprovado.GetProperty("situacao").GetString());
+        Assert.Equal(10m, aprovado.GetProperty("total").GetDecimal());
+
+        // Editar os itens não mexe na situação.
+        (await gestor.PutAsJsonAsync($"/api/orcamentos/{id}", NovoOrcamento(clienteId, item))).EnsureSuccessStatusCode();
+        var lista = await gestor.GetFromJsonAsync<JsonElement>("/api/orcamentos");
+        Assert.Equal("aprovado", lista.EnumerateArray().Single(o => o.GetProperty("id").GetGuid() == id).GetProperty("situacao").GetString());
+
+        // O mais recente excluído não devolve o número.
+        (await gestor.DeleteAsync($"/api/orcamentos/{id}")).EnsureSuccessStatusCode();
+        var b = await (await gestor.PostAsJsonAsync("/api/orcamentos", NovoOrcamento(clienteId, item))).Content.ReadFromJsonAsync<JsonElement>();
+        Assert.Equal(a.GetProperty("numero").GetInt32() + 1, b.GetProperty("numero").GetInt32());
+        Assert.Single((await gestor.GetFromJsonAsync<JsonElement>("/api/orcamentos?limite=1")).EnumerateArray());
+    }
 }

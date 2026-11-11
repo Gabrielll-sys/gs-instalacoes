@@ -2,19 +2,22 @@ import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useMemo, useState } from 'react';
 import { Alert, FlatList, RefreshControl, StyleSheet, View } from 'react-native';
-import { Button, Chip, FAB, Menu, Searchbar, Text } from 'react-native-paper';
+import { Button, FAB, Menu, Searchbar, Text } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AvisoSync } from '../componentes/AvisoSync';
 import { BarraGestor, useBaseDoFab } from '../componentes/BarraGestor';
 import { BotaoIcone } from '../componentes/BotaoIcone';
 import { EstadoVazio } from '../componentes/EstadoVazio';
+import { Esqueleto, Filtros, MostrarMais } from '../componentes/Listas';
 import { LinhaOrdem } from '../componentes/LinhaOrdem';
 import { useEquipe } from '../equipe';
 import { useOrdens } from '../ordens';
 import { sessao, useSessao } from '../sessao';
 import { sincronizar } from '../sync/motor';
 import { outbox } from '../sync/outbox';
-import { filtrarOrdens, LIMITE_ORDENS, type Filtro } from '../sync/regras';
+import { filtrarOrdens, type Filtro } from '../sync/regras';
+import { LIMITES } from '../tipos';
+import { mostrarMais } from '../orcamentos';
 import { cor, temaFab } from '../tema';
 
 const FILTROS: { valor: Filtro; rotulo: string }[] = [
@@ -23,8 +26,6 @@ const FILTROS: { valor: Filtro; rotulo: string }[] = [
   { valor: 'concluidas', rotulo: 'Concluídas' },
 ];
 
-// O chip tem 42dp; somado a isto chega aos 48dp mínimos do Android.
-const ALCANCE_CHIP = { top: 3, bottom: 3 };
 
 function MenuConta() {
   const [aberto, setAberto] = useState(false);
@@ -65,19 +66,6 @@ function MenuConta() {
   );
 }
 
-function LinhaEsqueleto() {
-  return (
-    <View style={estilos.esqueleto}>
-      <View style={estilos.expande}>
-        <View style={[estilos.barra, { width: '70%', height: 18 }]} />
-        <View style={[estilos.barra, { width: '50%' }]} />
-        <View style={[estilos.barra, { width: '35%' }]} />
-      </View>
-      <View style={estilos.placaEsqueleto} />
-    </View>
-  );
-}
-
 export default function Lista() {
   const insets = useSafeAreaInsets();
   const baseDoFab = useBaseDoFab();
@@ -89,6 +77,7 @@ export default function Lista() {
   const [puxando, setPuxando] = useState(false);
 
   const visiveis = useMemo(() => filtrarOrdens(ordens, busca, filtro), [busca, filtro, ordens]);
+  const cheia = ordens.length >= LIMITES.ordens;
   // O panorama que o dono quer ver sem abrir nenhuma OS; segue a busca para os números baterem com a lista.
   const contagens = useMemo(
     () => ({
@@ -110,10 +99,7 @@ export default function Lista() {
     if (consulta.isLoading) {
       return (
         <>
-          <LinhaEsqueleto />
-          <LinhaEsqueleto />
-          <LinhaEsqueleto />
-          <LinhaEsqueleto />
+          <Esqueleto placa />
         </>
       );
     }
@@ -163,27 +149,11 @@ export default function Lista() {
         />
       </View>
 
-      <View style={estilos.filtros}>
-        {FILTROS.map(({ valor, rotulo }) => {
-          const ativo = filtro === valor;
-          return (
-            <Chip
-              key={valor}
-              mode="outlined"
-              compact
-              selected={ativo}
-              showSelectedCheck={false}
-              hitSlop={ALCANCE_CHIP}
-              onPress={() => setFiltro(valor)}
-              style={[estilos.filtro, ativo && estilos.filtroAtivo]}
-              textStyle={ativo ? estilos.filtroAtivoTexto : estilos.filtroTexto}
-              accessibilityState={{ selected: ativo }}
-            >
-              {`${rotulo} ${contagens[valor]}${ordens.length >= LIMITE_ORDENS ? '+' : ''}`}
-            </Chip>
-          );
-        })}
-      </View>
+      <Filtros
+        opcoes={FILTROS.map(({ valor, rotulo }) => ({ valor, rotulo, total: `${contagens[valor]}${cheia ? '+' : ''}` }))}
+        valor={filtro}
+        aoMudar={setFiltro}
+      />
 
       <AvisoSync />
 
@@ -192,6 +162,9 @@ export default function Lista() {
         keyExtractor={(ordem) => ordem.id}
         renderItem={({ item }) => <LinhaOrdem ordem={item} />}
         ListEmptyComponent={vazio}
+        ListFooterComponent={
+          consulta.isLoading ? undefined : <MostrarMais cheia={cheia} carregando={consulta.isFetching} aoPedir={() => void mostrarMais('ordens')} />
+        }
         contentContainerStyle={{ paddingBottom: baseDoFab + 80 }}
         keyboardShouldPersistTaps="handled"
         refreshControl={
@@ -222,31 +195,7 @@ const estilos = StyleSheet.create({
   botaoTentar: { height: 48 },
   busca: { backgroundColor: cor.branco, borderRadius: 28 },
   buscaTexto: { fontSize: 16 },
-  filtros: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: cor.filete,
-  },
-  filtro: { backgroundColor: cor.branco },
-  filtroAtivo: { backgroundColor: cor.marinho, borderColor: cor.marinho },
-  filtroTexto: { marginVertical: 10, fontVariant: ['tabular-nums'] },
-  filtroAtivoTexto: { color: cor.branco, marginVertical: 10, fontVariant: ['tabular-nums'] },
   lista: { flex: 1 },
   fab: { position: 'absolute', right: 16, backgroundColor: cor.dourado },
   expande: { flex: 1, gap: 8 },
-  esqueleto: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 14,
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: cor.filete,
-  },
-  barra: { height: 12, borderRadius: 4, backgroundColor: cor.fundo },
-  placaEsqueleto: { width: 118, height: 56, borderRadius: 9, backgroundColor: cor.fundo },
 });

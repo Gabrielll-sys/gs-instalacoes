@@ -1,10 +1,11 @@
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, View } from 'react-native';
+import { FlatList, RefreshControl, StyleSheet, View } from 'react-native';
 import { Button, FAB, Searchbar, Text, TouchableRipple } from 'react-native-paper';
 import type { Cliente } from '../../api';
 import { BarraGestor, useBaseDoFab } from '../../componentes/BarraGestor';
 import { EstadoVazio } from '../../componentes/EstadoVazio';
+import { Esqueleto } from '../../componentes/Listas';
 import { useClientes } from '../../orcamentos';
 import { buscarClientes } from '../../valores';
 import { cor, temaFab } from '../../tema';
@@ -46,7 +47,7 @@ export default function Clientes() {
   };
 
   const vazio = () => {
-    if (clientes.isLoading) return <ActivityIndicator style={estilos.carregando} size="large" color={cor.marinho} />;
+    if (clientes.isLoading) return <Esqueleto />;
     if (clientes.isError)
       return (
         <EstadoVazio titulo="Não foi possível carregar os clientes" texto="Clientes e orçamentos precisam de internet.">
@@ -102,7 +103,6 @@ const estilos = StyleSheet.create({
   faixa: { backgroundColor: cor.marinho, paddingHorizontal: 16, paddingBottom: 16 },
   busca: { backgroundColor: cor.branco, borderRadius: 28 },
   buscaTexto: { fontSize: 16 },
-  carregando: { marginTop: 56 },
   linha: {
     paddingHorizontal: 16,
     paddingVertical: 14,

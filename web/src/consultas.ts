@@ -1,5 +1,6 @@
 import { QueryClient, useQuery } from '@tanstack/react-query';
 import { api, ErroApi } from './api';
+import { LIMITES, PASSO_DA_LISTA } from './tipos';
 import { sessao } from './sessao';
 
 export const queryClient = new QueryClient({
@@ -43,3 +44,9 @@ export const recarregarClientes = () =>
     queryClient.invalidateQueries({ queryKey: CHAVE_ORCAMENTOS }),
   ]);
 export const recarregarOrcamentos = () => queryClient.invalidateQueries({ queryKey: CHAVE_ORCAMENTOS });
+
+// Pede mais itens da lista à API; a busca e os filtros passam a valer sobre o que veio.
+export const mostrarMais = (lista: keyof typeof LIMITES) => {
+  LIMITES[lista] += PASSO_DA_LISTA;
+  return queryClient.invalidateQueries({ queryKey: [lista] });
+};

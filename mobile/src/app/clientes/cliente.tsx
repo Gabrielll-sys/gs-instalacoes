@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import { router, Stack, useLocalSearchParams, usePreventRemove } from 'expo-router';
+import { router, Stack, useLocalSearchParams, usePreventRemove, type Href } from 'expo-router';
 import { useState } from 'react';
 import { Alert, KeyboardAvoidingView, ScrollView, StyleSheet, View } from 'react-native';
 import { Button, HelperText, Snackbar, Text, TextInput } from 'react-native-paper';
@@ -7,7 +7,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { api, mensagemDoErro, type Cliente, type DadosCliente } from '../../api';
 import { BotaoIcone } from '../../componentes/BotaoIcone';
 import { EstadoVazio } from '../../componentes/EstadoVazio';
-import { lembrarClienteCriado, recarregarClientes, useClientes } from '../../orcamentos';
+import { recarregarClientes, useClientes } from '../../orcamentos';
+import { mascararDocumento, mascararTelefone } from '../../valores';
 import { cor } from '../../tema';
 
 const ALTURA_BARRA_ANDROID = 56;
@@ -16,7 +17,7 @@ const CAMPOS = Object.keys(VAZIO) as (keyof DadosCliente)[];
 const copiar = (origem: DadosCliente, mudar = (v: string) => v) =>
   Object.fromEntries(CAMPOS.map((k) => [k, mudar(origem[k])])) as DadosCliente;
 
-function FormCliente({ cliente, escolher }: { cliente?: Cliente; escolher: boolean }) {
+function FormCliente({ cliente, voltarPara }: { cliente?: Cliente; voltarPara?: string }) {
   const insets = useSafeAreaInsets();
   const inicial = cliente ?? VAZIO;
   const [dados, setDados] = useState(() => copiar(inicial));
@@ -30,9 +31,10 @@ function FormCliente({ cliente, escolher }: { cliente?: Cliente; escolher: boole
   const salvar = useMutation({
     mutationFn: () => (cliente ? api.salvarCliente(cliente.id, limpo) : api.criarCliente(limpo)),
     onSuccess: async (salvo) => {
-      if (!cliente && escolher) lembrarClienteCriado(salvo.id);
       await recarregarClientes();
-      router.back();
+      // Aberto de um orçamento: volta para ele já com o cliente novo escolhido.
+      if (!cliente && voltarPara) router.dismissTo(`${voltarPara}?clienteNovo=${salvo.id}` as Href);
+      else router.back();
     },
     onError: () => setSaindo(false),
   });
@@ -114,6 +116,7 @@ function FormCliente({ cliente, escolher }: { cliente?: Cliente; escolher: boole
           accessibilityLabel="Telefone"
           mode="outlined"
           {...campo('telefone')}
+          onBlur={() => setDados((d) => ({ ...d, telefone: mascararTelefone(d.telefone) }))}
           maxLength={30}
           keyboardType="phone-pad"
           autoComplete="tel"
@@ -139,7 +142,10 @@ function FormCliente({ cliente, escolher }: { cliente?: Cliente; escolher: boole
           )}
         </View>
 
-        <TextInput label="CPF ou CNPJ" accessibilityLabel="CPF ou CNPJ" mode="outlined" {...campo('documento')} maxLength={20} />
+        <TextInput label="CPF ou CNPJ" accessibilityLabel="CPF ou CNPJ" mode="outlined" {...campo('documento')}
+          onBlur={() => setDados((d) => ({ ...d, documento: mascararDocumento(d.documento) }))}
+          maxLength={20}
+        />
 
         <View>
           <TextInput
@@ -185,7 +191,7 @@ function FormCliente({ cliente, escolher }: { cliente?: Cliente; escolher: boole
 }
 
 export default function TelaCliente() {
-  const { id, escolher } = useLocalSearchParams<{ id?: string; escolher?: string }>();
+  const { id, voltarPara } = useLocalSearchParams<{ id?: string; voltarPara?: string }>();
   const clientes = useClientes();
   const cliente = clientes.data?.find((c) => c.id === id);
 
@@ -195,7 +201,7 @@ export default function TelaCliente() {
       {id && !cliente ? (
         <EstadoVazio titulo="Cliente não encontrado" texto="Volte e atualize a lista de clientes." />
       ) : (
-        <FormCliente cliente={cliente} escolher={escolher === '1'} />
+        <FormCliente cliente={cliente} voltarPara={voltarPara} />
       )}
     </>
   );

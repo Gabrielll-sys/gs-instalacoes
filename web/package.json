@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "test": "node --experimental-strip-types --test src/regras.test.mjs src/valores.test.mjs",
+    "test": "node --experimental-strip-types --test src/regras.test.mjs src/valores.test.mjs src/paridade.test.mjs",
     "typecheck": "tsc -b",
     "e2e": "node e2e/orcamentos.mjs && node e2e/ordens.mjs"
   },

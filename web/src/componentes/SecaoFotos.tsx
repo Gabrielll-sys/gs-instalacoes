@@ -23,6 +23,7 @@ export function SecaoFotos({ ordem, secao, proximoPasso }: { ordem: Ordem; secao
   const idTitulo = useId();
   const [aberta, setAberta] = useState<number | null>(null);
   const [progresso, setProgresso] = useState({ feitas: 0, total: 0 });
+  const [arrastando, setArrastando] = useState(false);
 
   const enviar = useMutation({
     mutationFn: (arquivos: File[]) => {
@@ -49,7 +50,24 @@ export function SecaoFotos({ ordem, secao, proximoPasso }: { ordem: Ordem; secao
   const erroDoEnvio = enviar.error instanceof FotoRecusada || enviar.error instanceof ErroApi ? enviar.error.message : mensagemDoErro(enviar.error);
 
   return (
-    <section className="secao-fotos" aria-labelledby={idTitulo}>
+    <section
+      className={`secao-fotos${arrastando ? ' arrastando' : ''}`}
+      aria-labelledby={idTitulo}
+      onDragOver={(evento) => {
+        if (enviar.isPending || !evento.dataTransfer.types.includes('Files')) return;
+        evento.preventDefault();
+        setArrastando(true);
+      }}
+      onDragLeave={(evento) => {
+        if (!evento.currentTarget.contains(evento.relatedTarget as Node)) setArrastando(false);
+      }}
+      onDrop={(evento) => {
+        evento.preventDefault();
+        setArrastando(false);
+        const arquivos = [...evento.dataTransfer.files].filter((a) => a.type.startsWith('image/'));
+        if (arquivos.length && !enviar.isPending) enviar.mutate(arquivos);
+      }}
+    >
       <h3 id={idTitulo} className="so-leitor">
         Fotos de {rotulo.toLowerCase()}
       </h3>
@@ -99,7 +117,7 @@ export function SecaoFotos({ ordem, secao, proximoPasso }: { ordem: Ordem; secao
         Enviar fotos
       </button>
       <p className="suave" aria-live="polite">
-        {enviar.isPending ? `Enviando ${Math.min(progresso.feitas + 1, progresso.total)} de ${progresso.total}…` : ''}
+        {enviar.isPending ? `Enviando ${Math.min(progresso.feitas + 1, progresso.total)} de ${progresso.total}…` : arrastando ? `Solte para enviar em ${rotulo}.` : ''}
       </p>
       {enviar.isError && <Erro>{erroDoEnvio}</Erro>}
       {excluir.isError && <Erro>{mensagemDoErro(excluir.error)}</Erro>}

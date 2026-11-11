@@ -3,6 +3,9 @@ import {
   mdiCalendarCheckOutline,
   mdiCalendarOutline,
   mdiCashMultiple,
+  mdiContentCopy,
+  mdiPhoneOutline,
+  mdiWhatsapp,
   mdiMapMarkerOutline,
   mdiNoteTextOutline,
   mdiPencilOutline,
@@ -17,8 +20,9 @@ import { Erro, EstadoVazio } from '../componentes/Estado';
 import { Gaveta } from '../componentes/Gaveta';
 import { Icone } from '../componentes/Icone';
 import { confirmar } from '../confirmar';
-import { recarregarOrcamentos, useClientes, useOrcamentos } from '../consultas';
-import { formatarDia, formatarMoeda, formatarQuantidade, numeroDoOrcamento } from '../valores';
+import { queryClient, recarregarOrcamentos, useClientes, useOrcamentos } from '../consultas';
+import type { Orcamento } from '../tipos';
+import { contatoDoTelefone, formatarDia, formatarMoeda, formatarQuantidade, numeroDoOrcamento, SITUACOES, type Situacao } from '../valores';
 
 export function GavetaOrcamento() {
   const { id } = useParams();
@@ -37,6 +41,12 @@ export function GavetaOrcamento() {
     },
   });
 
+  const situacao = useMutation({
+    mutationFn: (valor: Situacao) => api.mudarSituacao(id!, valor),
+    // A resposta já traz o orçamento atualizado: entra na lista sem esperar outra busca.
+    onSuccess: (salvo) => queryClient.setQueryData<Orcamento[]>(['orcamentos'], (lista) => lista?.map((o) => (o.id === salvo.id ? salvo : o))),
+  });
+
   if (!orcamento) {
     return (
       <Gaveta titulo="Orçamento" aoFechar={fechar}>
@@ -51,6 +61,7 @@ export function GavetaOrcamento() {
 
   const numero = numeroDoOrcamento(orcamento.numero);
   const contato = [cliente?.telefone, cliente?.email].filter(Boolean).join(' – ');
+  const links = cliente ? contatoDoTelefone(cliente.telefone) : null;
   // Tudo o que o PDF imprime, cliente incluído: se algo mudar depois de gerar, o arquivo fica velho.
   const conteudo = JSON.stringify([orcamento, cliente]);
   const condicoes = [
@@ -69,6 +80,9 @@ export function GavetaOrcamento() {
       aoFechar={fechar}
       acoes={
         <>
+          <Link to="/orcamentos/novo" state={{ base: orcamento.id }} className="botao-icone claro" aria-label="Duplicar orçamento" title="Duplicar orçamento">
+            <Icone caminho={mdiContentCopy} />
+          </Link>
           <Link to={`/orcamentos/${orcamento.id}/editar`} className="botao-icone claro" aria-label="Editar orçamento" title="Editar orçamento">
             <Icone caminho={mdiPencilOutline} />
           </Link>
@@ -93,6 +107,37 @@ export function GavetaOrcamento() {
             {formatarDia(orcamento.criadoEm)}
           </Dado>
         </dl>
+        {links && (
+          <div className="linha-botoes contato">
+            <a className="botao botao-contorno" href={links.ligar}>
+              <Icone caminho={mdiPhoneOutline} />
+              Ligar
+            </a>
+            <a className="botao botao-contorno" href={links.whatsapp} target="_blank" rel="noopener">
+              <Icone caminho={mdiWhatsapp} />
+              WhatsApp
+            </a>
+          </div>
+        )}
+        <fieldset className="campo situacao-campo">
+          <legend>Situação</legend>
+          <div className="chips" role="radiogroup" aria-label="Situação do orçamento">
+            {SITUACOES.map(({ valor, rotulo }) => (
+              <button
+                key={valor}
+                type="button"
+                role="radio"
+                aria-checked={orcamento.situacao === valor}
+                className={`chip${orcamento.situacao === valor ? ' ativo' : ''}`}
+                disabled={situacao.isPending}
+                onClick={() => situacao.mutate(valor)}
+              >
+                {rotulo}
+              </button>
+            ))}
+          </div>
+          {situacao.isError && <Erro>{mensagemDoErro(situacao.error)}</Erro>}
+        </fieldset>
         <BotaoPdf nome="orçamento" conteudo={conteudo} gerar={() => api.gerarPdfOrcamento(orcamento.id)} />
         {excluir.isError && <Erro>{mensagemDoErro(excluir.error)}</Erro>}
       </div>

@@ -1,10 +1,11 @@
 import { useMutation } from '@tanstack/react-query';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { ActivityIndicator, Alert, ScrollView, StyleSheet, View } from 'react-native';
-import { Snackbar, Text } from 'react-native-paper';
+import { ActivityIndicator, Alert, Linking, ScrollView, StyleSheet, View } from 'react-native';
+import { Button, Chip, Snackbar, Text } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { api, mensagemDoErro } from '../../../api';
+import { api, mensagemDoErro, type Orcamento } from '../../../api';
+import { queryClient } from '../../../sync/motor';
 import { BotaoIcone } from '../../../componentes/BotaoIcone';
 import { BotaoPdf } from '../../../componentes/BotaoRelatorio';
 import { Dado } from '../../../componentes/Dado';
@@ -12,7 +13,7 @@ import { EstadoVazio } from '../../../componentes/EstadoVazio';
 import { recarregarOrcamentos, useClientes, useOrcamentos } from '../../../orcamentos';
 import { gerarPdfOrcamento, mensagemDoPdf } from '../../../relatorio';
 import { cor, familia } from '../../../tema';
-import { formatarDia, formatarMoeda, formatarQuantidade, numeroDoOrcamento } from '../../../valores';
+import { contatoDoTelefone, formatarDia, formatarMoeda, formatarQuantidade, numeroDoOrcamento, SITUACOES, type Situacao } from '../../../valores';
 
 export default function TelaOrcamento() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -30,6 +31,13 @@ export default function TelaOrcamento() {
       await recarregarOrcamentos();
       router.back();
     },
+    onError: (e) => setErro(mensagemDoErro(e)),
+  });
+
+  const situacao = useMutation({
+    mutationFn: (valor: Situacao) => api.mudarSituacao(id, valor),
+    // A resposta já traz o orçamento atualizado: entra na lista sem esperar outra busca.
+    onSuccess: (salvo) => queryClient.setQueryData<Orcamento[]>(['orcamentos'], (lista) => lista?.map((o) => (o.id === salvo.id ? salvo : o))),
     onError: (e) => setErro(mensagemDoErro(e)),
   });
 
@@ -51,6 +59,8 @@ export default function TelaOrcamento() {
   // Tudo o que o PDF imprime, cliente incluído: se algo mudar depois de gerar, o arquivo fica velho.
   const conteudo = JSON.stringify([orcamento, cliente]);
   const contato = [cliente?.telefone, cliente?.email].filter(Boolean).join(' – ');
+  const links = cliente ? contatoDoTelefone(cliente.telefone) : null;
+  const abrir = (url: string) => Linking.openURL(url).catch(() => setErro('Nenhum app deste aparelho abre esse link.'));
   const condicoes = [
     { icone: 'cash-multiple', rotulo: 'Forma de pagamento', valor: orcamento.pagamento },
     { icone: 'calendar-check-outline', rotulo: 'Prazo de execução', valor: orcamento.prazo },
@@ -64,6 +74,11 @@ export default function TelaOrcamento() {
           title: `Orçamento ${numero}`,
           headerRight: () => (
             <View style={estilos.acoes}>
+              <BotaoIcone
+                icone="content-copy"
+                rotulo="Duplicar orçamento"
+                onPress={() => router.push({ pathname: '/orcamentos/novo', params: { base: orcamento.id } })}
+              />
               <BotaoIcone icone="pencil-outline" rotulo="Editar orçamento" onPress={() => router.push(`/orcamentos/${orcamento.id}/editar`)} />
               <BotaoIcone icone="trash-can-outline" rotulo="Excluir orçamento" onPress={confirmarExclusao} />
             </View>
@@ -76,6 +91,41 @@ export default function TelaOrcamento() {
           <Dado icone="account-outline" rotulo="Cliente" valor={orcamento.clienteNome + (contato ? `\n${contato}` : '')} />
           {!!cliente?.endereco && <Dado icone="map-marker-outline" rotulo="Endereço" valor={cliente.endereco} />}
           <Dado icone="calendar-outline" rotulo="Emitido em" valor={formatarDia(orcamento.criadoEm)} />
+          {links && (
+            <View style={estilos.contato}>
+              <Button mode="outlined" icon="phone-outline" onPress={() => void abrir(links.ligar)} style={estilos.expande} contentStyle={estilos.botao}>
+                Ligar
+              </Button>
+              <Button mode="outlined" icon="whatsapp" onPress={() => void abrir(links.whatsapp)} style={estilos.expande} contentStyle={estilos.botao}>
+                WhatsApp
+              </Button>
+            </View>
+          )}
+          <Text variant="labelLarge" style={estilos.rotuloSituacao}>
+            Situação
+          </Text>
+          <View style={estilos.situacoes} accessibilityRole="radiogroup" accessibilityLabel="Situação do orçamento">
+            {SITUACOES.map(({ valor, rotulo }) => {
+              const ativa = orcamento.situacao === valor;
+              return (
+                <Chip
+                  key={valor}
+                  mode="outlined"
+                  compact
+                  selected={ativa}
+                  showSelectedCheck={false}
+                  disabled={situacao.isPending}
+                  onPress={() => situacao.mutate(valor)}
+                  accessibilityRole="radio"
+                  accessibilityState={{ selected: ativa }}
+                  style={ativa ? estilos.chipAtivo : estilos.chip}
+                  textStyle={ativa ? estilos.chipAtivoTexto : estilos.chipTexto}
+                >
+                  {rotulo}
+                </Chip>
+              );
+            })}
+          </View>
           <BotaoPdf
             nome="orçamento"
             conteudo={conteudo}
@@ -137,6 +187,14 @@ const estilos = StyleSheet.create({
   tela: { flex: 1, backgroundColor: cor.fundo },
   carregando: { marginTop: 56 },
   acoes: { flexDirection: 'row' },
+  contato: { flexDirection: 'row', gap: 12, paddingVertical: 6 },
+  botao: { height: 48 },
+  rotuloSituacao: { paddingTop: 10 },
+  situacoes: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingVertical: 8 },
+  chip: { backgroundColor: cor.branco },
+  chipAtivo: { backgroundColor: cor.marinho, borderColor: cor.marinho },
+  chipTexto: { marginVertical: 10 },
+  chipAtivoTexto: { color: cor.branco, marginVertical: 10 },
   bloco: { backgroundColor: cor.branco, paddingHorizontal: 16, paddingVertical: 6 },
   itens: { marginTop: 8, paddingVertical: 14 },
   titulo: { color: cor.marinho, paddingBottom: 4 },

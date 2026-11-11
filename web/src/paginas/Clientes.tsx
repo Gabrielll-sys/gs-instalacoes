@@ -1,7 +1,7 @@
 import { mdiMagnify, mdiPlus } from '@mdi/js';
 import { useMemo, useState } from 'react';
 import { Link, Outlet, useParams } from 'react-router';
-import { EstadoVazio } from '../componentes/Estado';
+import { EstadoVazio, ListaEsqueleto } from '../componentes/Estado';
 import { Icone } from '../componentes/Icone';
 import { useClientes } from '../consultas';
 import { buscarClientes } from '../valores';
@@ -28,7 +28,7 @@ export function Clientes() {
       </header>
 
       {isLoading ? (
-        <p className="suave carregando">Carregando…</p>
+        <ListaEsqueleto rotulo="Carregando clientes" />
       ) : isError ? (
         <EstadoVazio titulo="Não foi possível carregar os clientes" texto="Confira a conexão e tente de novo.">
           <button type="button" className="botao botao-contorno" onClick={() => void refetch()}>

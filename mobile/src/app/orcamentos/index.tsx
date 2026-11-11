@@ -1,13 +1,16 @@
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, View } from 'react-native';
+import { FlatList, RefreshControl, StyleSheet, View } from 'react-native';
 import { Button, FAB, Searchbar, Text, TouchableRipple } from 'react-native-paper';
 import type { Orcamento } from '../../api';
 import { BarraGestor, useBaseDoFab } from '../../componentes/BarraGestor';
 import { EstadoVazio } from '../../componentes/EstadoVazio';
-import { useOrcamentos } from '../../orcamentos';
+import { Esqueleto, Filtros, MostrarMais } from '../../componentes/Listas';
+import { Selo } from '../../componentes/Selo';
+import { mostrarMais, useOrcamentos } from '../../orcamentos';
+import { LIMITES } from '../../tipos';
 import { cor, familia, temaFab } from '../../tema';
-import { filtrarOrcamentos, formatarDia, formatarMoeda, numeroDoOrcamento } from '../../valores';
+import { filtrarOrcamentos, formatarDia, formatarMoeda, numeroDoOrcamento, rotuloDaSituacao, SITUACOES, type Situacao } from '../../valores';
 
 function LinhaOrcamento({ orcamento }: { orcamento: Orcamento }) {
   const numero = numeroDoOrcamento(orcamento.numero);
@@ -17,7 +20,7 @@ function LinhaOrcamento({ orcamento }: { orcamento: Orcamento }) {
     <TouchableRipple
       onPress={() => router.push(`/orcamentos/${orcamento.id}`)}
       accessibilityRole="button"
-      accessibilityLabel={`Orçamento ${numero}, ${orcamento.clienteNome}, ${total}, emitido em ${dia}`}
+      accessibilityLabel={`Orçamento ${numero}, ${orcamento.clienteNome}, ${total}, ${rotuloDaSituacao(orcamento.situacao)}, emitido em ${dia}`}
       style={estilos.linha}
     >
       <View style={estilos.linhaConteudo}>
@@ -29,7 +32,10 @@ function LinhaOrcamento({ orcamento }: { orcamento: Orcamento }) {
             Nº {numero} – {dia}
           </Text>
         </View>
-        <Text style={estilos.valor}>{total}</Text>
+        <View style={estilos.direita}>
+          <Text style={estilos.valor}>{total}</Text>
+          <Selo situacao={orcamento.situacao} />
+        </View>
       </View>
     </TouchableRipple>
   );
@@ -41,7 +47,15 @@ export default function Orcamentos() {
   const [busca, setBusca] = useState('');
   const [puxando, setPuxando] = useState(false);
 
-  const visiveis = useMemo(() => filtrarOrcamentos(orcamentos.data ?? [], busca), [orcamentos.data, busca]);
+  const [situacao, setSituacao] = useState<Situacao | 'todas'>('todas');
+  const lista = useMemo(() => orcamentos.data ?? [], [orcamentos.data]);
+  const visiveis = useMemo(() => filtrarOrcamentos(lista, busca, situacao), [lista, busca, situacao]);
+  const cheia = lista.length >= LIMITES.orcamentos;
+  // Contagens seguem a busca, como nas OS, para baterem com a lista.
+  const filtros = [{ valor: 'todas' as const, rotulo: 'Todos' }, ...SITUACOES].map((f) => ({
+    ...f,
+    total: `${filtrarOrcamentos(lista, busca, f.valor).length}${cheia ? '+' : ''}`,
+  }));
 
   const atualizar = async () => {
     setPuxando(true);
@@ -50,7 +64,7 @@ export default function Orcamentos() {
   };
 
   const vazio = () => {
-    if (orcamentos.isLoading) return <ActivityIndicator style={estilos.carregando} size="large" color={cor.marinho} />;
+    if (orcamentos.isLoading) return <Esqueleto />;
     if (orcamentos.isError)
       return (
         <EstadoVazio titulo="Não foi possível carregar os orçamentos" texto="Clientes e orçamentos precisam de internet.">
@@ -59,7 +73,8 @@ export default function Orcamentos() {
           </Button>
         </EstadoVazio>
       );
-    if (busca) return <EstadoVazio titulo="Nenhum orçamento encontrado" texto="Busque pelo nome do cliente ou pelo número." />;
+    if (busca || situacao !== 'todas')
+      return <EstadoVazio titulo="Nenhum orçamento encontrado" texto="Busque pelo nome do cliente ou pelo número, ou mude o filtro." />;
     return <EstadoVazio titulo="Nenhum orçamento ainda" texto="Toque em Novo orçamento para montar o primeiro." />;
   };
 
@@ -81,7 +96,11 @@ export default function Orcamentos() {
         data={visiveis}
         keyExtractor={(orcamento) => orcamento.id}
         renderItem={({ item }) => <LinhaOrcamento orcamento={item} />}
+        ListHeaderComponent={<Filtros opcoes={filtros} valor={situacao} aoMudar={setSituacao} />}
         ListEmptyComponent={vazio()}
+        ListFooterComponent={
+          orcamentos.isLoading ? undefined : <MostrarMais cheia={cheia} carregando={orcamentos.isFetching} aoPedir={() => void mostrarMais('orcamentos')} />
+        }
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ paddingBottom: baseDoFab + 80 }}
         refreshControl={
@@ -106,7 +125,6 @@ const estilos = StyleSheet.create({
   faixa: { backgroundColor: cor.marinho, paddingHorizontal: 16, paddingBottom: 16 },
   busca: { backgroundColor: cor.branco, borderRadius: 28 },
   buscaTexto: { fontSize: 16 },
-  carregando: { marginTop: 56 },
   linha: {
     paddingHorizontal: 16,
     paddingVertical: 14,
@@ -117,6 +135,7 @@ const estilos = StyleSheet.create({
   expande: { flex: 1 },
   suave: { color: cor.textoSuave },
   tabular: { fontVariant: ['tabular-nums'] },
+  direita: { alignItems: 'flex-end', gap: 4 },
   valor: { fontFamily: familia.extra, fontSize: 17, lineHeight: 22, color: cor.marinho, fontVariant: ['tabular-nums'] },
   botaoTentar: { height: 48 },
   fab: { position: 'absolute', right: 16, backgroundColor: cor.dourado },

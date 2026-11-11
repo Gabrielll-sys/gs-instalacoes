@@ -122,8 +122,9 @@ try {
   ver('o que foi digitado no orçamento continua', await pagina.$eval('.item-editor input', (e) => e.value) === 'Cabo flexível 10 mm²');
   await clicarTexto('Cadastrar cliente');
   await preencher('Nome', 'Maria Souza (fictícia)');
-  await preencher('Telefone', '(31) 90000-0000');
+  await preencher('Telefone', '31900000000');
   await preencher('E-mail', 'sem-arroba');
+  ver('telefone ganha a máscara ao sair do campo', (await pagina.$eval('input[type=tel]', (e) => e.value)) === '(31) 90000-0000');
   await preencher('CPF ou CNPJ', '000.000.000-00');
   await preencher('Endereço', 'Rua Exemplo, 100 – Belo Horizonte/MG');
   await clicarTexto('Cadastrar cliente', 'button[type=submit]');
@@ -168,10 +169,32 @@ try {
   await dormir(800);
   ver('editar volta ao orçamento com o novo total', (await tem('R$ 3.922,97')) && !(await texto()).includes('Orçamento pronto'));
 
+  // Situação, contato e duplicar
+  ver('telefone vira Ligar e WhatsApp', await pagina.$eval('a[href^="https://wa.me/"]', (a) => a.getAttribute('href')) === 'https://wa.me/5531900000000');
+  await clicarTexto('Aprovado', 'button[role=radio]');
+  ver('situação muda na hora', await pagina.$eval('button[role=radio][aria-checked=true]', (b) => b.innerText.trim()) === 'Aprovado');
+  await clicarTexto('Duplicar orçamento');
+  ver('duplicar abre a cópia preenchida', (await tem('Cópia do orçamento 0001')) && (await pagina.$eval('.item-editor input', (e) => e.value)) === 'Cabo flexível 10 mm²');
+  await preencherItem(2, 'Preço unit.', '3890');
+  await preencherItem(2, 'Material', 'Wallbox 7,4 kW');
+  ver('preço ganha milhar ao sair do campo', (await pagina.$$eval('.item-editor', (l) => l[1].querySelectorAll('input')[3].value)) === '3.890,00');
+  await clicarTexto('Subir item 2');
+  ver('subir troca a ordem dos itens', (await pagina.$eval('.item-editor input', (e) => e.value)) === 'Wallbox 7,4 kW');
+  await clicarTexto('Criar orçamento');
+  await dormir(800);
+  ver('a cópia ganha número novo e começa em aberto', (await tem('Orçamento 0002')) && (await pagina.$eval('button[role=radio][aria-checked=true]', (b) => b.innerText.trim())) === 'Em aberto');
+  await clicarTexto('Excluir orçamento');
+  await responder('Excluir orçamento');
+  await clicarTexto('Maria Souza (fictícia)', 'a.linha strong');
+  await dormir(500);
+
   // Lista e clientes
   await pagina.keyboard.press('Escape');
   await dormir(500);
-  ver('lista mostra cliente, número e total', (await tem('Maria Souza (fictícia)')) && (await tem('Nº 0001')) && (await tem('R$ 3.922,97')));
+  ver('lista mostra cliente, número, total e situação', (await tem('Maria Souza (fictícia)')) && (await tem('Nº 0001')) && (await tem('R$ 3.922,97')) && (await tem('Aprovado')));
+  await clicarTexto('Em aberto\n0', '.filtros button');
+  ver('filtro de situação esconde o aprovado', await tem('Nenhum orçamento encontrado'));
+  await clicarTexto('Todos\n1', '.filtros button');
   await foto('web-orcamentos');
   await clicarTexto('Clientes', 'a');
   await clicarTexto('Maria Souza (fictícia)', 'a.linha strong');

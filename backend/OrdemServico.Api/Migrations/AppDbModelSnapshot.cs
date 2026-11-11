@@ -51,6 +51,19 @@ namespace OrdemServico.Api.Migrations
                     b.ToTable("Clientes");
                 });
 
+            modelBuilder.Entity("OrdemServico.Api.Contador", b =>
+                {
+                    b.Property<string>("Nome")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Valor")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Nome");
+
+                    b.ToTable("Contadores");
+                });
+
             modelBuilder.Entity("OrdemServico.Api.Foto", b =>
                 {
                     b.Property<Guid>("Id")
@@ -108,6 +121,10 @@ namespace OrdemServico.Api.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Prazo")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Situacao")
                         .IsRequired()
                         .HasColumnType("TEXT");
 

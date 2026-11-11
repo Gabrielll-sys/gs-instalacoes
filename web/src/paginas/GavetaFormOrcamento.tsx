@@ -1,44 +1,41 @@
-import { mdiMagnify, mdiPlus, mdiTrashCanOutline } from '@mdi/js';
+import { mdiPlus } from '@mdi/js';
 import { useMutation } from '@tanstack/react-query';
 import { useState, type FormEvent } from 'react';
-import { useNavigate, useParams } from 'react-router';
+import { useLocation, useNavigate, useParams } from 'react-router';
 import { api, mensagemDoErro, type DadosOrcamento, type Orcamento } from '../api';
 import { Campo } from '../componentes/Campos';
 import { Erro, EstadoVazio } from '../componentes/Estado';
 import { Gaveta } from '../componentes/Gaveta';
 import { Icone } from '../componentes/Icone';
+import { ItemOrcamento } from '../componentes/ItemOrcamento';
+import { SeletorCliente } from '../componentes/SeletorCliente';
 import { recarregarOrcamentos, useClientes, useOrcamentos } from '../consultas';
 import { useGuardaAlteracoes } from '../guardaAlteracoes';
 import {
-  buscarClientes,
-  centavosDoItem,
   centavosDoTotal,
   formatarCentavos,
   lerNumero,
+  linhaDoItem,
+  moverItem,
+  novaLinha,
   numeroDoOrcamento,
-  paraCampo,
-  precoParaCampo,
   problemaNoItem,
+  UNIDADES,
   type ItemDigitado,
+  type Linha,
 } from '../valores';
 import { FormCliente } from './GavetaCliente';
 
 const MAX_ITENS = 100;
-const OPCOES_VISIVEIS = 6;
 
-type Linha = ItemDigitado & { chave: number };
-let proximaChave = 0;
-const novaLinha = (item?: ItemDigitado): Linha => ({
-  chave: proximaChave++,
-  ...(item ?? { descricao: '', quantidade: '1', unidade: 'un', preco: '' }),
-});
-
-// Rota de Novo orçamento e de Editar orçamento.
+// Rota de Novo orçamento e de Editar orçamento. "Duplicar" abre o novo com a cópia de outro em location.state.base.
 export function GavetaFormOrcamento() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const base: string | undefined = useLocation().state?.base;
   const { data: orcamentos, isLoading } = useOrcamentos();
   const orcamento = id ? orcamentos?.find((o) => o.id === id) : undefined;
+  const modelo = !id && base ? orcamentos?.find((o) => o.id === base) : undefined;
 
   if (id && !orcamento) {
     return (
@@ -47,86 +44,28 @@ export function GavetaFormOrcamento() {
       </Gaveta>
     );
   }
-  return <FormOrcamento key={id ?? 'novo'} orcamento={orcamento} />;
+  if (base && !modelo && isLoading) return null;
+  return <FormOrcamento key={id ?? `novo-${base ?? ''}`} orcamento={orcamento} modelo={modelo} />;
 }
 
-function SeletorCliente({ onEscolher, onCadastrar }: { onEscolher: (id: string) => void; onCadastrar: () => void }) {
-  const clientes = useClientes();
-  const [busca, setBusca] = useState('');
-
-  if (clientes.isLoading) return <p className="suave">Carregando clientes…</p>;
-  if (clientes.isError)
-    return (
-      <div className="aviso-campo">
-        <Erro>{mensagemDoErro(clientes.error)}</Erro>
-        <button type="button" className="botao botao-contorno" onClick={() => void clientes.refetch()}>
-          Tentar de novo
-        </button>
-      </div>
-    );
-
-  const todos = clientes.data ?? [];
-  const encontrados = buscarClientes(todos, busca);
-  const dica =
-    todos.length === 0
-      ? 'Nenhum cliente cadastrado ainda.'
-      : encontrados.length === 0
-        ? 'Nenhum cliente com essa busca.'
-        : encontrados.length > OPCOES_VISIVEIS
-          ? `Mais ${encontrados.length - OPCOES_VISIVEIS} na lista: refine a busca.`
-          : '';
-
-  return (
-    <div className="seletor-cliente">
-      {todos.length > 0 && (
-        <label className="busca busca-larga">
-          <Icone caminho={mdiMagnify} />
-          <span className="so-leitor">Buscar cliente</span>
-          <input type="search" placeholder="Buscar nome, telefone ou endereço" value={busca} onChange={(e) => setBusca(e.target.value)} />
-        </label>
-      )}
-      {encontrados.length > 0 && (
-        <ul className="opcoes">
-          {encontrados.slice(0, OPCOES_VISIVEIS).map((cliente) => (
-            <li key={cliente.id}>
-              <button type="button" className="opcao" onClick={() => onEscolher(cliente.id)} aria-label={`Escolher ${cliente.nome}`}>
-                <strong>{cliente.nome}</strong>
-                {cliente.telefone && <span>{cliente.telefone}</span>}
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
-      {dica && <p className="suave">{dica}</p>}
-      <button type="button" className="botao botao-texto alinha-inicio" onClick={onCadastrar}>
-        <Icone caminho={mdiPlus} />
-        Cadastrar cliente
-      </button>
-    </div>
-  );
-}
-
-function FormOrcamento({ orcamento }: { orcamento?: Orcamento }) {
+// `modelo` preenche um orçamento novo a partir de outro; `orcamento` edita o próprio.
+function FormOrcamento({ orcamento, modelo }: { orcamento?: Orcamento; modelo?: Orcamento }) {
   const navigate = useNavigate();
   const clientes = useClientes();
-  const [clienteId, setClienteId] = useState(orcamento?.clienteId ?? '');
-  const [itens, setItens] = useState<Linha[]>(() =>
-    orcamento
-      ? orcamento.itens.map((i) =>
-          novaLinha({ descricao: i.descricao, quantidade: paraCampo(i.quantidade), unidade: i.unidade, preco: precoParaCampo(i.precoUnitario) }),
-        )
-      : [novaLinha()],
-  );
-  const [pagamento, setPagamento] = useState(orcamento?.pagamento ?? '');
-  const [prazo, setPrazo] = useState(orcamento?.prazo ?? '');
-  const [observacoes, setObservacoes] = useState(orcamento?.observacoes ?? '');
+  const origem = orcamento ?? modelo;
+  const [clienteId, setClienteId] = useState(origem?.clienteId ?? '');
+  const [itens, setItens] = useState<Linha[]>(() => (origem ? origem.itens.map(linhaDoItem) : [novaLinha()]));
+  const [pagamento, setPagamento] = useState(origem?.pagamento ?? '');
+  const [prazo, setPrazo] = useState(origem?.prazo ?? '');
+  const [observacoes, setObservacoes] = useState(origem?.observacoes ?? '');
   const [tentou, setTentou] = useState(false);
   const [saindo, setSaindo] = useState(false);
   const [cadastrando, setCadastrando] = useState(false);
 
   const retrato = JSON.stringify([clienteId, itens.map((i) => [i.descricao, i.quantidade, i.unidade, i.preco]), pagamento, prazo, observacoes]);
   const [inicial] = useState(retrato);
-  useGuardaAlteracoes(retrato !== inicial && !saindo);
+  // A cópia ainda não existe no servidor: sair dela sem salvar também pergunta.
+  useGuardaAlteracoes((retrato !== inicial || !!modelo) && !saindo);
 
   const dados = (): DadosOrcamento => ({
     clienteId,
@@ -156,7 +95,7 @@ function FormOrcamento({ orcamento }: { orcamento?: Orcamento }) {
 
   const escolhido = clientes.data?.find((c) => c.id === clienteId);
   // Antes de a lista chegar, o nome que veio com o orçamento basta para mostrar quem é.
-  const nomeEscolhido = escolhido?.nome ?? (clienteId === orcamento?.clienteId ? orcamento.clienteNome : '');
+  const nomeEscolhido = escolhido?.nome ?? (clienteId === origem?.clienteId ? origem.clienteNome : '');
   const temProblema = !clienteId || itens.some((i) => problemaNoItem(i));
 
   const enviar = (evento: FormEvent) => {
@@ -172,7 +111,13 @@ function FormOrcamento({ orcamento }: { orcamento?: Orcamento }) {
 
   return (
     <Gaveta
-      titulo={orcamento ? `Editar orçamento ${numeroDoOrcamento(orcamento.numero)}` : 'Novo orçamento'}
+      titulo={
+        orcamento
+          ? `Editar orçamento ${numeroDoOrcamento(orcamento.numero)}`
+          : modelo
+            ? `Cópia do orçamento ${numeroDoOrcamento(modelo.numero)}`
+            : 'Novo orçamento'
+      }
       aoFechar={fechar}
       rodape={
         <div className="rodape-total">
@@ -212,65 +157,24 @@ function FormOrcamento({ orcamento }: { orcamento?: Orcamento }) {
             Itens
           </h3>
           <ol className="itens-editor">
-            {itens.map((item, i) => {
-              const problema = tentou ? problemaNoItem(item) : null;
-              const quantidade = lerNumero(item.quantidade);
-              const preco = lerNumero(item.preco);
-              const totalItem = quantidade !== null && preco !== null ? formatarCentavos(centavosDoItem(quantidade, preco)) : '';
-              const marcar = (trecho: string) => (problema?.includes(trecho) ? ' com-erro' : '');
-              return (
-                <li key={item.chave} className="item-editor">
-                  <div className="item-topo">
-                    <span>Item {i + 1}</span>
-                    {itens.length > 1 && (
-                      <button
-                        type="button"
-                        className="botao-icone"
-                        aria-label={`Remover item ${i + 1}`}
-                        title="Remover item"
-                        onClick={() => setItens((lista) => lista.filter((l) => l.chave !== item.chave))}
-                      >
-                        <Icone caminho={mdiTrashCanOutline} />
-                      </button>
-                    )}
-                  </div>
-                  <label className={`campo${marcar('material')}`}>
-                    <span className="campo-rotulo">Material</span>
-                    <input value={item.descricao} onChange={(e) => mudarItem(item.chave, 'descricao', e.target.value)} maxLength={200} aria-invalid={!!marcar('material')} />
-                  </label>
-                  <div className="item-numeros">
-                    <label className={`campo${marcar('quantidade')}`}>
-                      <span className="campo-rotulo">Qtd.</span>
-                      <input
-                        value={item.quantidade}
-                        onChange={(e) => mudarItem(item.chave, 'quantidade', e.target.value)}
-                        inputMode="decimal"
-                        aria-invalid={!!marcar('quantidade')}
-                      />
-                    </label>
-                    <label className={`campo${marcar('unidade')}`}>
-                      <span className="campo-rotulo">Un.</span>
-                      <input value={item.unidade} onChange={(e) => mudarItem(item.chave, 'unidade', e.target.value)} maxLength={10} aria-invalid={!!marcar('unidade')} />
-                    </label>
-                    <label className={`campo${marcar('preço')}`}>
-                      <span className="campo-rotulo">Preço unit.</span>
-                      <span className="com-prefixo">
-                        <span aria-hidden="true">R$</span>
-                        <input value={item.preco} onChange={(e) => mudarItem(item.chave, 'preco', e.target.value)} inputMode="decimal" aria-invalid={!!marcar('preço')} />
-                      </span>
-                    </label>
-                  </div>
-                  {problema ? (
-                    <p className="item-erro" role="alert">
-                      {problema}
-                    </p>
-                  ) : (
-                    <p className="item-total">{totalItem && `Total do item: ${totalItem}`}</p>
-                  )}
-                </li>
-              );
-            })}
+            {itens.map((item, i) => (
+              <ItemOrcamento
+                key={item.chave}
+                item={item}
+                indice={i}
+                quantos={itens.length}
+                tentou={tentou}
+                aoMudar={(campo, valor) => mudarItem(item.chave, campo, valor)}
+                aoMover={(para) => setItens((lista) => moverItem(lista, i, para))}
+                aoRemover={() => setItens((lista) => lista.filter((l) => l.chave !== item.chave))}
+              />
+            ))}
           </ol>
+          <datalist id="unidades-comuns">
+            {UNIDADES.map((u) => (
+              <option key={u} value={u} />
+            ))}
+          </datalist>
           {itens.length < MAX_ITENS && (
             <button type="button" className="botao botao-contorno alinha-inicio" onClick={() => setItens((lista) => [...lista, novaLinha()])}>
               <Icone caminho={mdiPlus} />

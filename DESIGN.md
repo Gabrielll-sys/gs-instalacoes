@@ -372,7 +372,7 @@ Irmão do relatório (`backend/OrdemServico.Api/OrcamentoPdf.cs`), com as mesmas
 
 ## Versão web
 
-Mesmo mundo no navegador (`web/`), com os tokens de cor, tipo e forma em `web/src/estilos.css`, Overpass do `@fontsource/overpass` nos pesos 400, 600, 800 e 900 e os mesmos ícones Material Design Icons (`@mdi/js`). Na web o peso vem de `font-weight`, porque a regra do peso no arquivo é do Android.
+Mesmo mundo no navegador (`web/`), com os tokens de cor, tipo e forma em `web/src/estilos/` (base, casca, gaveta, formularios, orcamentos e responsivo, nessa ordem), Overpass do `@fontsource/overpass` nos pesos 400, 600, 800 e 900 e os mesmos ícones Material Design Icons (`@mdi/js`). Na web o peso vem de `font-weight`, porque a regra do peso no arquivo é do Android.
 
 - **Trilho:** coluna marinho de 232px à esquerda, com o logo, a navegação (Ordens de serviço e, só para o gestor, Orçamentos, Clientes e Equipe) e a conta no pé, com Trocar senha e Sair. Item ativo com fundo branco a 18%. Abaixo de 900px vira barra no topo, com "Ordens" no lugar de "Ordens de serviço" e as ações da conta só no ícone. Com as quatro áreas do gestor, abaixo de 700px só a área aberta mantém o nome, e as outras ficam no ícone com o nome acessível no `aria-label`; abaixo de 520px a barra do gestor deixa o carro do logo para esse nome caber. O técnico, com uma área só, mantém o nome e o logo em qualquer largura.
 - **Área de trabalho:** cabeçalho branco com o título display, a busca em pílula e a ação principal dourada (Nova OS, Nova conta); filtros com contagem logo abaixo; lista rente às bordas, igual à do app.
@@ -385,7 +385,7 @@ Mesmo mundo no navegador (`web/`), com os tokens de cor, tipo e forma em `web/sr
 ## Do's and Don'ts
 
 ### Do:
-- **Do** usar `cor` e `familia` de `mobile/src/tema.ts` e os controles temados do Paper antes de criar uma peça nova; na web, as variáveis de `web/src/estilos.css`.
+- **Do** usar `cor` e `familia` de `mobile/src/tema.ts` e os controles temados do Paper antes de criar uma peça nova; na web, as variáveis de `web/src/estilos/` (base, casca, gaveta, formularios, orcamentos e responsivo, nessa ordem).
 - **Do** manter dourado com texto e ícone marinho em todo preenchimento.
 - **Do** mostrar a contagem de fotos de ANTES e DEPOIS sempre com a placa.
 - **Do** dizer o estado de envio com ícone e texto, usando os tons de Atenção, Enviando e Erro.

@@ -9,7 +9,13 @@ import { createBrowserRouter, Navigate, RouterProvider } from 'react-router';
 import { Casca } from './componentes/Casca';
 import { Protegido, SoGestor } from './componentes/Guardas';
 import { queryClient } from './consultas';
-import './estilos.css';
+// Em ordem: cada arquivo pode sobrepor o anterior, e o responsivo vem por último.
+import './estilos/base.css';
+import './estilos/casca.css';
+import './estilos/gaveta.css';
+import './estilos/formularios.css';
+import './estilos/orcamentos.css';
+import './estilos/responsivo.css';
 import { Clientes } from './paginas/Clientes';
 import { Equipe } from './paginas/Equipe';
 import { GavetaCliente } from './paginas/GavetaCliente';

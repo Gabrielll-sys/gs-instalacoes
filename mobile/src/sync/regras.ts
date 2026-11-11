@@ -48,8 +48,6 @@ export class ErroApi extends Error {
   }
 }
 
-// Mesmo limite do GET /api/ordens: ao atingi-lo, os totais do app são só o mínimo.
-export const LIMITE_ORDENS = 200;
 
 // Mesmo limite que o servidor confere ao registrar a foto.
 export const LIMITE_FOTO_BYTES = 4 * 1024 * 1024;
