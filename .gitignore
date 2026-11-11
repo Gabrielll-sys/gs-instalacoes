@@ -1,0 +1,11 @@
+bin/
+obj/
+.vs/
+*.db
+*.db-shm
+*.db-wal
+backend/OrdemServico.Api/appsettings.Production.json
+.env
+.impeccable/mocks/
+.impeccable/questions/
+.impeccable/review/

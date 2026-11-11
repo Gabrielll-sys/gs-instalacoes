@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="OrdemServico.Api/OrdemServico.Api.csproj" />
+  <Project Path="OrdemServico.Tests/OrdemServico.Tests.csproj" />
+</Solution>

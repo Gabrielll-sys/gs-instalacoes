@@ -1,0 +1,46 @@
+{
+  "expo": {
+    "name": "GS Instalações",
+    "slug": "gs-instalacoes-os",
+    "scheme": "gsinstalacoesos",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "android": {
+      "package": "br.com.gsinstalacoes.os",
+      "adaptiveIcon": {
+        "backgroundColor": "#00265F",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-image",
+      "expo-secure-store",
+      "expo-font",
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "O app usa a câmera para fotografar o local antes e depois da instalação.",
+          "photosPermission": "O app acessa suas fotos para anexar imagens à ordem de serviço.",
+          "microphonePermission": false
+        }
+      ],
+      "expo-sharing",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#00265F",
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 288
+        }
+      ]
+    ]
+  }
+}

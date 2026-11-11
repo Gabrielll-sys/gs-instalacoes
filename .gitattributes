@@ -1,0 +1,4 @@
+# Fins de linha LF no repositório: o Dockerfile e os scripts rodam em Linux no Railway e na Vercel.
+* text=auto eol=lf
+*.png binary
+*.ttf binary

@@ -1,0 +1,471 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-07T16:00:00-03:00",
+  "title": "Design System: GS Instalações",
+  "extensions": {
+    "colorMeta": {
+      "marinho": {
+        "role": "primary",
+        "displayName": "Marinho de Placa",
+        "canonical": "#00265F",
+        "tonalRamp": [
+          "#000A22",
+          "#022151",
+          "#173E79",
+          "#355D9B",
+          "#5781C1",
+          "#7DA6E5",
+          "#B4CCF1",
+          "#E7EFFB"
+        ]
+      },
+      "dourado": {
+        "role": "secondary",
+        "displayName": "Dourado GS",
+        "canonical": "#EAB827",
+        "tonalRamp": [
+          "#100A00",
+          "#2E2202",
+          "#503D05",
+          "#745A0D",
+          "#9F7B08",
+          "#CB9D0A",
+          "#E2C88B",
+          "#F6EEDB"
+        ]
+      },
+      "branco": {
+        "role": "neutral",
+        "displayName": "Branco de Legenda",
+        "canonical": "#FFFFFF",
+        "tonalRamp": [
+          "#0B0B0B",
+          "#242424",
+          "#404040",
+          "#5D5D5D",
+          "#808080",
+          "#A4A4A4",
+          "#CACACA",
+          "#EEEEEE"
+        ]
+      },
+      "fundo": {
+        "role": "neutral",
+        "displayName": "Faixa Azulada",
+        "canonical": "#F1F4F8",
+        "tonalRamp": [
+          "#0A0B0C",
+          "#222427",
+          "#3E4043",
+          "#5B5E61",
+          "#7E8084",
+          "#A2A5A8",
+          "#C9CBCD",
+          "#EEEEEF"
+        ]
+      },
+      "texto": {
+        "role": "neutral",
+        "displayName": "Tinta Azulada",
+        "canonical": "#10213D",
+        "tonalRamp": [
+          "#050B17",
+          "#15243C",
+          "#2D405E",
+          "#4A5E7F",
+          "#6C81A3",
+          "#91A6C7",
+          "#BFCBDF",
+          "#EBEFF5"
+        ]
+      },
+      "texto-suave": {
+        "role": "neutral",
+        "displayName": "Tinta Suave",
+        "canonical": "#47566C",
+        "tonalRamp": [
+          "#060B14",
+          "#192435",
+          "#324055",
+          "#4F5F75",
+          "#718199",
+          "#96A6BD",
+          "#C2CBD9",
+          "#ECEFF3"
+        ]
+      },
+      "filete": {
+        "role": "neutral",
+        "displayName": "Filete Claro",
+        "canonical": "#DDE3EC",
+        "tonalRamp": [
+          "#090B0E",
+          "#20242A",
+          "#3B4047",
+          "#595E66",
+          "#7B8189",
+          "#A0A5AD",
+          "#C8CBCF",
+          "#EDEEF0"
+        ]
+      },
+      "contorno": {
+        "role": "neutral",
+        "displayName": "Contorno de Controle",
+        "canonical": "#7A889C",
+        "tonalRamp": [
+          "#070B12",
+          "#1B2532",
+          "#344152",
+          "#515F71",
+          "#738195",
+          "#98A6B9",
+          "#C3CBD7",
+          "#ECEFF2"
+        ]
+      },
+      "atencao": {
+        "role": "estado",
+        "displayName": "Atenção",
+        "canonical": "#5C4500",
+        "tonalRamp": [
+          "#110A00",
+          "#2F2200",
+          "#513C02",
+          "#725A1E",
+          "#967D43",
+          "#BAA26C",
+          "#D7C9AB",
+          "#F2EEE4"
+        ]
+      },
+      "atencao-fundo": {
+        "role": "estado",
+        "displayName": "Fundo de Atenção",
+        "canonical": "#FFF6D9",
+        "tonalRamp": [
+          "#0E0B03",
+          "#2A2410",
+          "#473F27",
+          "#655D44",
+          "#888066",
+          "#ACA48B",
+          "#CFCABC",
+          "#F0EEEA"
+        ]
+      },
+      "envio-fundo": {
+        "role": "estado",
+        "displayName": "Fundo de Envio",
+        "canonical": "#E3EAF5",
+        "tonalRamp": [
+          "#090B0F",
+          "#20242B",
+          "#3B4049",
+          "#585E67",
+          "#7A818A",
+          "#9FA5AF",
+          "#C7CBD0",
+          "#EDEEF0"
+        ]
+      },
+      "erro": {
+        "role": "estado",
+        "displayName": "Erro",
+        "canonical": "#B42318",
+        "tonalRamp": [
+          "#1F0000",
+          "#4B0100",
+          "#7C0502",
+          "#AD1A10",
+          "#D74839",
+          "#FD7563",
+          "#FFB5A9",
+          "#FFE9E5"
+        ]
+      },
+      "erro-fundo": {
+        "role": "estado",
+        "displayName": "Fundo de Erro",
+        "canonical": "#FDECEA",
+        "tonalRamp": [
+          "#0F0A09",
+          "#2B2120",
+          "#493C3B",
+          "#685A58",
+          "#8B7C7A",
+          "#AFA19F",
+          "#D1C8C7",
+          "#F0EEED"
+        ]
+      },
+      "carimbo-fundo": {
+        "role": "estado",
+        "displayName": "Marinho do Carimbo",
+        "canonical": "rgba(0, 38, 95, 0.82)",
+        "tonalRamp": [
+          "#000A22",
+          "#022151",
+          "#173E79",
+          "#355D9B",
+          "#5781C1",
+          "#7DA6E5",
+          "#B4CCF1",
+          "#E7EFFB"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display-small": {
+        "displayName": "Display",
+        "purpose": "Título da lista.",
+        "runtimeFamily": "Overpass_900Black"
+      },
+      "title-large": {
+        "displayName": "Title Large",
+        "purpose": "Título da barra nativa e do estado vazio.",
+        "runtimeFamily": "Overpass_800ExtraBold"
+      },
+      "title-medium": {
+        "displayName": "Title Medium",
+        "purpose": "Nome do cliente na lista e rótulo da seção no visualizador.",
+        "runtimeFamily": "Overpass_800ExtraBold"
+      },
+      "body-large": {
+        "displayName": "Body Large",
+        "purpose": "Valores de dado, campos e estado vazio.",
+        "runtimeFamily": "Overpass_400Regular"
+      },
+      "body-medium": {
+        "displayName": "Body Medium",
+        "purpose": "Data e responsáveis na lista, instruções e mensagens.",
+        "runtimeFamily": "Overpass_400Regular"
+      },
+      "label-large": {
+        "displayName": "Label Large",
+        "purpose": "Botões, filtros, faixas de aviso e data no visualizador.",
+        "runtimeFamily": "Overpass_600SemiBold"
+      },
+      "label-medium": {
+        "displayName": "Label Medium",
+        "purpose": "Legenda ANTES e DEPOIS da placa.",
+        "runtimeFamily": "Overpass_800ExtraBold"
+      },
+      "label-small": {
+        "displayName": "Label Small",
+        "purpose": "Rótulo de dado e linha na fila.",
+        "runtimeFamily": "Overpass_600SemiBold"
+      },
+      "numero-placa": {
+        "displayName": "Número da Placa",
+        "purpose": "Contagem de fotos, tabular.",
+        "runtimeFamily": "Overpass_900Black"
+      },
+      "carimbo": {
+        "displayName": "Carimbo",
+        "purpose": "Data sobre a miniatura, tabular.",
+        "runtimeFamily": "Overpass_800ExtraBold"
+      },
+      "fab": {
+        "displayName": "FAB",
+        "purpose": "Rótulos Nova OS e Nova conta.",
+        "runtimeFamily": "Overpass_800ExtraBold"
+      }
+    },
+    "shadows": [
+      {
+        "name": "flutuante-material",
+        "value": "Padrão do Paper: FAB nível 3, menu nível 2, snackbar nível 2",
+        "purpose": "Só em peças flutuantes; demais superfícies são planas."
+      }
+    ],
+    "motion": [
+      {
+        "name": "placa-segura-dourado",
+        "value": "150ms",
+        "purpose": "Tempo em que o número fica dourado na transição de 0 para mais."
+      },
+      {
+        "name": "placa-volta-branco",
+        "value": "300ms Easing.out(Easing.exp)",
+        "purpose": "Retorno ao branco por opacidade da camada dourada; instantâneo com animações reduzidas."
+      },
+      {
+        "name": "miniatura-carrega",
+        "value": "150ms",
+        "purpose": "Fade do expo-image ao carregar miniatura."
+      }
+    ],
+    "breakpoints": []
+  },
+  "components": [
+    {
+      "name": "Botão principal",
+      "kind": "button",
+      "refersTo": "botao-principal",
+      "description": "Ação principal da tela, em dourado com texto marinho. Tem 52dp no login e nos rodapés de formulário; a Câmera do próximo passo usa o mesmo par de cores com 48dp.",
+      "html": "<button class=\"ds-btn-principal\">Abrir OS</button>",
+      "css": ".ds-btn-principal{font-family:Overpass,sans-serif;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-width:140px;height:52px;padding:0 24px;border-radius:15px;border:none;background:#EAB827;color:#00265F;font-size:15px;font-weight:600;line-height:20px;transition:filter .15s}.ds-btn-principal:hover{filter:brightness(.96)}.ds-btn-principal:active{filter:brightness(.9)}.ds-btn-principal:focus-visible{outline:2px solid #00265F;outline-offset:2px}"
+    },
+    {
+      "name": "Câmera fora do próximo passo",
+      "kind": "button",
+      "refersTo": "botao-camera",
+      "description": "Preenchido em marinho: Câmera quando a seção não é o próximo passo e Abrir do relatório pronto.",
+      "html": "<button class=\"ds-btn-camera\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M4 8h3l2-3h6l2 3h3v11H4z\"/><circle cx=\"12\" cy=\"13\" r=\"3.5\"/></svg>Câmera</button>",
+      "css": ".ds-btn-camera{font-family:Overpass,sans-serif;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-width:140px;height:48px;padding:0 24px;border-radius:15px;border:none;background:#00265F;color:#FFFFFF;font-size:15px;font-weight:600;line-height:20px;transition:filter .15s}.ds-btn-camera:hover{filter:brightness(.96)}.ds-btn-camera:active{filter:brightness(.9)}.ds-btn-camera:focus-visible{outline:2px solid #00265F;outline-offset:2px}"
+    },
+    {
+      "name": "Botão de contorno",
+      "kind": "button",
+      "refersTo": "botao-contorno",
+      "description": "Contorno com texto marinho: Galeria ao lado da Câmera, Enviar ao lado de Abrir; Gerar relatório em PDF e Tentar de novo sozinhos.",
+      "html": "<button class=\"ds-btn-contorno\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><rect x=\"8\" y=\"4\" width=\"13\" height=\"13\" rx=\"1\"/><path d=\"M4 8v12h12\"/><path d=\"M8 14l3-3 3 3 2-2 3 3\"/></svg>Galeria</button>",
+      "css": ".ds-btn-contorno{font-family:Overpass,sans-serif;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-width:140px;height:48px;padding:0 24px;border-radius:15px;border:1px solid #7A889C;background:transparent;color:#00265F;font-size:15px;font-weight:600;line-height:20px;transition:filter .15s}.ds-btn-contorno:hover{filter:brightness(.96)}.ds-btn-contorno:active{filter:brightness(.9)}.ds-btn-contorno:focus-visible{outline:2px solid #00265F;outline-offset:2px}"
+    },
+    {
+      "name": "Campo",
+      "kind": "input",
+      "refersTo": "campo",
+      "description": "TextInput contornado do Paper, com rótulo flutuante; o foco leva a borda a marinho.",
+      "html": "<label class=\"ds-campo\"><input class=\"ds-campo-entrada\" placeholder=\" \"><span class=\"ds-campo-rotulo\">Nome do cliente</span></label>",
+      "css": ".ds-campo{font-family:Overpass,sans-serif;position:relative;display:inline-block}.ds-campo-entrada{font-family:inherit;width:280px;height:50px;padding:0 16px;border:1px solid #7A889C;border-radius:3px;background:#F1F4F8;color:#10213D;font-size:16px;line-height:24px}.ds-campo-entrada:focus-visible{outline:none;border-color:#00265F;box-shadow:inset 0 0 0 1px #00265F}.ds-campo-rotulo{position:absolute;left:16px;top:25px;transform:translateY(-50%);color:#47566C;font-size:16px;line-height:20px;pointer-events:none;transition:top .15s,font-size .15s}.ds-campo-entrada:focus-visible+.ds-campo-rotulo,.ds-campo-entrada:not(:placeholder-shown)+.ds-campo-rotulo{top:0;left:12px;padding:0 4px;background:#F1F4F8;font-size:12px}.ds-campo-entrada:focus-visible+.ds-campo-rotulo{color:#00265F}"
+    },
+    {
+      "name": "Filtro",
+      "kind": "chip",
+      "refersTo": "filtro",
+      "description": "Filtro com contagem tabular; ativo em marinho, sem marca de seleção. O papel da conta, Técnico e Gestor, tem a mesma aparência.",
+      "html": "<div class=\"ds-filtros\"><button class=\"ds-filtro ds-filtro-ativo\">Todas 8</button><button class=\"ds-filtro\">Abertas 4</button></div>",
+      "css": ".ds-filtros{display:flex;gap:8px}.ds-filtro{position:relative;font-family:Overpass,sans-serif;height:42px;padding:0 12px;border:1px solid #7A889C;border-radius:6px;background:#FFFFFF;color:#47566C;font-size:15px;font-weight:600;font-variant-numeric:tabular-nums}.ds-filtro::after{content:\"\";position:absolute;inset:-4px -1px}.ds-filtro:hover{background:#F1F4F8}.ds-filtro:focus-visible{outline:2px solid #00265F;outline-offset:2px}.ds-filtro-ativo,.ds-filtro-ativo:hover{background:#00265F;border-color:#00265F;color:#FFFFFF}"
+    },
+    {
+      "name": "Seletor de responsáveis",
+      "kind": "chip",
+      "refersTo": "filtro-ativo",
+      "description": "Pessoas cadastradas, sem digitação. Marcada em marinho com visto branco; desmarcada em contorno com ícone de mais. Um toque alterna.",
+      "html": "<div class=\"ds-responsaveis\" role=\"group\" aria-label=\"Responsáveis\"><button type=\"button\" role=\"checkbox\" aria-checked=\"true\" class=\"ds-responsavel\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12.5l4.5 4.5L19 7.5\"/></svg>Ana Souza</button><button type=\"button\" role=\"checkbox\" aria-checked=\"false\" class=\"ds-responsavel\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 5v14M5 12h14\"/></svg>Bruno Lima</button></div>",
+      "css": ".ds-responsaveis{display:flex;flex-wrap:wrap;gap:8px}.ds-responsavel{position:relative;font-family:Overpass,sans-serif;display:inline-flex;align-items:center;gap:8px;height:42px;padding:0 16px 0 8px;border:1px solid #7A889C;border-radius:6px;background:#FFFFFF;color:#47566C;font-size:15px;font-weight:600;line-height:20px}.ds-responsavel::after{content:\"\";position:absolute;inset:-4px -1px}.ds-responsavel svg{color:#00265F}.ds-responsavel:hover{background:#F1F4F8}.ds-responsavel:active{filter:brightness(.9)}.ds-responsavel:focus-visible{outline:2px solid #00265F;outline-offset:2px}.ds-responsavel[aria-checked=\"true\"],.ds-responsavel[aria-checked=\"true\"]:hover{background:#00265F;border-color:#00265F;color:#FFFFFF}.ds-responsavel[aria-checked=\"true\"] svg{color:#FFFFFF}"
+    },
+    {
+      "name": "Barra de topo",
+      "kind": "nav",
+      "refersTo": "barra-topo",
+      "description": "Faixa marinho sem sombra, título branco extrabold.",
+      "html": "<header class=\"ds-barra\">Nova OS</header>",
+      "css": ".ds-barra{font-family:Overpass,sans-serif;width:320px;padding:18px 16px;background:#00265F;color:#FFFFFF;font-size:20px;font-weight:800;line-height:26px}"
+    },
+    {
+      "name": "Placa",
+      "kind": "custom",
+      "refersTo": "placa",
+      "description": "Assinatura: painel marinho, filete branco interno, legenda e número tabular. Com total zero, o losango dourado fica ao lado do 0; quando entra a primeira foto, ele some e o número nasce dourado, segura 150ms e volta ao branco em 300ms.",
+      "html": "<div class=\"ds-placa\"><div class=\"ds-placa-filete\"><div class=\"ds-placa-linha\"><span class=\"ds-placa-legenda\">ANTES</span><span class=\"ds-placa-valor\"><span class=\"ds-placa-numero ds-placa-numero-novo\" data-numero=\"1\">1</span></span></div><div class=\"ds-placa-linha\"><span class=\"ds-placa-legenda\">DEPOIS</span><span class=\"ds-placa-valor\"><span class=\"ds-placa-losango\"></span><span class=\"ds-placa-numero\">0</span></span></div></div></div>",
+      "css": ".ds-placa{font-family:Overpass,sans-serif;display:inline-block;min-width:118px;padding:3px;border-radius:9px;background:#00265F}.ds-placa-filete{border:1.5px solid #FFFFFF;border-radius:7px;padding:4px 9px}.ds-placa-linha{display:flex;align-items:center;justify-content:space-between;gap:12px}.ds-placa-legenda{color:#FFFFFF;font-size:13px;font-weight:800;line-height:19px;letter-spacing:.4px}.ds-placa-valor{display:flex;align-items:center;gap:7px}.ds-placa-losango{width:9px;height:9px;background:#EAB827;transform:rotate(45deg)}.ds-placa-numero{color:#FFFFFF;font-size:16px;font-weight:900;line-height:21px;font-variant-numeric:tabular-nums}.ds-placa-numero-novo{position:relative}.ds-placa-numero-novo::after{content:attr(data-numero);position:absolute;top:0;right:0;color:#EAB827;opacity:0;animation:ds-placa-destaque 300ms cubic-bezier(.19,1,.22,1) 150ms backwards}@keyframes ds-placa-destaque{from{opacity:1}to{opacity:0}}@media (prefers-reduced-motion:reduce){.ds-placa-numero-novo::after{animation:none}}"
+    },
+    {
+      "name": "Carimbo de data",
+      "kind": "custom",
+      "refersTo": "carimbo-foto",
+      "description": "Data dourada sobre a miniatura, de quando a foto foi adicionada à OS. Toda foto tem um.",
+      "html": "<div class=\"ds-foto\"><span class=\"ds-carimbo\">06/11 14:08</span></div>",
+      "css": ".ds-foto{position:relative;width:120px;height:120px;background:#47566C}.ds-carimbo{font-family:Overpass,sans-serif;position:absolute;left:4px;bottom:4px;padding:1px 5px;border-radius:4px;background:rgba(0,38,95,.82);color:#EAB827;font-size:12px;font-weight:800;line-height:17px;font-variant-numeric:tabular-nums}"
+    },
+    {
+      "name": "Faixa de atenção",
+      "kind": "custom",
+      "refersTo": "faixa-atencao",
+      "description": "Aviso de envio com ícone e texto, em tom próprio, sem dourado.",
+      "html": "<div class=\"ds-faixa\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M2 8.5a15 15 0 0 1 20 0M5.5 12.5a10 10 0 0 1 13 0M9 16a5 5 0 0 1 6 0\"/><circle cx=\"12\" cy=\"19.5\" r=\"1\"/><path d=\"M3 3l18 18\"/></svg>Sem internet. Aguardando envio: 1 foto.</div>",
+      "css": ".ds-faixa{font-family:Overpass,sans-serif;display:flex;align-items:center;gap:10px;min-height:48px;padding:11px 16px;background:#FFF6D9;color:#5C4500;font-size:15px;font-weight:600;line-height:20px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "A Placa de Estrada",
+    "overview": "Cada ordem de serviço se lê como uma placa rodoviária: de relance, com pressa, em qualquer luz. A faixa marinho com legendas brancas dá o contraste, a letra de estrada Overpass dá a voz, e a placa com filete branco responde à pergunta que importa em toda tela: quantas fotos de antes e de depois esta OS já tem.\n\nO sistema é denso e direto, feito para quem está em pé, em garagens e subsolos, com as mãos ocupadas. Os controles são Material 3 temados, sem reinvenção: o caráter vem da cor, da letra e da placa. O app existe só em tema claro e em retrato. Tema escuro é decisão em aberto no PRODUCT.md e não tem nenhum token aqui.\n\nO mundo recusa o padrão da categoria, cartões empilhados com selo colorido de status. Os valores em `px` do frontmatter equivalem a `dp` no app; a fonte normativa no código é `mobile/src/tema.ts`.",
+    "keyCharacteristics": [
+      "Faixa marinho no topo das telas de trabalho, com texto branco.",
+      "Lista em linhas com filete fino, não em cartões.",
+      "Placa com número tabular como assinatura e único ponto de movimento próprio.",
+      "Dourado raro, com função fixa.",
+      "Seções brancas separadas por faixas de fundo azulado, sem sombra.",
+      "Estado de envio sempre visível, com ícone e texto.",
+      "Na web, trilho marinho à esquerda e gaveta à direita sobre a lista; abaixo de 900px o trilho vira barra no topo e a gaveta ocupa a tela.",
+      "Orçamentos e clientes, só do gestor: listas em linhas com o total marinho à direita, faixa de total marinho sem filete e PDF irmão do relatório, com o total na faixa de topo."
+    ],
+    "rules": [
+      {
+        "name": "A Regra dos Três Dourados",
+        "body": "Na interface, o dourado tem exatamente três usos: a ação principal de cada tela, o losango que só significa \"falta foto\" e o carimbo de data sobre a foto. Se um quarto uso parecer necessário, a resposta é outra cor. O logo é arte da marca e fica fora da conta. O número que nasce dourado é a passagem da placa de \"falta foto\" para \"tem foto\", dura 450ms e não se reutiliza em nenhum outro lugar.",
+        "section": "colors"
+      },
+      {
+        "name": "A Regra do Próximo Passo",
+        "body": "Na tela da OS, só a Câmera da seção que o técnico precisa preencher agora é dourada: ANTES enquanto estiver vazia, depois DEPOIS. Com as duas preenchidas, nenhum botão da tela é dourado, porque não há passo pendente.",
+        "section": "colors"
+      },
+      {
+        "name": "A Regra do Losango Único",
+        "body": "O losango significa \"falta foto\" e mais nada. Fila usa ícone de envio (`cloud-upload-outline`), nunca o losango; erro usa ícone de alerta.",
+        "section": "colors"
+      },
+      {
+        "name": "A Regra do Fundo Escuro",
+        "body": "Dourado nunca é texto ou ícone sobre fundo claro (1,84:1 sobre branco). Sobre marinho ele chega a 7,89:1.",
+        "section": "colors"
+      },
+      {
+        "name": "A Regra do Peso no Arquivo",
+        "body": "O peso vem do arquivo da fonte (`familia.regular`, `semi`, `extra`, `black`), com `fontWeight: 'normal'`. Outro valor engrossaria a letra de novo no Android.",
+        "section": "typography"
+      },
+      {
+        "name": "A Regra do Número Tabular",
+        "body": "Toda contagem e data que se compara de relance usa `tabular-nums`: placa, filtros, carimbo e data do visualizador.",
+        "section": "typography"
+      },
+      {
+        "name": "A Regra dos 48dp",
+        "body": "Todo alvo de toque tem ao menos 48dp. Chips de 42dp completam a altura com área extra de toque de 3dp em cima e embaixo; a altura do botão é definida no conteúdo.",
+        "section": "layout"
+      },
+      {
+        "name": "A Regra do Flutuante",
+        "body": "Sombra é só para o que flutua sobre a tela. Superfície que faz parte da tela separa por tom ou filete.",
+        "section": "elevation"
+      },
+      {
+        "name": "A Regra da Placa Própria",
+        "body": "O filete branco interno pertence à placa, e a placa só mostra contagem de fotos. Outro conteúdo em painel marinho não leva filete.",
+        "section": "components"
+      },
+      {
+        "name": "A Regra da Data de Adição",
+        "body": "O carimbo mostra quando a foto foi adicionada à OS, no aparelho, e toda foto tem um. A data de captura não é usada.",
+        "section": "components"
+      },
+      {
+        "name": "A Regra do Total à Vista",
+        "body": "Em orçamento, o total tem o mesmo peso da placa nas OS: black, marinho e tabular, na faixa de topo do PDF, na faixa de total e no rodapé do formulário. Não ganha dourado nem o filete da placa."
+      }
+    ],
+    "dos": [
+      "Do usar `cor` e `familia` de `mobile/src/tema.ts` e os controles temados do Paper antes de criar uma peça nova; na web, as variáveis de `web/src/estilos.css`.",
+      "Do manter dourado com texto e ícone marinho em todo preenchimento.",
+      "Do mostrar a contagem de fotos de ANTES e DEPOIS sempre com a placa.",
+      "Do dizer o estado de envio com ícone e texto, usando os tons de Atenção, Enviando e Erro.",
+      "Do respeitar animações reduzidas em qualquer movimento próprio, como a placa faz.",
+      "Do deixar o restante do movimento com o nativo do Material: ripple, transição de pilha, fade do visualizador e fade de 150ms ao carregar miniatura.",
+      "Do conferir toda peça nova do Paper contra o tema, para que o lilás padrão do Material 3 não apareça."
+    ],
+    "donts": [
+      "Don't usar dourado fora dos três usos, nem como cor de ênfase, ícone decorativo, faixa de aviso ou borda.",
+      "Don't usar o losango para fila, erro ou qualquer estado que não seja \"falta foto\".",
+      "Don't adicionar ação ao Snackbar sem decidir a cor: pelo `inversePrimary` do tema, ela nasceria dourada e abriria um uso fora dos três.",
+      "Don't empilhar as OS em cartões com selo colorido de status. Os selos de envio ficam só na miniatura da foto.",
+      "Don't criar tokens ou variantes de tema escuro enquanto a decisão estiver em aberto no PRODUCT.md.",
+      "Don't definir `fontWeight` diferente de `normal` sobre as famílias Overpass no app.",
+      "Don't pintar o número de dourado fora da transição de 0 para mais."
+    ]
+  }
+}
