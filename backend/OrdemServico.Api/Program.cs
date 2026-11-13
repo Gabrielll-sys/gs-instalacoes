@@ -1,8 +1,11 @@
 ﻿using System.Security.Claims;
 using System.Text;
+using System.IO.Compression;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileProviders.Physical;
 using Microsoft.IdentityModel.Tokens;
@@ -29,6 +32,17 @@ builder.Services.AddSingleton<IR2Storage, R2Storage>();
 builder.Services.AddSingleton<BackupDiario>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<BackupDiario>());
 builder.Services.AddCors();
+builder.Services.AddMemoryCache();
+// JSON das listas encolhe 70% a 80% comprimido: menos dados no 4G do técnico e menos banda no Railway.
+// O PDF não entra (já vem comprimido) e o nível rápido gasta pouca CPU.
+builder.Services.AddResponseCompression(o =>
+{
+    o.EnableForHttps = true;
+    o.Providers.Add<BrotliCompressionProvider>();
+    o.Providers.Add<GzipCompressionProvider>();
+});
+builder.Services.Configure<BrotliCompressionProviderOptions>(o => o.Level = CompressionLevel.Fastest);
+builder.Services.Configure<GzipCompressionProviderOptions>(o => o.Level = CompressionLevel.Fastest);
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(o =>
 {
@@ -41,12 +55,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     o.Events = new JwtBearerEvents
     {
         // O token vale 90 dias: conta desativada ou senha trocada precisam perder o acesso na hora.
+        // A conta fica 5 minutos em memória para não ler o banco a cada pedido; toda rota que muda a conta limpa esse cache.
         OnTokenValidated = async ctx =>
         {
             var token = ctx.Principal!;
             var id = Guid.TryParse(token.FindFirstValue("uid"), out var uid) ? uid : Guid.Empty;
-            var db = ctx.HttpContext.RequestServices.GetRequiredService<AppDb>();
-            var usuario = await db.Usuarios.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id);
+            var servicos = ctx.HttpContext.RequestServices;
+            var usuario = await servicos.GetRequiredService<IMemoryCache>().GetOrCreateAsync(Autenticacao.ChaveDoCache(id), e =>
+            {
+                e.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
+                return servicos.GetRequiredService<AppDb>().Usuarios.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id);
+            });
             if (usuario is not { Ativo: true } || token.FindFirstValue("ver") != usuario.VersaoSessao.ToString())
             {
                 ctx.Fail("Sessão encerrada.");
@@ -99,6 +118,7 @@ if (app.Environment.IsDevelopment())
 else if (origens.Length > 0)
     app.UseCors(p => p.WithOrigins(origens).AllowAnyHeader().AllowAnyMethod().WithExposedHeaders("Content-Disposition"));
 
+app.UseResponseCompression();
 app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();

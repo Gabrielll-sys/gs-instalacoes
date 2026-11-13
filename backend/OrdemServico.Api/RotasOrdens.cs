@@ -23,7 +23,7 @@ public static class RotasOrdens
             return lista.Select(o => new OrdemDto(
                 o.Id, o.Cliente, o.Responsaveis, o.Observacoes, o.AbertaEm,
                 o.Fotos.Select(f => new FotoDto(f.Id, f.OrdemId, f.Secao, r2.UrlPublica(f.Chave), f.CriadaEm)).ToList()));
-        });
+        }).ComEtag();
 
         // PUT com id gerado no aparelho: a mesma OS pode ser reenviada pela fila offline sem duplicar.
         ordens.MapPut("/{id:guid}", async (Guid id, OrdemRequest req, ClaimsPrincipal quem, AppDb db) =>

@@ -16,7 +16,7 @@ public static class RotasOrcamentos
         var clientes = app.MapGroup("/api/clientes").RequireAuthorization(p => p.RequireRole(Papeis.Gestor));
 
         clientes.MapGet("", async (AppDb db) =>
-            (await db.Clientes.AsNoTracking().ToListAsync()).OrderBy(c => c.Nome, OrdemAlfabetica).Select(ParaDto));
+            (await db.Clientes.AsNoTracking().ToListAsync()).OrderBy(c => c.Nome, OrdemAlfabetica).Select(ParaDto)).ComEtag();
 
         clientes.MapPost("", async (ClienteRequest req, AppDb db) =>
         {
@@ -48,7 +48,7 @@ public static class RotasOrcamentos
 
         // Os mais recentes primeiro; "Mostrar mais" nos clientes pede um limite maior.
         orcamentos.MapGet("", async (int? limite, AppDb db) =>
-            (await db.Orcamentos.AsNoTracking().Include(o => o.Cliente).OrderByDescending(o => o.Numero).Take(Listas.Limite(limite)).ToListAsync()).Select(ParaDto));
+            (await db.Orcamentos.AsNoTracking().Include(o => o.Cliente).OrderByDescending(o => o.Numero).Take(Listas.Limite(limite)).ToListAsync()).Select(ParaDto)).ComEtag();
 
         orcamentos.MapPost("", async (OrcamentoRequest req, ClaimsPrincipal quem, AppDb db) =>
         {

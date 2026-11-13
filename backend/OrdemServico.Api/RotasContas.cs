@@ -1,7 +1,8 @@
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using static OrdemServico.Api.Respostas;
 
 namespace OrdemServico.Api;
@@ -33,7 +34,7 @@ public static class RotasContas
             return Results.Ok(auth.Sessao(usuario));
         }).RequireRateLimiting("login");
 
-        app.MapPut("/api/conta/senha", async (TrocaSenhaRequest req, ClaimsPrincipal quem, AppDb db, Autenticacao auth) =>
+        app.MapPut("/api/conta/senha", async (TrocaSenhaRequest req, ClaimsPrincipal quem, AppDb db, Autenticacao auth, IMemoryCache cache) =>
         {
             var id = Guid.Parse(quem.FindFirstValue("uid")!);
             var usuario = await db.Usuarios.FirstAsync(u => u.Id == id);
@@ -44,13 +45,15 @@ public static class RotasContas
 
             auth.DefinirSenha(usuario, req.Nova!, provisoria: false);
             await db.SaveChangesAsync();
+            cache.Remove(Autenticacao.ChaveDoCache(usuario.Id));
             return Results.Ok(auth.Sessao(usuario));
         }).RequireAuthorization().RequireRateLimiting("login");
 
         // Para o seletor de responsáveis: só técnicos ativos, e só o nome, sem usuário de login.
         app.MapGet("/api/equipe", async (AppDb db) =>
             await db.Usuarios.AsNoTracking().Where(u => u.Ativo && u.Papel == Papeis.Tecnico).OrderBy(u => u.Nome).Select(u => u.Nome).Distinct().ToListAsync())
-            .RequireAuthorization();
+            .RequireAuthorization()
+            .ComEtag();
 
         var usuarios = app.MapGroup("/api/usuarios").RequireAuthorization(p => p.RequireRole(Papeis.Gestor));
 
@@ -72,7 +75,7 @@ public static class RotasContas
             return Results.Ok(ParaDto(usuario));
         });
 
-        usuarios.MapPut("/{id:guid}", async (Guid id, UsuarioRequest req, AppDb db) =>
+        usuarios.MapPut("/{id:guid}", async (Guid id, UsuarioRequest req, AppDb db, IMemoryCache cache) =>
         {
             var nome = Limpo(req.Nome);
             if (ProblemaNaConta(nome, req.Papel) is { } problema) return Erro(problema);
@@ -87,16 +90,18 @@ public static class RotasContas
             usuario.Papel = req.Papel!;
             usuario.Ativo = req.Ativo;
             await db.SaveChangesAsync();
+            cache.Remove(Autenticacao.ChaveDoCache(id));
             return Results.Ok(ParaDto(usuario));
         });
 
         // Para quem esqueceu a senha: volta à padrão, e a pessoa escolhe outra no próximo acesso.
-        usuarios.MapPut("/{id:guid}/senha", async (Guid id, AppDb db, Autenticacao auth) =>
+        usuarios.MapPut("/{id:guid}/senha", async (Guid id, AppDb db, Autenticacao auth, IMemoryCache cache) =>
         {
             if (await db.Usuarios.FindAsync(id) is not { } usuario) return ContaNaoEncontrada();
 
             auth.DefinirSenha(usuario, Usuario.SenhaPadrao, provisoria: true);
             await db.SaveChangesAsync();
+            cache.Remove(Autenticacao.ChaveDoCache(id));
             return Results.Ok(ParaDto(usuario));
         });
     }

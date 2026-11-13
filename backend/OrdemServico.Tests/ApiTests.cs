@@ -767,4 +767,27 @@ public class ApiTests(Api api) : IClassFixture<Api>
         // No mesmo dia não repete.
         Assert.False(await backup.FazerSeFaltar(agora.AddHours(6), CancellationToken.None));
     }
+
+    [Fact]
+    public async Task Lista_igual_volta_304_e_resposta_vem_comprimida()
+    {
+        var gestor = await api.ClienteGestor();
+        var primeira = await gestor.GetAsync("/api/ordens");
+        var etag = primeira.Headers.ETag;
+        Assert.NotNull(etag);
+
+        var pedido = new HttpRequestMessage(HttpMethod.Get, "/api/ordens");
+        pedido.Headers.IfNoneMatch.Add(etag!);
+        Assert.Equal(HttpStatusCode.NotModified, (await gestor.SendAsync(pedido)).StatusCode);
+
+        // Mudou a lista, muda a marca.
+        (await gestor.PutAsJsonAsync($"/api/ordens/{Guid.NewGuid()}", NovaOrdem("Nova para mudar a lista"))).EnsureSuccessStatusCode();
+        var depois = new HttpRequestMessage(HttpMethod.Get, "/api/ordens");
+        depois.Headers.IfNoneMatch.Add(etag!);
+        Assert.Equal(HttpStatusCode.OK, (await gestor.SendAsync(depois)).StatusCode);
+
+        var comprimido = new HttpRequestMessage(HttpMethod.Get, "/api/ordens");
+        comprimido.Headers.AcceptEncoding.ParseAdd("gzip");
+        Assert.Contains("gzip", (await gestor.SendAsync(comprimido)).Content.Headers.ContentEncoding);
+    }
 }

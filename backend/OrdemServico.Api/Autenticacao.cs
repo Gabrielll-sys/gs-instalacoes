@@ -1,4 +1,4 @@
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
@@ -12,10 +12,12 @@ public sealed class Autenticacao(SymmetricSecurityKey chave)
 
     public SymmetricSecurityKey Chave => chave;
 
+    public static string ChaveDoCache(Guid usuarioId) => $"conta:{usuarioId}";
+
     public SessaoDto Sessao(Usuario u) => new(
         new JsonWebTokenHandler().CreateToken(new SecurityTokenDescriptor
         {
-            // Só a identidade: nome e papel são lidos do banco a cada pedido.
+            // Só a identidade: nome e papel vêm do banco (com cache curto), não do token.
             Subject = new ClaimsIdentity([new Claim("uid", u.Id.ToString()), new Claim("ver", u.VersaoSessao.ToString())]),
             // Validade longa porque o técnico pode passar dias em campo sem conseguir renovar.
             Expires = DateTime.UtcNow.AddDays(90),

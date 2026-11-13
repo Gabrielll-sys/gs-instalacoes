@@ -9,8 +9,14 @@ export type { Cliente, DadosCliente, DadosOrcamento, ItemOrcamento, Orcamento } 
 export const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:5202';
 const TEMPO_LIMITE_MS = 20_000;
 
+// Última resposta de cada lista, com a marca (ETag) que a API mandou. Se nada mudou, ela responde 304 vazio
+// e o app reaproveita o que já tem: menos dados no 4G. A chave inclui o token, então outra conta não vê nada daqui.
+const respostasGuardadas = new Map<string, { etag: string; dados: unknown }>();
+
 async function chamar<T = void>(caminho: string, metodo = 'GET', corpo?: unknown): Promise<T> {
   const token = sessao.get()?.token;
+  const chaveGuardada = metodo === 'GET' ? `${token}|${caminho}` : null;
+  const guardada = chaveGuardada ? respostasGuardadas.get(chaveGuardada) : undefined;
   // Sem limite, uma conexão travada prenderia a fila inteira para sempre.
   const controle = new AbortController();
   const limite = setTimeout(() => controle.abort(), TEMPO_LIMITE_MS);
@@ -20,6 +26,7 @@ async function chamar<T = void>(caminho: string, metodo = 'GET', corpo?: unknown
       headers: {
         ...(corpo ? { 'Content-Type': 'application/json' } : {}),
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(guardada ? { 'If-None-Match': guardada.etag } : {}),
       },
       body: corpo ? JSON.stringify(corpo) : undefined,
       signal: controle.signal,
@@ -28,11 +35,15 @@ async function chamar<T = void>(caminho: string, metodo = 'GET', corpo?: unknown
     if (resposta.status === 401 && token) {
       void sessao.sair('Sua sessão expirou. Entre de novo: o que está na fila continua guardado.');
     }
+    if (resposta.status === 304 && guardada) return guardada.dados as T;
     if (!resposta.ok) {
       const dados = await resposta.json().catch(() => null);
       throw new ErroApi(resposta.status, dados?.message ?? `O servidor respondeu com erro ${resposta.status}.`);
     }
-    return (resposta.status === 204 ? undefined : await resposta.json()) as T;
+    const dados = resposta.status === 204 ? undefined : await resposta.json();
+    const etag = resposta.headers.get('ETag');
+    if (chaveGuardada && etag) respostasGuardadas.set(chaveGuardada, { etag, dados });
+    return dados as T;
   } finally {
     clearTimeout(limite);
   }
