@@ -96,8 +96,13 @@ Auth__GestorInicial__Usuario  usuário do primeiro gestor, usado só enquanto n�
 Auth__GestorInicial__Senha    senha dele; o app não obriga a trocar, use uma senha forte
 Auth__JwtKey                  ao menos 32 bytes aleatórios
 CloudflareR2__AccountId, AccessKey, SecretKey, BucketName e PublicUrl, como na seção do R2
+CloudflareR2__BucketBackup    bucket privado, só para o backup do banco; sem ele, não há backup
 Cors__Origens                 endereço do site, ex.: https://seu-site.vercel.app; vários separados por vírgula
 ```
+
+**Backup.** Uma vez por dia a API copia o banco para o `CloudflareR2__BucketBackup`, como `ordens-AAAA-MM-DD.db`, e apaga as cópias com mais de 30 dias. Use um bucket **sem acesso público**, separado do das fotos: o banco tem endereços, telefones e senhas cifradas. As mesmas chaves do R2 servem, desde que tenham acesso aos dois buckets. Para restaurar, baixe a cópia do dia no painel do R2, pare o serviço, troque o `/data/ordens.db` por ela e suba de novo.
+
+**Economia no plano de US$ 5.** O `backend/railway.json` liga a suspensão sem tráfego: a API dorme quando ninguém usa e acorda no primeiro pedido, com alguns segundos de espera nesse primeiro acesso. O backup roda sempre que ela acorda. A API usa o coletor de memória de estação de trabalho, mais enxuto num contêiner pequeno, e o relatório baixa 3 fotos por vez, já reduzidas a 1600 px, para não estourar a memória com OS cheias de fotos.
 
 `ConnectionStrings__Db` já vem no Dockerfile como `Data Source=/data/ordens.db`. Fora do Railway, aponte para um volume persistente. Sem `Cors__Origens`, a API de produção recusa o site; o app nativo não depende dela.
 

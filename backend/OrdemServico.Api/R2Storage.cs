@@ -1,4 +1,4 @@
-using System.Net;
+﻿using System.Net;
 using Amazon.S3;
 using Amazon.S3.Model;
 
@@ -11,6 +11,11 @@ public interface IR2Storage
     Task ExcluirAsync(string chave);
     Task<byte[]?> LerAsync(string chave, CancellationToken ct);
     Task<long?> TamanhoAsync(string chave, CancellationToken ct);
+
+    // Backup do banco: num bucket privado à parte, porque o das fotos é público.
+    Task<bool> BackupExisteAsync(string chave, CancellationToken ct);
+    Task EnviarBackupAsync(string chave, string arquivo, CancellationToken ct);
+    Task ExcluirBackupAsync(string chave);
 }
 
 public sealed class R2Storage(IConfiguration cfg) : IR2Storage, IDisposable
@@ -24,6 +29,9 @@ public sealed class R2Storage(IConfiguration cfg) : IR2Storage, IDisposable
             ServiceURL = $"https://{Obrigatorio(cfg, "AccountId")}.r2.cloudflarestorage.com",
             ForcePathStyle = true,
             AuthenticationRegion = "auto",
+            // O R2 não aceita as somas de verificação que o SDK manda por padrão em envios diretos.
+            RequestChecksumCalculation = Amazon.Runtime.RequestChecksumCalculation.WHEN_REQUIRED,
+            ResponseChecksumValidation = Amazon.Runtime.ResponseChecksumValidation.WHEN_REQUIRED,
         }));
 
     public string GerarUrlUpload(string chave, string contentType)
@@ -72,6 +80,31 @@ public sealed class R2Storage(IConfiguration cfg) : IR2Storage, IDisposable
             return null;
         }
     }
+
+    public async Task<bool> BackupExisteAsync(string chave, CancellationToken ct)
+    {
+        try
+        {
+            await _client.Value.GetObjectMetadataAsync(Obrigatorio(cfg, "BucketBackup"), chave, ct);
+            return true;
+        }
+        catch (AmazonS3Exception e) when (e.StatusCode == HttpStatusCode.NotFound)
+        {
+            return false;
+        }
+    }
+
+    public Task EnviarBackupAsync(string chave, string arquivo, CancellationToken ct) =>
+        _client.Value.PutObjectAsync(new PutObjectRequest
+        {
+            BucketName = Obrigatorio(cfg, "BucketBackup"),
+            Key = chave,
+            FilePath = arquivo,
+            DisablePayloadSigning = true,
+        }, ct);
+
+    public Task ExcluirBackupAsync(string chave) =>
+        _client.Value.DeleteObjectAsync(Obrigatorio(cfg, "BucketBackup"), chave);
 
     public void Dispose()
     {

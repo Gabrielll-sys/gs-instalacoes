@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using QuestPDF.Fluent;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -27,6 +28,18 @@ public sealed class FakeR2 : IR2Storage
     public Dictionary<string, long?> Tamanhos { get; } = [];
     public Task<long?> TamanhoAsync(string chave, CancellationToken ct) =>
         Task.FromResult(Tamanhos.TryGetValue(chave, out var tamanho) ? tamanho : 1000);
+    public Dictionary<string, byte[]> Backups { get; } = [];
+    public Task<bool> BackupExisteAsync(string chave, CancellationToken ct) => Task.FromResult(Backups.ContainsKey(chave));
+    public Task EnviarBackupAsync(string chave, string arquivo, CancellationToken ct)
+    {
+        Backups[chave] = File.ReadAllBytes(arquivo);
+        return Task.CompletedTask;
+    }
+    public Task ExcluirBackupAsync(string chave)
+    {
+        Backups.Remove(chave);
+        return Task.CompletedTask;
+    }
 }
 
 public sealed class Api : WebApplicationFactory<Program>
@@ -708,5 +721,50 @@ public class ApiTests(Api api) : IClassFixture<Api>
         var b = await (await gestor.PostAsJsonAsync("/api/orcamentos", NovoOrcamento(clienteId, item))).Content.ReadFromJsonAsync<JsonElement>();
         Assert.Equal(a.GetProperty("numero").GetInt32() + 1, b.GetProperty("numero").GetInt32());
         Assert.Single((await gestor.GetFromJsonAsync<JsonElement>("/api/orcamentos?limite=1")).EnumerateArray());
+    }
+
+    [Fact]
+    public void Foto_grande_e_reduzida_para_o_relatorio_e_a_pequena_fica_como_esta()
+    {
+        // Foto de verdade, gerada pelo próprio QuestPDF: 3000 x 2000 pixels.
+        MarcaPdf.Preparar();
+        var grande = QuestPDF.Fluent.Document.Create(d => d.Page(p =>
+            {
+                p.Size(3000, 2000);
+                p.Content().Background("#00265F");
+            }))
+            .GenerateImages(new QuestPDF.Infrastructure.ImageGenerationSettings { ImageFormat = QuestPDF.Infrastructure.ImageFormat.Jpeg, RasterDpi = 72 })
+            .First();
+        Assert.Equal((3000, 2000), RelatorioPdf.Tamanho(grande));
+
+        var reduzida = RelatorioPdf.Reduzir(grande)!;
+        var (largura, altura) = RelatorioPdf.Tamanho(reduzida)!.Value;
+        Assert.Equal(RelatorioPdf.LadoMaximo, largura);
+        Assert.InRange(altura, 1066, 1067);
+        Assert.True(reduzida.Length < grande.Length);
+        Assert.False(RelatorioPdf.EstaEmPe(reduzida));
+
+        var pequena = Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==");
+        Assert.Same(pequena, RelatorioPdf.Reduzir(pequena));
+        Assert.Null(RelatorioPdf.Reduzir(null));
+        byte[] ilegivel = [1, 2, 3];
+        Assert.Same(ilegivel, RelatorioPdf.Reduzir(ilegivel));
+    }
+
+    [Fact]
+    public async Task Backup_sai_uma_vez_por_dia_e_apaga_o_de_mais_de_30_dias()
+    {
+        var backup = api.Services.GetRequiredService<BackupDiario>();
+        var agora = new DateTimeOffset(2026, 11, 13, 15, 0, 0, TimeSpan.Zero);
+        var velho = BackupDiario.Chave(new DateTime(2026, 10, 10));
+        api.R2.Backups[velho] = [1];
+
+        Assert.True(await backup.FazerSeFaltar(agora, CancellationToken.None));
+        var copia = api.R2.Backups[BackupDiario.Chave(new DateTime(2026, 11, 13))];
+        Assert.Equal("SQLite format 3", System.Text.Encoding.ASCII.GetString(copia, 0, 15));
+        Assert.DoesNotContain(velho, api.R2.Backups.Keys);
+
+        // No mesmo dia não repete.
+        Assert.False(await backup.FazerSeFaltar(agora.AddHours(6), CancellationToken.None));
     }
 }

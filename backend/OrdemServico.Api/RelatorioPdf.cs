@@ -1,4 +1,4 @@
-using System.Buffers.Binary;
+﻿using System.Buffers.Binary;
 using System.Globalization;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
@@ -292,27 +292,57 @@ public static class RelatorioPdf
         }
     }
 
-    // O QuestPDF não expõe o tamanho da imagem, e o cabeçalho do arquivo basta para saber a orientação.
+    // Foto do relatório ocupa no máximo meia página: 1600 px no lado maior imprimem nítido em A4.
+    public const int LadoMaximo = 1600;
+
+    // Reduz a foto logo depois de baixar, para o relatório não segurar os originais de 4 MB ao mesmo tempo.
+    // Foto menor, de tamanho desconhecido ou que não abre volta como veio: o relatório já trata as duas últimas.
+    public static byte[]? Reduzir(byte[]? dados)
+    {
+        if (dados is null || Tamanho(dados) is not { } t || Math.Max(t.Largura, t.Altura) <= LadoMaximo) return dados;
+        Preparar();
+        var escala = (float)LadoMaximo / Math.Max(t.Largura, t.Altura);
+        try
+        {
+            // Uma página do tamanho da foto reduzida, desenhada a 72 dpi: um ponto vira um pixel.
+            return Document.Create(doc => doc.Page(pagina =>
+                {
+                    pagina.Size(t.Largura * escala, t.Altura * escala);
+                    pagina.Margin(0);
+                    pagina.Content().Image(dados).FitArea();
+                }))
+                .GenerateImages(new ImageGenerationSettings { ImageFormat = ImageFormat.Jpeg, ImageCompressionQuality = ImageCompressionQuality.High, RasterDpi = 72 })
+                .First();
+        }
+        catch (Exception)
+        {
+            return dados;
+        }
+    }
+
+    public static bool? EstaEmPe(byte[]? d) => Tamanho(d) is { } t ? t.Altura > t.Largura : null;
+
+    // O QuestPDF não expõe o tamanho da imagem, e o cabeçalho do arquivo basta para ler largura e altura.
     // shortcut: ignora a orientação gravada no EXIF dos JPEG antigos; errar só muda a altura do par, nunca corta a foto.
-    public static bool? EstaEmPe(byte[]? d)
+    public static (int Largura, int Altura)? Tamanho(byte[]? d)
     {
         if (d is null || d.Length < 24) return null;
         if (d[0] == 0x89 && d[1] == 'P')
-            return BinaryPrimitives.ReadInt32BigEndian(d.AsSpan(20)) > BinaryPrimitives.ReadInt32BigEndian(d.AsSpan(16));
+            return (BinaryPrimitives.ReadInt32BigEndian(d.AsSpan(16)), BinaryPrimitives.ReadInt32BigEndian(d.AsSpan(20)));
 
         // WebP, o formato que o app envia: o tamanho fica no começo do bloco VP8, VP8L ou VP8X.
         if (d.Length >= 30 && d.AsSpan(0, 4).SequenceEqual("RIFF"u8) && d.AsSpan(8, 4).SequenceEqual("WEBP"u8))
         {
             var bloco = d.AsSpan(12, 4);
             if (bloco.SequenceEqual("VP8 "u8))
-                return (BinaryPrimitives.ReadUInt16LittleEndian(d.AsSpan(28)) & 0x3FFF) > (BinaryPrimitives.ReadUInt16LittleEndian(d.AsSpan(26)) & 0x3FFF);
+                return (BinaryPrimitives.ReadUInt16LittleEndian(d.AsSpan(26)) & 0x3FFF, BinaryPrimitives.ReadUInt16LittleEndian(d.AsSpan(28)) & 0x3FFF);
             if (bloco.SequenceEqual("VP8L"u8))
             {
                 var bits = BinaryPrimitives.ReadUInt32LittleEndian(d.AsSpan(21));
-                return ((bits >> 14) & 0x3FFF) > (bits & 0x3FFF);
+                return ((int)(bits & 0x3FFF) + 1, (int)((bits >> 14) & 0x3FFF) + 1);
             }
             if (bloco.SequenceEqual("VP8X"u8))
-                return (d[27] | d[28] << 8 | d[29] << 16) > (d[24] | d[25] << 8 | d[26] << 16);
+                return ((d[24] | d[25] << 8 | d[26] << 16) + 1, (d[27] | d[28] << 8 | d[29] << 16) + 1);
             return null;
         }
         if (d[0] != 0xFF || d[1] != 0xD8) return null;
@@ -321,7 +351,7 @@ public static class RelatorioPdf
         for (var i = 2; i + 9 < d.Length && d[i] == 0xFF; i += 2 + BinaryPrimitives.ReadUInt16BigEndian(d.AsSpan(i + 2)))
         {
             if (d[i + 1] is >= 0xC0 and <= 0xCF and not (0xC4 or 0xC8 or 0xCC))
-                return BinaryPrimitives.ReadUInt16BigEndian(d.AsSpan(i + 5)) > BinaryPrimitives.ReadUInt16BigEndian(d.AsSpan(i + 7));
+                return (BinaryPrimitives.ReadUInt16BigEndian(d.AsSpan(i + 7)), BinaryPrimitives.ReadUInt16BigEndian(d.AsSpan(i + 5)));
         }
         return null;
     }

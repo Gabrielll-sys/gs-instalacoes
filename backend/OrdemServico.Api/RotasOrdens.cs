@@ -55,7 +55,20 @@ public static class RotasOrdens
             var ordem = await db.Ordens.AsNoTracking().Include(o => o.Fotos).FirstOrDefaultAsync(o => o.Id == id, ct);
             if (ordem is null) return OsNaoEncontrada();
 
-            var arquivos = await Task.WhenAll(ordem.Fotos.Select(async f => (f.Id, Dados: await r2.LerAsync(f.Chave, ct))));
+            // Poucas por vez e já reduzidas: 30 fotos de 4 MB não ficam inteiras na memória ao mesmo tempo.
+            using var vagas = new SemaphoreSlim(3);
+            var arquivos = await Task.WhenAll(ordem.Fotos.Select(async f =>
+            {
+                await vagas.WaitAsync(ct);
+                try
+                {
+                    return (f.Id, Dados: RelatorioPdf.Reduzir(await r2.LerAsync(f.Chave, ct)));
+                }
+                finally
+                {
+                    vagas.Release();
+                }
+            }));
             var pdf = RelatorioPdf.Gerar(ordem, arquivos.ToDictionary(a => a.Id, a => a.Dados), quem.Identity!.Name!, DateTimeOffset.UtcNow);
             return Results.File(pdf, "application/pdf", $"Relatorio-OS-{RelatorioPdf.Codigo(ordem.Id)}.pdf");
         }).RequireAuthorization(p => p.RequireRole(Papeis.Gestor));

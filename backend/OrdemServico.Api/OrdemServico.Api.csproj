@@ -5,6 +5,10 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>3cbb9501-1c0a-45a9-b77a-980a9f8d9b6b</UserSecretsId>
+    <!-- Plano pequeno no Railway, cobrado por memória: coletor de estação de trabalho, sem a thread de coleta em paralelo.
+         O de servidor reserva memória por núcleo pensando em máquinas grandes. -->
+    <ServerGarbageCollection>false</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>false</ConcurrentGarbageCollection>
   </PropertyGroup>
 
   <ItemGroup>

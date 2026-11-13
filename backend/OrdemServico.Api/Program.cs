@@ -26,6 +26,8 @@ var autenticacao = new Autenticacao(chaveJwt);
 builder.Services.AddSingleton(autenticacao);
 builder.Services.AddDbContext<AppDb>(o => o.UseSqlite(cfg.GetConnectionString("Db")));
 builder.Services.AddSingleton<IR2Storage, R2Storage>();
+builder.Services.AddSingleton<BackupDiario>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<BackupDiario>());
 builder.Services.AddCors();
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(o =>
