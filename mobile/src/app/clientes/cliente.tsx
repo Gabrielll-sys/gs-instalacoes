@@ -173,7 +173,7 @@ function FormCliente({ cliente, voltarPara }: { cliente?: Cliente; voltarPara?: 
         <Button
           mode="contained"
           buttonColor={cor.dourado}
-          textColor={cor.marinho}
+          textColor={cor.sobreDourado}
           onPress={enviar}
           loading={salvar.isPending}
           disabled={salvar.isPending || excluir.isPending}
@@ -208,7 +208,7 @@ export default function TelaCliente() {
 }
 
 const estilos = StyleSheet.create({
-  tela: { flex: 1, backgroundColor: cor.branco },
+  tela: { flex: 1, backgroundColor: cor.superficie },
   conteudo: { padding: 16, gap: 8 },
   endereco: { minHeight: 96 },
   erro: { color: cor.erro },
@@ -217,7 +217,7 @@ const estilos = StyleSheet.create({
     paddingTop: 12,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: cor.filete,
-    backgroundColor: cor.branco,
+    backgroundColor: cor.superficie,
   },
   botao: { height: 52 },
 });

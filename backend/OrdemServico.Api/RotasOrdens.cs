@@ -12,9 +12,21 @@ public static class RotasOrdens
         var ordens = app.MapGroup("/api/ordens").RequireAuthorization();
 
         // As mais recentes primeiro; "Mostrar mais" nos clientes pede um limite maior.
-        ordens.MapGet("", async (int? limite, AppDb db, IR2Storage r2) =>
+        // Com busca, procura em todas as OS, não só nas que a tela já carregou.
+        ordens.MapGet("", async (int? limite, string? busca, AppDb db, IR2Storage r2) =>
         {
-            var lista = await db.Ordens.AsNoTracking()
+            var consulta = db.Ordens.AsNoTracking();
+            if (!string.IsNullOrWhiteSpace(busca))
+            {
+                // shortcut: compara em memória só cliente e responsáveis de todas as OS; criar coluna normalizada no banco se passar de dezenas de milhares.
+                var termo = SemAcento(busca.Trim());
+                var achadas = (await db.Ordens.AsNoTracking().Select(o => new { o.Id, o.Cliente, o.Responsaveis }).ToListAsync())
+                    .Where(o => SemAcento($"{o.Cliente} {string.Join(' ', o.Responsaveis)}").Contains(termo))
+                    .Select(o => o.Id)
+                    .ToList();
+                consulta = consulta.Where(o => achadas.Contains(o.Id));
+            }
+            var lista = await consulta
                 .Include(o => o.Fotos.OrderBy(f => f.CriadaEm))
                 .OrderByDescending(o => o.AbertaEm)
                 .Take(Listas.Limite(limite))
@@ -22,7 +34,7 @@ public static class RotasOrdens
 
             return lista.Select(o => new OrdemDto(
                 o.Id, o.Cliente, o.Responsaveis, o.Observacoes, o.AbertaEm,
-                o.Fotos.Select(f => new FotoDto(f.Id, f.OrdemId, f.Secao, r2.UrlPublica(f.Chave), f.CriadaEm)).ToList()));
+                o.Fotos.Select(f => new FotoDto(f.Id, f.OrdemId, f.Secao, r2.UrlPublica(f.Chave), f.CriadaEm, f.TemMiniatura ? r2.UrlPublica(Fotos.ChaveMiniatura(f.Chave)) : null)).ToList()));
         }).ComEtag();
 
         // PUT com id gerado no aparelho: a mesma OS pode ser reenviada pela fila offline sem duplicar.
@@ -79,7 +91,7 @@ public static class RotasOrdens
             var ordem = await db.Ordens.Include(o => o.Fotos).FirstOrDefaultAsync(o => o.Id == id);
             if (ordem is null) return Results.NoContent();
             // Fotos do R2 antes do banco: se falhar no meio, a OS continua e a nova tentativa termina sem deixar arquivo órfão.
-            foreach (var foto in ordem.Fotos) await r2.ExcluirAsync(foto.Chave);
+            foreach (var foto in ordem.Fotos) await ExcluirArquivos(r2, foto);
             db.Ordens.Remove(ordem);
             await db.SaveChangesAsync();
             return Results.NoContent();
@@ -120,6 +132,7 @@ public static class RotasOrdens
                     Chave = chave,
                     CriadaEm = NaoFuturo(req.CriadaEm),
                     EnviadaPor = quem.Identity?.Name,
+                    TemMiniatura = await CriarMiniatura(r2, chave, ct),
                 });
                 await db.SaveChangesAsync();
             }
@@ -132,7 +145,7 @@ public static class RotasOrdens
             if (foto is null) return Results.NoContent();
 
             // R2 antes do banco: se falhar, o registro continua e a nova tentativa não deixa arquivo órfão.
-            await r2.ExcluirAsync(foto.Chave);
+            await ExcluirArquivos(r2, foto);
             db.Fotos.Remove(foto);
             await db.SaveChangesAsync();
             return Results.NoContent();
@@ -140,4 +153,28 @@ public static class RotasOrdens
     }
 
     private static IResult OsNaoEncontrada() => NaoEncontrado("OS não encontrada.");
+
+    // Miniatura para a grade das telas: baixar a foto inteira só para mostrar 110 px gastava os dados do técnico.
+    // Falhar aqui não impede o cadastro, e foto que já é pequena dispensa miniatura: as telas usam a foto inteira.
+    private static async Task<bool> CriarMiniatura(IR2Storage r2, string chave, CancellationToken ct)
+    {
+        try
+        {
+            var dados = await r2.LerAsync(chave, ct);
+            var miniatura = RelatorioPdf.Reduzir(dados, Fotos.LadoMiniatura);
+            if (miniatura is null || ReferenceEquals(miniatura, dados)) return false;
+            await r2.EnviarAsync(Fotos.ChaveMiniatura(chave), miniatura, "image/jpeg", ct);
+            return true;
+        }
+        catch (Exception e) when (e is not OperationCanceledException)
+        {
+            return false;
+        }
+    }
+
+    private static async Task ExcluirArquivos(IR2Storage r2, Foto foto)
+    {
+        await r2.ExcluirAsync(foto.Chave);
+        if (foto.TemMiniatura) await r2.ExcluirAsync(Fotos.ChaveMiniatura(foto.Chave));
+    }
 }

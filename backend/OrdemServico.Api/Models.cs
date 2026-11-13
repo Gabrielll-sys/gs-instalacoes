@@ -25,6 +25,8 @@ public class Foto
     public DateTimeOffset CriadaEm { get; set; }
     // Nulo nas fotos enviadas antes das contas individuais.
     public string? EnviadaPor { get; set; }
+    // Falso nas fotos de antes das miniaturas e quando gerar falhou: as telas mostram a foto inteira.
+    public bool TemMiniatura { get; set; }
 }
 
 public class Usuario
@@ -128,7 +130,7 @@ public record SituacaoRequest(string? Situacao);
 public record OrcamentoRequest(Guid? ClienteId, List<ItemRequest?>? Itens, string? Pagamento, string? Prazo, string? Observacoes);
 public record FotoRequest(string? Secao, string? ContentType, DateTimeOffset? CriadaEm);
 
-public record FotoDto(Guid Id, Guid OrdemId, string Secao, string Url, DateTimeOffset CriadaEm);
+public record FotoDto(Guid Id, Guid OrdemId, string Secao, string Url, DateTimeOffset CriadaEm, string? MiniaturaUrl);
 public record OrdemDto(Guid Id, string Cliente, List<string> Responsaveis, string Observacoes, DateTimeOffset AbertaEm, List<FotoDto> Fotos);
 public record SessaoDto(string Token, string Nome, string Papel, bool TrocarSenha);
 public record UsuarioDto(Guid Id, string Login, string Nome, string Papel, bool Ativo, bool TrocarSenha);
@@ -167,6 +169,10 @@ public static class Fotos
     public const string Depois = "depois";
     // O app compacta antes de enviar; este limite é a garantia do lado do servidor.
     public const long TamanhoMaximo = 4 * 1024 * 1024;
+    // A grade mostra 3 fotos por linha, de cerca de 110 px: 360 px cobrem telas de alta densidade.
+    public const int LadoMiniatura = 360;
+
+    public static string ChaveMiniatura(string chave) => $"{chave[..chave.LastIndexOf('.')]}-mini.jpg";
 
     private static readonly Dictionary<string, string> Extensoes = new()
     {

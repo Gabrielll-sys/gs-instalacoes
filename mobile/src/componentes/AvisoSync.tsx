@@ -90,7 +90,7 @@ export function AvisoSync({ ordemId }: { ordemId?: string }) {
       <Faixa
         fundo={cor.envioFundo}
         cor={cor.marinho}
-        icone={<ActivityIndicator size={18} color={cor.marinho} />}
+        icone={<ActivityIndicator size={18} color={cor.realce} />}
         texto={`Enviando ${pendentes}…`}
       />
     );

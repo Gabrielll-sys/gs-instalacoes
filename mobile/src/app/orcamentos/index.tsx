@@ -7,8 +7,8 @@ import { BarraGestor, useBaseDoFab } from '../../componentes/BarraGestor';
 import { EstadoVazio } from '../../componentes/EstadoVazio';
 import { Esqueleto, Filtros, MostrarMais } from '../../componentes/Listas';
 import { Selo } from '../../componentes/Selo';
+import { useBuscaCompleta } from '../../buscaCompleta';
 import { mostrarMais, useOrcamentos } from '../../orcamentos';
-import { LIMITES } from '../../tipos';
 import { cor, familia, temaFab } from '../../tema';
 import { filtrarOrcamentos, formatarDia, formatarMoeda, numeroDoOrcamento, rotuloDaSituacao, SITUACOES, type Situacao } from '../../valores';
 
@@ -48,9 +48,9 @@ export default function Orcamentos() {
   const [puxando, setPuxando] = useState(false);
 
   const [situacao, setSituacao] = useState<Situacao | 'todas'>('todas');
-  const lista = useMemo(() => orcamentos.data ?? [], [orcamentos.data]);
+  const carregados = useMemo(() => orcamentos.data ?? [], [orcamentos.data]);
+  const { itens: lista, cheia, buscando } = useBuscaCompleta('orcamentos', carregados, busca);
   const visiveis = useMemo(() => filtrarOrcamentos(lista, busca, situacao), [lista, busca, situacao]);
-  const cheia = lista.length >= LIMITES.orcamentos;
   // Contagens seguem a busca, como nas OS, para baterem com a lista.
   const filtros = [{ valor: 'todas' as const, rotulo: 'Todos' }, ...SITUACOES].map((f) => ({
     ...f,
@@ -96,7 +96,16 @@ export default function Orcamentos() {
         data={visiveis}
         keyExtractor={(orcamento) => orcamento.id}
         renderItem={({ item }) => <LinhaOrcamento orcamento={item} />}
-        ListHeaderComponent={<Filtros opcoes={filtros} valor={situacao} aoMudar={setSituacao} />}
+        ListHeaderComponent={
+          <>
+            <Filtros opcoes={filtros} valor={situacao} aoMudar={setSituacao} />
+            {buscando && (
+              <Text variant="bodyMedium" style={estilos.buscando} accessibilityLiveRegion="polite">
+                Buscando em todos os orçamentos…
+              </Text>
+            )}
+          </>
+        }
         ListEmptyComponent={vazio()}
         ListFooterComponent={
           orcamentos.isLoading ? undefined : <MostrarMais cheia={cheia} carregando={orcamentos.isFetching} aoPedir={() => void mostrarMais('orcamentos')} />
@@ -104,13 +113,13 @@ export default function Orcamentos() {
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ paddingBottom: baseDoFab + 80 }}
         refreshControl={
-          <RefreshControl refreshing={puxando} onRefresh={() => void atualizar()} colors={[cor.marinho]} tintColor={cor.marinho} />
+          <RefreshControl refreshing={puxando} onRefresh={() => void atualizar()} colors={[cor.realce]} tintColor={cor.realce} />
         }
       />
       <FAB
         icon="plus"
         label="Novo orçamento"
-        color={cor.marinho}
+        color={cor.sobreDourado}
         theme={temaFab}
         onPress={() => router.push('/orcamentos/novo')}
         style={[estilos.fab, { bottom: baseDoFab }]}
@@ -121,9 +130,9 @@ export default function Orcamentos() {
 }
 
 const estilos = StyleSheet.create({
-  tela: { flex: 1, backgroundColor: cor.branco },
+  tela: { flex: 1, backgroundColor: cor.superficie },
   faixa: { backgroundColor: cor.marinho, paddingHorizontal: 16, paddingBottom: 16 },
-  busca: { backgroundColor: cor.branco, borderRadius: 28 },
+  busca: { backgroundColor: cor.superficie, borderRadius: 28 },
   buscaTexto: { fontSize: 16 },
   linha: {
     paddingHorizontal: 16,
@@ -135,8 +144,9 @@ const estilos = StyleSheet.create({
   expande: { flex: 1 },
   suave: { color: cor.textoSuave },
   tabular: { fontVariant: ['tabular-nums'] },
+  buscando: { color: cor.textoSuave, paddingHorizontal: 16, paddingVertical: 8 },
   direita: { alignItems: 'flex-end', gap: 4 },
-  valor: { fontFamily: familia.extra, fontSize: 17, lineHeight: 22, color: cor.marinho, fontVariant: ['tabular-nums'] },
+  valor: { fontFamily: familia.extra, fontSize: 17, lineHeight: 22, color: cor.realce, fontVariant: ['tabular-nums'] },
   botaoTentar: { height: 48 },
   fab: { position: 'absolute', right: 16, backgroundColor: cor.dourado },
 });

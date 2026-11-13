@@ -47,8 +47,22 @@ public static class RotasOrcamentos
         var orcamentos = app.MapGroup("/api/orcamentos").RequireAuthorization(p => p.RequireRole(Papeis.Gestor));
 
         // Os mais recentes primeiro; "Mostrar mais" nos clientes pede um limite maior.
-        orcamentos.MapGet("", async (int? limite, AppDb db) =>
-            (await db.Orcamentos.AsNoTracking().Include(o => o.Cliente).OrderByDescending(o => o.Numero).Take(Listas.Limite(limite)).ToListAsync()).Select(ParaDto)).ComEtag();
+        // Com busca, procura em todos os orçamentos, pelo cliente ou pelo número.
+        orcamentos.MapGet("", async (int? limite, string? busca, AppDb db) =>
+        {
+            var consulta = db.Orcamentos.AsNoTracking();
+            if (!string.IsNullOrWhiteSpace(busca))
+            {
+                // shortcut: compara em memória número e cliente de todos; criar coluna normalizada no banco se passar de dezenas de milhares.
+                var termo = SemAcento(busca.Trim());
+                var achados = (await db.Orcamentos.AsNoTracking().Select(o => new { o.Id, o.Numero, Cliente = o.Cliente.Nome }).ToListAsync())
+                    .Where(o => SemAcento($"{o.Cliente} {o.Numero} {o.Numero:D4}").Contains(termo))
+                    .Select(o => o.Id)
+                    .ToList();
+                consulta = consulta.Where(o => achados.Contains(o.Id));
+            }
+            return (await consulta.Include(o => o.Cliente).OrderByDescending(o => o.Numero).Take(Listas.Limite(limite)).ToListAsync()).Select(ParaDto);
+        }).ComEtag();
 
         orcamentos.MapPost("", async (OrcamentoRequest req, ClaimsPrincipal quem, AppDb db) =>
         {

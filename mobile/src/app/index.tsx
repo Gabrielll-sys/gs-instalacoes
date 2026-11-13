@@ -11,12 +11,12 @@ import { EstadoVazio } from '../componentes/EstadoVazio';
 import { Esqueleto, Filtros, MostrarMais } from '../componentes/Listas';
 import { LinhaOrdem } from '../componentes/LinhaOrdem';
 import { useEquipe } from '../equipe';
+import { useBuscaCompleta } from '../buscaCompleta';
 import { useOrdens } from '../ordens';
 import { sessao, useSessao } from '../sessao';
 import { sincronizar } from '../sync/motor';
 import { outbox } from '../sync/outbox';
 import { filtrarOrdens, type Filtro } from '../sync/regras';
-import { LIMITES } from '../tipos';
 import { mostrarMais } from '../orcamentos';
 import { cor, temaFab } from '../tema';
 
@@ -69,15 +69,15 @@ function MenuConta() {
 export default function Lista() {
   const insets = useSafeAreaInsets();
   const baseDoFab = useBaseDoFab();
-  const { ordens, consulta } = useOrdens();
+  const { ordens: carregadas, consulta } = useOrdens();
   // Busca logo aqui para o seletor de responsáveis já estar guardado quando o técnico abrir uma OS sem internet.
   useEquipe();
   const [busca, setBusca] = useState('');
   const [filtro, setFiltro] = useState<Filtro>('todas');
   const [puxando, setPuxando] = useState(false);
+  const { itens: ordens, cheia, buscando } = useBuscaCompleta('ordens', carregadas, busca);
 
   const visiveis = useMemo(() => filtrarOrdens(ordens, busca, filtro), [busca, filtro, ordens]);
-  const cheia = ordens.length >= LIMITES.ordens;
   // O panorama que o dono quer ver sem abrir nenhuma OS; segue a busca para os números baterem com a lista.
   const contagens = useMemo(
     () => ({
@@ -156,6 +156,11 @@ export default function Lista() {
       />
 
       <AvisoSync />
+      {buscando && (
+        <Text variant="bodyMedium" style={estilos.buscando} accessibilityLiveRegion="polite">
+          Buscando em todas as OS…
+        </Text>
+      )}
 
       <FlatList
         data={visiveis}
@@ -168,7 +173,7 @@ export default function Lista() {
         contentContainerStyle={{ paddingBottom: baseDoFab + 80 }}
         keyboardShouldPersistTaps="handled"
         refreshControl={
-          <RefreshControl refreshing={puxando} onRefresh={() => void atualizar()} colors={[cor.marinho]} tintColor={cor.marinho} />
+          <RefreshControl refreshing={puxando} onRefresh={() => void atualizar()} colors={[cor.realce]} tintColor={cor.realce} />
         }
         style={estilos.lista}
       />
@@ -176,7 +181,7 @@ export default function Lista() {
       <FAB
         icon="plus"
         label="Nova OS"
-        color={cor.marinho}
+        color={cor.sobreDourado}
         theme={temaFab}
         onPress={() => router.push('/ordens/nova')}
         style={[estilos.fab, { bottom: baseDoFab }]}
@@ -187,13 +192,14 @@ export default function Lista() {
 }
 
 const estilos = StyleSheet.create({
-  tela: { flex: 1, backgroundColor: cor.branco },
+  buscando: { color: cor.textoSuave, paddingHorizontal: 16, paddingVertical: 8 },
+  tela: { flex: 1, backgroundColor: cor.superficie },
   cabecalho: { backgroundColor: cor.marinho, paddingHorizontal: 16, paddingBottom: 16, gap: 12 },
   topo: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
   titulo: { flex: 1, color: cor.branco },
   nomeConta: { paddingHorizontal: 16, paddingVertical: 10 },
   botaoTentar: { height: 48 },
-  busca: { backgroundColor: cor.branco, borderRadius: 28 },
+  busca: { backgroundColor: cor.superficie, borderRadius: 28 },
   buscaTexto: { fontSize: 16 },
   lista: { flex: 1 },
   fab: { position: 'absolute', right: 16, backgroundColor: cor.dourado },

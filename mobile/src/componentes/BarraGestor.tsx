@@ -49,7 +49,7 @@ export function BarraGestor() {
           >
             <View style={estilos.centro}>
               <View style={[estilos.indicador, ativa && estilos.indicadorAtivo]}>
-                <Icon source={icone} size={24} color={ativa ? cor.marinho : cor.textoSuave} />
+                <Icon source={icone} size={24} color={ativa ? cor.realce : cor.textoSuave} />
               </View>
               <Text variant="labelMedium" style={ativa ? estilos.rotuloAtivo : estilos.rotulo}>
                 {rotulo}
@@ -65,7 +65,7 @@ export function BarraGestor() {
 const estilos = StyleSheet.create({
   barra: {
     flexDirection: 'row',
-    backgroundColor: cor.branco,
+    backgroundColor: cor.superficie,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: cor.filete,
   },
@@ -74,5 +74,5 @@ const estilos = StyleSheet.create({
   indicador: { width: 56, height: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center' },
   indicadorAtivo: { backgroundColor: cor.envioFundo },
   rotulo: { color: cor.textoSuave },
-  rotuloAtivo: { color: cor.marinho },
+  rotuloAtivo: { color: cor.realce },
 });

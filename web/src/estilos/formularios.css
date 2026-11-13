@@ -46,8 +46,8 @@
 .campo input:focus,
 .campo textarea:focus {
   outline: none;
-  border-color: var(--marinho);
-  box-shadow: inset 0 0 0 1px var(--marinho);
+  border-color: var(--realce);
+  box-shadow: inset 0 0 0 1px var(--realce);
 }
 
 .campo.com-erro input,
@@ -87,7 +87,7 @@
   padding: 14px;
   border-radius: 12px;
   background: var(--fundo);
-  color: var(--marinho);
+  color: var(--realce);
 }
 
 .abertura div {
@@ -129,7 +129,7 @@
 .marcar input {
   width: 20px;
   height: 20px;
-  accent-color: var(--marinho);
+  accent-color: var(--realce);
 }
 
 .interruptor {
@@ -226,7 +226,7 @@
   align-self: stretch;
   justify-content: center;
   padding: 48px max(32px, calc((100% - 400px) / 2));
-  background: var(--branco);
+  background: var(--superficie);
 }
 
 /* Troca de senha: página simples com faixa marinho. */
@@ -251,7 +251,7 @@
 
 .pagina-simples {
   min-height: 100dvh;
-  background: var(--branco);
+  background: var(--superficie);
 }
 
 .pagina-simples-corpo {

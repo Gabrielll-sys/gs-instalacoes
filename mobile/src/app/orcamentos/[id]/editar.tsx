@@ -11,7 +11,7 @@ export default function EditarOrcamento() {
   const orcamento = orcamentos.data?.find((o) => o.id === id);
 
   if (orcamento) return <FormOrcamento orcamento={orcamento} />;
-  if (orcamentos.isLoading) return <ActivityIndicator style={estilos.carregando} size="large" color={cor.marinho} />;
+  if (orcamentos.isLoading) return <ActivityIndicator style={estilos.carregando} size="large" color={cor.realce} />;
   return <EstadoVazio titulo="Orçamento não encontrado" texto="Volte e atualize a lista de orçamentos." />;
 }
 

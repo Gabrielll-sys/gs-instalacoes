@@ -11,6 +11,7 @@ public interface IR2Storage
     Task ExcluirAsync(string chave);
     Task<byte[]?> LerAsync(string chave, CancellationToken ct);
     Task<long?> TamanhoAsync(string chave, CancellationToken ct);
+    Task EnviarAsync(string chave, byte[] dados, string contentType, CancellationToken ct);
 
     // Backup do banco: num bucket privado à parte, porque o das fotos é público.
     Task<bool> BackupExisteAsync(string chave, CancellationToken ct);
@@ -79,6 +80,19 @@ public sealed class R2Storage(IConfiguration cfg) : IR2Storage, IDisposable
         {
             return null;
         }
+    }
+
+    public async Task EnviarAsync(string chave, byte[] dados, string contentType, CancellationToken ct)
+    {
+        using var corpo = new MemoryStream(dados);
+        await _client.Value.PutObjectAsync(new PutObjectRequest
+        {
+            BucketName = Obrigatorio(cfg, "BucketName"),
+            Key = chave,
+            InputStream = corpo,
+            ContentType = contentType,
+            DisablePayloadSigning = true,
+        }, ct);
     }
 
     public async Task<bool> BackupExisteAsync(string chave, CancellationToken ct)

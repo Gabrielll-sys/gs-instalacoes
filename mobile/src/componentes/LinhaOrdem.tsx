@@ -53,7 +53,7 @@ export const LinhaOrdem = memo(function LinhaOrdem({ ordem }: { ordem: Ordem }) 
 });
 
 const estilos = StyleSheet.create({
-  toque: { backgroundColor: cor.branco, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: cor.filete },
+  toque: { backgroundColor: cor.superficie, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: cor.filete },
   linha: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 16, paddingVertical: 14 },
   info: { flex: 1, minWidth: 0 },
   suave: { color: cor.textoSuave },

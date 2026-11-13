@@ -103,7 +103,7 @@
   align-items: center;
   gap: 16px;
   padding: 20px 32px;
-  background: var(--branco);
+  background: var(--superficie);
   border-bottom: 1px solid var(--filete);
 }
 
@@ -129,8 +129,8 @@
 }
 
 .busca:focus-within {
-  border-color: var(--marinho);
-  box-shadow: inset 0 0 0 1px var(--marinho);
+  border-color: var(--realce);
+  box-shadow: inset 0 0 0 1px var(--realce);
 }
 
 .busca input {
@@ -156,7 +156,7 @@
 
 .filtros {
   padding: 12px 32px;
-  background: var(--branco);
+  background: var(--superficie);
   border-bottom: 1px solid var(--filete);
 }
 
@@ -168,7 +168,7 @@
   padding: 0 14px;
   border: 1px solid var(--contorno);
   border-radius: 6px;
-  background: var(--branco);
+  background: var(--superficie);
   color: var(--texto-suave);
   font-weight: 600;
   font-size: 15px;
@@ -196,7 +196,7 @@
 }
 
 .chip:not(.marcado) svg {
-  color: var(--marinho);
+  color: var(--realce);
 }
 
 .numero {
@@ -208,7 +208,7 @@
   list-style: none;
   margin: 0;
   padding: 0;
-  background: var(--branco);
+  background: var(--superficie);
 }
 
 .linha {
@@ -217,14 +217,14 @@
   gap: 16px;
   padding: 14px 32px;
   border-bottom: 1px solid var(--filete);
-  background: var(--branco);
+  background: var(--superficie);
   color: inherit;
   text-decoration: none;
   transition: background-color 150ms;
 }
 
 a.linha:hover {
-  background: #f8fafc;
+  background: var(--superficie-hover);
 }
 
 .linha.selecionada {

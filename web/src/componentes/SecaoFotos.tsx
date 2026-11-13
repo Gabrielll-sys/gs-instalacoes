@@ -86,7 +86,7 @@ export function SecaoFotos({ ordem, secao, proximoPasso }: { ordem: Ordem; secao
                 onClick={() => setAberta(indice)}
                 aria-label={`Abrir foto de ${rotulo.toLowerCase()} adicionada em ${formatarCarimbo(foto.criadaEm)}`}
               >
-                <img src={foto.url} alt="" loading="lazy" />
+                <img src={foto.miniaturaUrl ?? foto.url} alt="" loading="lazy" />
                 <span className="carimbo">{formatarCarimbo(foto.criadaEm)}</span>
               </button>
             </li>

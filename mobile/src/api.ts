@@ -64,6 +64,7 @@ export const api = {
   salvarConta: (id: string, conta: { nome: string; papel: Papel; ativo: boolean }) => chamar<Conta>(`/usuarios/${id}`, 'PUT', conta),
   redefinirSenha: (id: string) => chamar<Conta>(`/usuarios/${id}/senha`, 'PUT', {}),
   listarOrdens: () => chamar<Ordem[]>(`/ordens?limite=${LIMITES.ordens}`),
+  buscarOrdens: (busca: string) => chamar<Ordem[]>(`/ordens?limite=${LIMITES.ordens}&busca=${encodeURIComponent(busca)}`),
   salvarOrdem: (ordem: DadosOrdem) => chamar(`/ordens/${ordem.id}`, 'PUT', ordem),
   excluirOrdem: (id: string) => chamar(`/ordens/${id}`, 'DELETE'),
   urlDeUpload: (ordemId: string, fotoId: string, contentType: string) =>
@@ -79,6 +80,7 @@ export const api = {
   salvarCliente: (id: string, cliente: DadosCliente) => chamar<Cliente>(`/clientes/${id}`, 'PUT', cliente),
   excluirCliente: (id: string) => chamar(`/clientes/${id}`, 'DELETE'),
   listarOrcamentos: () => chamar<Orcamento[]>(`/orcamentos?limite=${LIMITES.orcamentos}`),
+  buscarOrcamentos: (busca: string) => chamar<Orcamento[]>(`/orcamentos?limite=${LIMITES.orcamentos}&busca=${encodeURIComponent(busca)}`),
   mudarSituacao: (id: string, situacao: Situacao) => chamar<Orcamento>(`/orcamentos/${id}/situacao`, 'PUT', { situacao }),
   criarOrcamento: (orcamento: DadosOrcamento) => chamar<Orcamento>('/orcamentos', 'POST', orcamento),
   salvarOrcamento: (id: string, orcamento: DadosOrcamento) => chamar<Orcamento>(`/orcamentos/${id}`, 'PUT', orcamento),

@@ -297,11 +297,11 @@ public static class RelatorioPdf
 
     // Reduz a foto logo depois de baixar, para o relatório não segurar os originais de 4 MB ao mesmo tempo.
     // Foto menor, de tamanho desconhecido ou que não abre volta como veio: o relatório já trata as duas últimas.
-    public static byte[]? Reduzir(byte[]? dados)
+    public static byte[]? Reduzir(byte[]? dados, int ladoMaximo = LadoMaximo)
     {
-        if (dados is null || Tamanho(dados) is not { } t || Math.Max(t.Largura, t.Altura) <= LadoMaximo) return dados;
+        if (dados is null || Tamanho(dados) is not { } t || Math.Max(t.Largura, t.Altura) <= ladoMaximo) return dados;
         Preparar();
-        var escala = (float)LadoMaximo / Math.Max(t.Largura, t.Altura);
+        var escala = (float)ladoMaximo / Math.Max(t.Largura, t.Altura);
         try
         {
             // Uma página do tamanho da foto reduzida, desenhada a 72 dpi: um ponto vira um pixel.

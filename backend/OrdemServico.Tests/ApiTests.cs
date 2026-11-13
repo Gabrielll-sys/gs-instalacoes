@@ -28,6 +28,11 @@ public sealed class FakeR2 : IR2Storage
     public Dictionary<string, long?> Tamanhos { get; } = [];
     public Task<long?> TamanhoAsync(string chave, CancellationToken ct) =>
         Task.FromResult(Tamanhos.TryGetValue(chave, out var tamanho) ? tamanho : 1000);
+    public Task EnviarAsync(string chave, byte[] dados, string contentType, CancellationToken ct)
+    {
+        Arquivos[chave] = dados;
+        return Task.CompletedTask;
+    }
     public Dictionary<string, byte[]> Backups { get; } = [];
     public Task<bool> BackupExisteAsync(string chave, CancellationToken ct) => Task.FromResult(Backups.ContainsKey(chave));
     public Task EnviarBackupAsync(string chave, string arquivo, CancellationToken ct)
@@ -789,5 +794,56 @@ public class ApiTests(Api api) : IClassFixture<Api>
         var comprimido = new HttpRequestMessage(HttpMethod.Get, "/api/ordens");
         comprimido.Headers.AcceptEncoding.ParseAdd("gzip");
         Assert.Contains("gzip", (await gestor.SendAsync(comprimido)).Content.Headers.ContentEncoding);
+    }
+
+    [Fact]
+    public async Task Foto_grande_ganha_miniatura_e_ela_sai_junto_na_exclusao()
+    {
+        MarcaPdf.Preparar();
+        var foto = Document.Create(d => d.Page(p =>
+            {
+                p.Size(2000, 1500);
+                p.Content().Background("#EAB827");
+            }))
+            .GenerateImages(new QuestPDF.Infrastructure.ImageGenerationSettings { ImageFormat = QuestPDF.Infrastructure.ImageFormat.Jpeg, RasterDpi = 72 })
+            .First();
+        var tecnico = await api.ClienteLogado();
+        var ordemId = Guid.NewGuid();
+        var fotoId = Guid.NewGuid();
+        var chave = $"ordens/{ordemId}/{fotoId}.jpg";
+        api.R2.Arquivos[chave] = foto;
+        (await tecnico.PutAsJsonAsync($"/api/ordens/{ordemId}", NovaOrdem("Com miniatura"))).EnsureSuccessStatusCode();
+        (await tecnico.PutAsJsonAsync($"/api/ordens/{ordemId}/fotos/{fotoId}", new { secao = "antes", contentType = "image/jpeg", criadaEm = DateTimeOffset.UtcNow })).EnsureSuccessStatusCode();
+
+        var mini = Fotos.ChaveMiniatura(chave);
+        Assert.Equal((Fotos.LadoMiniatura, 270), RelatorioPdf.Tamanho(api.R2.Arquivos[mini]));
+        var registrada = (await BuscarOrdem(tecnico, ordemId)).GetProperty("fotos")[0];
+        Assert.Equal($"https://cdn.test/{mini}", registrada.GetProperty("miniaturaUrl").GetString());
+
+        (await tecnico.DeleteAsync($"/api/ordens/{ordemId}/fotos/{fotoId}")).EnsureSuccessStatusCode();
+        Assert.Contains(mini, api.R2.Excluidas);
+    }
+
+    [Fact]
+    public async Task Busca_acha_OS_e_orcamento_fora_da_lista_carregada()
+    {
+        var gestor = await api.ClienteGestor();
+        var antiga = Guid.NewGuid();
+        (await gestor.PutAsJsonAsync($"/api/ordens/{antiga}", NovaOrdem("Condomínio Ipê Amarelo", DateTimeOffset.UtcNow.AddYears(-3)))).EnsureSuccessStatusCode();
+        for (var i = 0; i < 3; i++) (await gestor.PutAsJsonAsync($"/api/ordens/{Guid.NewGuid()}", NovaOrdem($"Recente {i}"))).EnsureSuccessStatusCode();
+
+        // Com limite 1, a antiga não vem na lista; a busca sem acento acha.
+        var lista = await gestor.GetFromJsonAsync<JsonElement>("/api/ordens?limite=1");
+        Assert.DoesNotContain(lista.EnumerateArray(), o => o.GetProperty("id").GetGuid() == antiga);
+        var achadas = await gestor.GetFromJsonAsync<JsonElement>("/api/ordens?limite=1&busca=IPE%20amarelo");
+        Assert.Equal(antiga, achadas.EnumerateArray().Single().GetProperty("id").GetGuid());
+
+        var clienteId = await CriarCliente(gestor, "Ótica Busca Funda");
+        var orcamento = await (await gestor.PostAsJsonAsync("/api/orcamentos", NovoOrcamento(clienteId, new { descricao = "Mat", quantidade = 1, unidade = "un", precoUnitario = 1m })))
+            .Content.ReadFromJsonAsync<JsonElement>();
+        var pelaBusca = await gestor.GetFromJsonAsync<JsonElement>("/api/orcamentos?busca=otica%20busca");
+        Assert.Equal(orcamento.GetProperty("id").GetGuid(), pelaBusca.EnumerateArray().Single().GetProperty("id").GetGuid());
+        var peloNumero = await gestor.GetFromJsonAsync<JsonElement>($"/api/orcamentos?busca={orcamento.GetProperty("numero").GetInt32():D4}");
+        Assert.Contains(peloNumero.EnumerateArray(), o => o.GetProperty("id").GetGuid() == orcamento.GetProperty("id").GetGuid());
     }
 }

@@ -210,7 +210,7 @@ export function FormOrcamento({ orcamento, modelo }: { orcamento?: Orcamento; mo
         <Button
           mode="contained"
           buttonColor={cor.dourado}
-          textColor={cor.marinho}
+          textColor={cor.sobreDourado}
           onPress={enviar}
           loading={salvar.isPending}
           disabled={salvar.isPending}
@@ -224,9 +224,9 @@ export function FormOrcamento({ orcamento, modelo }: { orcamento?: Orcamento; mo
 }
 
 const estilos = StyleSheet.create({
-  tela: { flex: 1, backgroundColor: cor.branco },
+  tela: { flex: 1, backgroundColor: cor.superficie },
   conteudo: { padding: 16, gap: 8, paddingBottom: 32 },
-  secao: { color: cor.marinho },
+  secao: { color: cor.realce },
   secaoSeguinte: { marginTop: 20 },
   expande: { flex: 1 },
   suave: { color: cor.textoSuave },
@@ -252,8 +252,8 @@ const estilos = StyleSheet.create({
     paddingTop: 12,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: cor.filete,
-    backgroundColor: cor.branco,
+    backgroundColor: cor.superficie,
   },
-  totalValor: { fontFamily: familia.black, fontSize: 22, lineHeight: 28, color: cor.marinho, fontVariant: ['tabular-nums'] },
+  totalValor: { fontFamily: familia.black, fontSize: 22, lineHeight: 28, color: cor.realce, fontVariant: ['tabular-nums'] },
   botao: { height: 52, paddingHorizontal: 8 },
 });

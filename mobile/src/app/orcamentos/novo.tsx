@@ -11,7 +11,7 @@ export default function NovoOrcamento() {
   const orcamentos = useOrcamentos();
   const modelo = base ? orcamentos.data?.find((o) => o.id === base) : undefined;
 
-  if (base && !modelo && orcamentos.isLoading) return <ActivityIndicator style={estilos.carregando} size="large" color={cor.marinho} />;
+  if (base && !modelo && orcamentos.isLoading) return <ActivityIndicator style={estilos.carregando} size="large" color={cor.realce} />;
   return (
     <>
       {modelo && <Stack.Screen options={{ title: `Cópia do ${numeroDoOrcamento(modelo.numero)}` }} />}

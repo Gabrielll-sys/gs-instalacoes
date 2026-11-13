@@ -1,10 +1,15 @@
-/* Mundo "Placa de Serviço" do DESIGN.md, na web. Só tema claro: tema escuro é decisão em aberto. */
+/* Mundo "Placa de Serviço" do DESIGN.md, na web. Claro ou escuro, conforme a configuração do aparelho. */
 :root {
   --marinho: #00265f;
   --marinho-hover: #0b3a80;
   --dourado: #eab827;
   --dourado-hover: #d9a81c;
   --branco: #ffffff;
+  /* Papéis, para o tema escuro trocar só o que precisa: fundo de lista e cartão, texto que era marinho e texto no dourado. */
+  --superficie: #ffffff;
+  --superficie-hover: #f8fafc;
+  --realce: #00265f;
+  --sobre-dourado: #00265f;
   --fundo: #f1f4f8;
   --texto: #10213d;
   --texto-suave: #47566c;
@@ -15,16 +20,40 @@
   --envio-fundo: #e3eaf5;
   --erro: #b42318;
   --erro-fundo: #fdecea;
+  /* Fundo do botão de excluir: o mesmo vermelho nos dois temas, para o texto branco continuar legível. */
+  --erro-forte: #b42318;
   --carimbo-fundo: rgba(0, 38, 95, 0.82);
   --sobre-marinho-suave: rgba(255, 255, 255, 0.8);
   --saida-exponencial: cubic-bezier(0.16, 1, 0.3, 1);
   --entrada-material: cubic-bezier(0.2, 0, 0, 1);
-  color-scheme: light;
+  color-scheme: light dark;
   font-family: Overpass, system-ui, sans-serif;
   font-size: 16px;
   line-height: 24px;
   color: var(--texto);
   -webkit-text-size-adjust: 100%;
+}
+
+/* Escuro: fundo quase preto azulado, superfícies um tom acima, marinho mais claro para as faixas e o realce em azul claro.
+   O dourado não muda, e o texto sobre ele continua marinho escuro. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --marinho: #1d4689;
+    --marinho-hover: #26549e;
+    --superficie: #141c2b;
+    --superficie-hover: #1a2436;
+    --realce: #9dbbff;
+    --fundo: #0b1220;
+    --texto: #e6ebf3;
+    --texto-suave: #a6b2c4;
+    --filete: #26324a;
+    --contorno: #5d6b82;
+    --atencao: #f2d37a;
+    --atencao-fundo: #3a3010;
+    --envio-fundo: #1c2a44;
+    --erro: #ff8a80;
+    --erro-fundo: #3b1715;
+  }
 }
 
 *,
@@ -63,7 +92,7 @@ select {
 }
 
 a {
-  color: var(--marinho);
+  color: var(--realce);
 }
 
 ::selection {
@@ -72,7 +101,7 @@ a {
 }
 
 :focus-visible {
-  outline: 3px solid var(--marinho);
+  outline: 3px solid var(--realce);
   outline-offset: 2px;
 }
 
@@ -145,7 +174,7 @@ a {
 
 .botao-ouro {
   background: var(--dourado);
-  color: var(--marinho);
+  color: var(--sobre-dourado);
 }
 
 .botao-ouro:hover:not(:disabled) {
@@ -162,9 +191,9 @@ a {
 }
 
 .botao-contorno {
-  background: var(--branco);
+  background: var(--superficie);
   border-color: var(--contorno);
-  color: var(--marinho);
+  color: var(--realce);
 }
 
 .botao-contorno:hover:not(:disabled),
@@ -174,11 +203,11 @@ a {
 
 .botao-texto {
   background: transparent;
-  color: var(--marinho);
+  color: var(--realce);
 }
 
 .botao-perigo {
-  background: var(--erro);
+  background: var(--erro-forte);
   color: var(--branco);
 }
 
@@ -192,7 +221,7 @@ a {
   padding: 24px;
   border: 0;
   border-radius: 12px;
-  background: var(--branco);
+  background: var(--superficie);
   color: var(--texto);
   box-shadow: 0 12px 32px rgba(16, 33, 61, 0.24);
 }

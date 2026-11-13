@@ -196,7 +196,7 @@ function FormConta({ conta, unicoGestor }: { conta?: Conta; unicoGestor: boolean
         <Button
           mode="contained"
           buttonColor={cor.dourado}
-          textColor={cor.marinho}
+          textColor={cor.sobreDourado}
           onPress={enviar}
           loading={salvar.isPending}
           disabled={salvar.isPending}
@@ -226,7 +226,7 @@ export default function TelaConta() {
 }
 
 const estilos = StyleSheet.create({
-  tela: { flex: 1, backgroundColor: cor.branco },
+  tela: { flex: 1, backgroundColor: cor.superficie },
   conteudo: { padding: 16, gap: 8 },
   expande: { flex: 1 },
   suave: { color: cor.textoSuave },
@@ -234,7 +234,7 @@ const estilos = StyleSheet.create({
   rotulo: { marginTop: 4 },
   papeis: { flexDirection: 'row', gap: 8 },
   dicaPapel: { paddingHorizontal: 0 },
-  chip: { backgroundColor: cor.branco },
+  chip: { backgroundColor: cor.superficie },
   chipAtivo: { backgroundColor: cor.marinho, borderColor: cor.marinho },
   chipTexto: { marginVertical: 10 },
   chipAtivoTexto: { color: cor.branco, marginVertical: 10 },
@@ -246,7 +246,7 @@ const estilos = StyleSheet.create({
     paddingTop: 12,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: cor.filete,
-    backgroundColor: cor.branco,
+    backgroundColor: cor.superficie,
   },
   botao: { height: 52 },
 });

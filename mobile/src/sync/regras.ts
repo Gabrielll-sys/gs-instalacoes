@@ -7,6 +7,8 @@ export type Foto = {
   ordemId: string;
   secao: Secao;
   url: string;
+  // Versão de 360 px para a grade; nula nas fotos antigas e nas que ainda estão na fila, que mostram a inteira.
+  miniaturaUrl?: string | null;
   // Quando foi adicionada à OS, no aparelho. É a única data que a foto mostra.
   criadaEm: string;
   // Só existem enquanto a foto está na fila do aparelho.

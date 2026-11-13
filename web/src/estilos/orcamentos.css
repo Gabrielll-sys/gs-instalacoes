@@ -1,7 +1,7 @@
 /* Orçamentos e clientes: mesmas linhas, gavetas e campos das OS. */
 .valor-linha {
   flex: none;
-  color: var(--marinho);
+  color: var(--realce);
   font-weight: 800;
   font-size: 17px;
   line-height: 22px;
@@ -16,7 +16,7 @@
 }
 
 .titulo-secao {
-  color: var(--marinho);
+  color: var(--realce);
   font-weight: 800;
   font-size: 18px;
   line-height: 23px;
@@ -130,7 +130,7 @@
 }
 
 .opcao:hover {
-  background: #f8fafc;
+  background: var(--superficie-hover);
 }
 
 .opcao strong {
@@ -259,7 +259,7 @@
 }
 
 .rodape-total strong {
-  color: var(--marinho);
+  color: var(--realce);
   font-weight: 900;
   font-size: 22px;
   line-height: 28px;
@@ -300,7 +300,7 @@
 
 .situacao-enviado {
   background: var(--envio-fundo);
-  color: var(--marinho);
+  color: var(--realce);
 }
 
 .situacao-aprovado {
@@ -315,6 +315,14 @@
 
 .situacao-campo {
   margin-top: 8px;
+}
+
+.link-whatsapp {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--realce);
+  font-weight: 700;
 }
 
 .linha-botoes.contato {
@@ -332,7 +340,7 @@
 
 /* Arrastar fotos do computador: a seção inteira vira alvo. */
 .secao-fotos.arrastando {
-  outline: 2px dashed var(--marinho);
+  outline: 2px dashed var(--realce);
   outline-offset: -6px;
   background: var(--envio-fundo);
 }

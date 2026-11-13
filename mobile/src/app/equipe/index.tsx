@@ -77,13 +77,13 @@ export default function Equipe() {
         }
         contentContainerStyle={{ paddingBottom: baseDoFab + 80 }}
         refreshControl={
-          <RefreshControl refreshing={puxando} onRefresh={() => void atualizar()} colors={[cor.marinho]} tintColor={cor.marinho} />
+          <RefreshControl refreshing={puxando} onRefresh={() => void atualizar()} colors={[cor.realce]} tintColor={cor.realce} />
         }
       />
       <FAB
         icon="plus"
         label="Nova conta"
-        color={cor.marinho}
+        color={cor.sobreDourado}
         theme={temaFab}
         onPress={() => router.push('/equipe/conta')}
         style={[estilos.fab, { bottom: baseDoFab }]}
@@ -94,7 +94,7 @@ export default function Equipe() {
 }
 
 const estilos = StyleSheet.create({
-  tela: { flex: 1, backgroundColor: cor.branco },
+  tela: { flex: 1, backgroundColor: cor.superficie },
   linha: {
     paddingHorizontal: 16,
     paddingVertical: 14,

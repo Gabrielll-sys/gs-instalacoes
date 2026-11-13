@@ -18,7 +18,7 @@ export function Dado({
   return (
     <View style={estilos.dado} accessible accessibilityLabel={`${rotulo}: ${valor}`}>
       <View style={estilos.icone}>
-        <Icon source={icone} size={22} color={cor.marinho} />
+        <Icon source={icone} size={22} color={cor.realce} />
       </View>
       <View style={estilos.expande}>
         <Text variant="labelSmall" style={estilos.suave}>

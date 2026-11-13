@@ -96,7 +96,7 @@ export function FormOrdem({
     >
       <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={estilos.conteudo}>
         <View style={estilos.abertura}>
-          <Icon source="calendar-clock-outline" size={22} color={cor.marinho} />
+          <Icon source="calendar-clock-outline" size={22} color={cor.realce} />
           <View style={estilos.expande}>
             <Text variant="labelLarge">Aberta em {formatarData(inicial.abertaEm)}</Text>
             <Text variant="bodyMedium" style={estilos.suave}>
@@ -125,7 +125,7 @@ export function FormOrdem({
               style={estilos.sugestao}
             >
               <View style={estilos.sugestaoLinha}>
-                <Icon source="card-account-details-outline" size={20} color={cor.marinho} />
+                <Icon source="card-account-details-outline" size={20} color={cor.realce} />
                 <Text variant="bodyLarge" style={estilos.expande} numberOfLines={1}>
                   {c.nome}
                 </Text>
@@ -148,7 +148,7 @@ export function FormOrdem({
                 <Chip
                   key={pessoa}
                   mode="outlined"
-                  icon={() => <Icon source={marcada ? 'check' : 'plus'} size={18} color={marcada ? cor.branco : cor.marinho} />}
+                  icon={() => <Icon source={marcada ? 'check' : 'plus'} size={18} color={marcada ? cor.branco : cor.realce} />}
                   style={marcada ? estilos.chipSelecionado : estilos.chip}
                   textStyle={marcada ? estilos.chipSelecionadoTexto : estilos.chipTexto}
                   hitSlop={ALCANCE_CHIP}
@@ -188,7 +188,7 @@ export function FormOrdem({
         <Button
           mode="contained"
           buttonColor={cor.dourado}
-          textColor={cor.marinho}
+          textColor={cor.sobreDourado}
           onPress={enviar}
           loading={salvar.isPending}
           disabled={salvar.isPending}
@@ -207,7 +207,7 @@ export function FormOrdem({
 const estilos = StyleSheet.create({
   sugestao: { minHeight: 48, justifyContent: 'center', borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: cor.filete },
   sugestaoLinha: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 4 },
-  tela: { flex: 1, backgroundColor: cor.branco },
+  tela: { flex: 1, backgroundColor: cor.superficie },
   conteudo: { padding: 16, gap: 8 },
   abertura: {
     flexDirection: 'row',
@@ -222,7 +222,7 @@ const estilos = StyleSheet.create({
   suave: { color: cor.textoSuave },
   rotulo: { marginBottom: 8 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  chip: { backgroundColor: cor.branco },
+  chip: { backgroundColor: cor.superficie },
   chipTexto: { marginVertical: 10 },
   chipSelecionado: { backgroundColor: cor.marinho, borderColor: cor.marinho },
   chipSelecionadoTexto: { color: cor.branco, marginVertical: 10 },
@@ -232,7 +232,7 @@ const estilos = StyleSheet.create({
     paddingTop: 12,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: cor.filete,
-    backgroundColor: cor.branco,
+    backgroundColor: cor.superficie,
   },
   botao: { height: 52 },
 });

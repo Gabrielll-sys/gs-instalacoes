@@ -206,7 +206,7 @@ components:
 
 Cada ordem de serviço se lê como uma placa rodoviária: de relance, com pressa, em qualquer luz. A faixa marinho com legendas brancas dá o contraste, a letra de estrada Overpass dá a voz, e a placa com filete branco responde à pergunta que importa em toda tela: quantas fotos de antes e de depois esta OS já tem.
 
-O sistema é denso e direto, feito para quem está em pé, em garagens e subsolos, com as mãos ocupadas. Os controles são Material 3 temados, sem reinvenção: o caráter vem da cor, da letra e da placa. O app existe só em tema claro e em retrato. Tema escuro é decisão em aberto no PRODUCT.md e não tem nenhum token aqui.
+O sistema é denso e direto, feito para quem está em pé, em garagens e subsolos, com as mãos ocupadas. Os controles são Material 3 temados, sem reinvenção: o caráter vem da cor, da letra e da placa. O app é em retrato e segue o tema claro ou escuro do aparelho; o escuro está descrito em Tema escuro, abaixo.
 
 O mundo recusa o padrão da categoria, cartões empilhados com selo colorido de status. Os valores em `px` do frontmatter equivalem a `dp` no app; a fonte normativa no código é `mobile/src/tema.ts`.
 
@@ -370,6 +370,9 @@ Irmão do relatório (`backend/OrdemServico.Api/OrcamentoPdf.cs`), com as mesmas
 
 **A Regra do Total à Vista.** Em orçamento, o total tem o mesmo peso da placa nas OS: black, marinho e tabular, na faixa de topo do PDF, na faixa de total e no rodapé do formulário. Não ganha dourado nem o filete da placa.
 
+### Tema escuro
+Segue a configuração do aparelho (app) ou do navegador (site). Os tokens têm papéis para trocar só o necessário: `superficie` (fundo de lista, cartão e gaveta), `realce` (texto e ícone que no claro são marinho) e `sobreDourado` (texto nos botões dourados, sempre marinho escuro). No escuro: fundo `#0B1220`, superfície `#141C2B`, texto `#E6EBF3`, texto suave `#A6B2C4`, filete `#26324A`, realce `#9DBBFF` e marinho das faixas, placas e chips `#1D4689`, mais claro para não sumir no fundo. O dourado e o carimbo não mudam, e o botão de excluir mantém o vermelho forte `#B42318` com texto branco. No app, o tema é escolhido ao abrir; trocar a configuração com o app aberto vale na próxima abertura.
+
 ## Versão web
 
 Mesmo mundo no navegador (`web/`), com os tokens de cor, tipo e forma em `web/src/estilos/` (base, casca, gaveta, formularios, orcamentos e responsivo, nessa ordem), Overpass do `@fontsource/overpass` nos pesos 400, 600, 800 e 900 e os mesmos ícones Material Design Icons (`@mdi/js`). Na web o peso vem de `font-weight`, porque a regra do peso no arquivo é do Android.
@@ -398,6 +401,6 @@ Mesmo mundo no navegador (`web/`), com os tokens de cor, tipo e forma em `web/sr
 - **Don't** usar o losango para fila, erro ou qualquer estado que não seja "falta foto".
 - **Don't** adicionar ação ao Snackbar sem decidir a cor: pelo `inversePrimary` do tema, ela nasceria dourada e abriria um uso fora dos três.
 - **Don't** empilhar as OS em cartões com selo colorido de status. Os selos de envio ficam só na miniatura da foto.
-- **Don't** criar tokens ou variantes de tema escuro enquanto a decisão estiver em aberto no PRODUCT.md.
+- **Don't** usar `marinho` como cor de texto ou ícone sobre superfície: use `realce`, que clareia no escuro. Texto em botão dourado usa `sobreDourado`.
 - **Don't** definir `fontWeight` diferente de `normal` sobre as famílias Overpass no app.
 - **Don't** pintar o número de dourado fora da transição de 0 para mais.

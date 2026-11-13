@@ -13,7 +13,7 @@ export function SeletorCliente({ onEscolher, voltarPara }: { onEscolher: (id: st
   const clientes = useClientes();
   const [busca, setBusca] = useState('');
 
-  if (clientes.isLoading) return <ActivityIndicator style={estilos.carregando} color={cor.marinho} />;
+  if (clientes.isLoading) return <ActivityIndicator style={estilos.carregando} color={cor.realce} />;
   if (clientes.isError)
     return (
       <View style={estilos.aviso}>

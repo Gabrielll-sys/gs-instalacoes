@@ -81,7 +81,7 @@ export default function TelaOrdem() {
       <>
         <Stack.Screen options={{ title: 'Ordem de serviço' }} />
         {consulta.isLoading ? (
-          <ActivityIndicator style={estilos.carregando} size="large" color={cor.marinho} />
+          <ActivityIndicator style={estilos.carregando} size="large" color={cor.realce} />
         ) : (
           <EstadoVazio titulo="OS não encontrada" texto="Ela pode ter ficado fora das 200 mais recentes." />
         )}
@@ -149,7 +149,7 @@ const estilos = StyleSheet.create({
   acoes: { flexDirection: 'row' },
   tela: { flex: 1, backgroundColor: cor.fundo },
   carregando: { marginTop: 56 },
-  dados: { backgroundColor: cor.branco, paddingHorizontal: 16, paddingVertical: 6 },
+  dados: { backgroundColor: cor.superficie, paddingHorizontal: 16, paddingVertical: 6 },
   verTudo: { alignSelf: 'flex-start', marginLeft: 28 },
   verTudoConteudo: { height: 48 },
 });

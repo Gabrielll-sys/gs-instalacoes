@@ -138,7 +138,12 @@ export function GavetaOrcamento() {
           </div>
           {situacao.isError && <Erro>{mensagemDoErro(situacao.error)}</Erro>}
         </fieldset>
-        <BotaoPdf nome="orçamento" conteudo={conteudo} gerar={() => api.gerarPdfOrcamento(orcamento.id)} />
+        <BotaoPdf
+          nome="orçamento"
+          conteudo={conteudo}
+          gerar={() => api.gerarPdfOrcamento(orcamento.id)}
+          envioDireto={{ whatsapp: links?.whatsapp, mensagem: `Olá! Segue o orçamento nº ${numero} da GS Instalações.` }}
+        />
         {excluir.isError && <Erro>{mensagemDoErro(excluir.error)}</Erro>}
       </div>
 

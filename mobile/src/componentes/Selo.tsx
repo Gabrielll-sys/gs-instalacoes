@@ -5,7 +5,7 @@ import { rotuloDaSituacao } from '../valores';
 // Selo da situação do orçamento, sem dourado: aprovado é o único preenchido em marinho.
 const CORES: Record<string, { fundo: string; texto: string }> = {
   aberto: { fundo: cor.fundo, texto: cor.textoSuave },
-  enviado: { fundo: cor.envioFundo, texto: cor.marinho },
+  enviado: { fundo: cor.envioFundo, texto: cor.realce },
   aprovado: { fundo: cor.marinho, texto: cor.branco },
   recusado: { fundo: cor.erroFundo, texto: cor.erro },
 };

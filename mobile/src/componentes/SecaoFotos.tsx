@@ -27,7 +27,7 @@ function Miniatura({ foto, lado, onPress }: { foto: Foto; lado: number; onPress:
       android_ripple={{ color: 'rgba(255,255,255,0.3)', foreground: true }}
       style={{ width: lado, height: lado }}
     >
-      <Image source={{ uri: foto.url }} recyclingKey={foto.id} transition={150} contentFit="cover" style={estilos.imagem} />
+      <Image source={{ uri: foto.miniaturaUrl ?? foto.url }} recyclingKey={foto.id} transition={150} contentFit="cover" style={estilos.imagem} />
       <View style={estilos.carimbo}>
         <Text style={estilos.carimboTexto}>{carimbo}</Text>
       </View>
@@ -97,7 +97,7 @@ export function SecaoFotos({
           mode="contained"
           icon="camera-outline"
           buttonColor={proximoPasso ? cor.dourado : undefined}
-          textColor={proximoPasso ? cor.marinho : undefined}
+          textColor={proximoPasso ? cor.sobreDourado : undefined}
           onPress={() => adicionar.mutate('camera')}
           loading={carregando('camera')}
           disabled={adicionar.isPending}
@@ -125,7 +125,7 @@ export function SecaoFotos({
 }
 
 const estilos = StyleSheet.create({
-  secao: { backgroundColor: cor.branco, padding: MARGEM, gap: 14, marginTop: 8 },
+  secao: { backgroundColor: cor.superficie, padding: MARGEM, gap: 14, marginTop: 8 },
   cabecalho: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   placa: { minWidth: 118 },
   vazio: { flex: 1, color: cor.textoSuave },

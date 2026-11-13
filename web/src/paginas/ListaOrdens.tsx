@@ -4,9 +4,9 @@ import { Link, Outlet, useParams } from 'react-router';
 import { EstadoVazio, ListaEsqueleto, MostrarMais } from '../componentes/Estado';
 import { Icone } from '../componentes/Icone';
 import { Placa } from '../componentes/Placa';
+import { useBuscaCompleta } from '../buscaCompleta';
 import { mostrarMais, useOrdens } from '../consultas';
 import { contarFotos, filtrarOrdens, formatarData, type Filtro } from '../regras';
-import { LIMITES } from '../tipos';
 
 const FILTROS: { valor: Filtro; rotulo: string }[] = [
   { valor: 'todas', rotulo: 'Todas' },
@@ -15,9 +15,10 @@ const FILTROS: { valor: Filtro; rotulo: string }[] = [
 ];
 
 export function ListaOrdens() {
-  const { data: ordens = [], isLoading, isError, isFetching, refetch } = useOrdens();
+  const { data: carregadas = [], isLoading, isError, isFetching, refetch } = useOrdens();
   const { id } = useParams();
   const [busca, setBusca] = useState('');
+  const { itens: ordens, cheia, buscando } = useBuscaCompleta('ordens', carregadas, busca);
   const [filtro, setFiltro] = useState<Filtro>('todas');
 
   const visiveis = useMemo(() => filtrarOrdens(ordens, busca, filtro), [ordens, busca, filtro]);
@@ -26,7 +27,6 @@ export function ListaOrdens() {
     () => Object.fromEntries(FILTROS.map(({ valor }) => [valor, filtrarOrdens(ordens, busca, valor).length])) as Record<Filtro, number>,
     [ordens, busca],
   );
-  const cheia = ordens.length >= LIMITES.ordens;
   const mais = cheia ? '+' : '';
 
   return (
@@ -52,6 +52,7 @@ export function ListaOrdens() {
         ))}
       </div>
 
+      {buscando && <p className="dica-lista" aria-live="polite">Buscando em todas as OS…</p>}
       {isLoading ? (
         <ListaEsqueleto rotulo="Carregando ordens de serviço" placa />
       ) : isError && ordens.length === 0 ? (

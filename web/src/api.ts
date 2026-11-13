@@ -3,7 +3,8 @@ import { LIMITES, type Cliente, type DadosCliente, type DadosOrcamento, type Orc
 import type { Situacao } from './valores';
 
 export type Secao = 'antes' | 'depois';
-export type Foto = { id: string; ordemId: string; secao: Secao; url: string; criadaEm: string };
+// miniaturaUrl: versão de 360 px para a grade; nula nas fotos antigas, que mostram a inteira.
+export type Foto = { id: string; ordemId: string; secao: Secao; url: string; criadaEm: string; miniaturaUrl?: string | null };
 export type DadosOrdem = { id: string; cliente: string; responsaveis: string[]; observacoes: string; abertaEm: string };
 export type Ordem = DadosOrdem & { fotos: Foto[] };
 export type Conta = { id: string; login: string; nome: string; papel: Papel; ativo: boolean; trocarSenha: boolean };
@@ -80,6 +81,7 @@ export const api = {
   salvarConta: (id: string, conta: { nome: string; papel: Papel; ativo: boolean }) => chamar<Conta>(`/usuarios/${id}`, 'PUT', conta),
   redefinirSenha: (id: string) => chamar<Conta>(`/usuarios/${id}/senha`, 'PUT', {}),
   listarOrdens: () => chamar<Ordem[]>(`/ordens?limite=${LIMITES.ordens}`),
+  buscarOrdens: (busca: string) => chamar<Ordem[]>(`/ordens?limite=${LIMITES.ordens}&busca=${encodeURIComponent(busca)}`),
   salvarOrdem: (ordem: DadosOrdem) => chamar(`/ordens/${ordem.id}`, 'PUT', ordem),
   excluirOrdem: (id: string) => chamar(`/ordens/${id}`, 'DELETE'),
   urlDeUpload: (ordemId: string, fotoId: string, contentType: string) =>
@@ -94,6 +96,7 @@ export const api = {
   salvarCliente: (id: string, cliente: DadosCliente) => chamar<Cliente>(`/clientes/${id}`, 'PUT', cliente),
   excluirCliente: (id: string) => chamar(`/clientes/${id}`, 'DELETE'),
   listarOrcamentos: () => chamar<Orcamento[]>(`/orcamentos?limite=${LIMITES.orcamentos}`),
+  buscarOrcamentos: (busca: string) => chamar<Orcamento[]>(`/orcamentos?limite=${LIMITES.orcamentos}&busca=${encodeURIComponent(busca)}`),
   mudarSituacao: (id: string, situacao: Situacao) => chamar<Orcamento>(`/orcamentos/${id}/situacao`, 'PUT', { situacao }),
   criarOrcamento: (orcamento: DadosOrcamento) => chamar<Orcamento>('/orcamentos', 'POST', orcamento),
   salvarOrcamento: (id: string, orcamento: DadosOrcamento) => chamar<Orcamento>(`/orcamentos/${id}`, 'PUT', orcamento),

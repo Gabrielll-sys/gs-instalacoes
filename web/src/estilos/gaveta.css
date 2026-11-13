@@ -64,12 +64,12 @@
 
 .gaveta-rodape {
   padding: 12px 24px;
-  background: var(--branco);
+  background: var(--superficie);
   border-top: 1px solid var(--filete);
 }
 
 .bloco-branco {
-  background: var(--branco);
+  background: var(--superficie);
   padding: 16px 24px;
 }
 
@@ -83,7 +83,7 @@
   display: flex;
   gap: 14px;
   padding: 8px 0;
-  color: var(--marinho);
+  color: var(--realce);
 }
 
 .dado > div {
@@ -126,7 +126,7 @@
   flex-direction: column;
   gap: 14px;
   padding: 16px 24px;
-  background: var(--branco);
+  background: var(--superficie);
 }
 
 .secao-fotos > .botao {

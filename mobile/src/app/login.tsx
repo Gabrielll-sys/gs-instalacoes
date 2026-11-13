@@ -101,7 +101,7 @@ export default function Login() {
           <Button
             mode="contained"
             buttonColor={cor.dourado}
-            textColor={cor.marinho}
+            textColor={cor.sobreDourado}
             onPress={enviar}
             loading={entrar.isPending}
             disabled={entrar.isPending}
@@ -123,7 +123,7 @@ const estilos = StyleSheet.create({
   nome: { width: '100%', aspectRatio: 452 / 58, marginTop: 4 },
   servicos: { color: cor.branco, textAlign: 'center' },
   painel: {
-    backgroundColor: cor.branco,
+    backgroundColor: cor.superficie,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: 20,

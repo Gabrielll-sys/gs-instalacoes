@@ -43,7 +43,7 @@ export default function TelaOrcamento() {
 
   if (!orcamento) {
     return orcamentos.isLoading ? (
-      <ActivityIndicator style={estilos.carregando} size="large" color={cor.marinho} />
+      <ActivityIndicator style={estilos.carregando} size="large" color={cor.realce} />
     ) : (
       <EstadoVazio titulo="Orçamento não encontrado" texto="Ele pode ter sido excluído. Volte e atualize a lista." />
     );
@@ -133,6 +133,7 @@ export default function TelaOrcamento() {
             tituloEnvio={`Orçamento ${numero} – ${orcamento.clienteNome}`}
             mensagemDoErro={(e) => mensagemDoPdf(e, 'Este orçamento foi excluído. Volte e atualize a lista.')}
             onErro={setErro}
+            envioDireto
           />
         </View>
 
@@ -191,13 +192,13 @@ const estilos = StyleSheet.create({
   botao: { height: 48 },
   rotuloSituacao: { paddingTop: 10 },
   situacoes: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingVertical: 8 },
-  chip: { backgroundColor: cor.branco },
+  chip: { backgroundColor: cor.superficie },
   chipAtivo: { backgroundColor: cor.marinho, borderColor: cor.marinho },
   chipTexto: { marginVertical: 10 },
   chipAtivoTexto: { color: cor.branco, marginVertical: 10 },
-  bloco: { backgroundColor: cor.branco, paddingHorizontal: 16, paddingVertical: 6 },
+  bloco: { backgroundColor: cor.superficie, paddingHorizontal: 16, paddingVertical: 6 },
   itens: { marginTop: 8, paddingVertical: 14 },
-  titulo: { color: cor.marinho, paddingBottom: 4 },
+  titulo: { color: cor.realce, paddingBottom: 4 },
   item: {
     flexDirection: 'row',
     alignItems: 'flex-start',

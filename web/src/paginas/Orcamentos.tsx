@@ -3,17 +3,17 @@ import { useMemo, useState } from 'react';
 import { Link, Outlet, useParams } from 'react-router';
 import { EstadoVazio, ListaEsqueleto, MostrarMais } from '../componentes/Estado';
 import { Icone } from '../componentes/Icone';
+import { useBuscaCompleta } from '../buscaCompleta';
 import { mostrarMais, useOrcamentos } from '../consultas';
-import { LIMITES } from '../tipos';
 import { filtrarOrcamentos, formatarDia, formatarMoeda, numeroDoOrcamento, rotuloDaSituacao, SITUACOES, type Situacao } from '../valores';
 
 export function Orcamentos() {
-  const { data: orcamentos = [], isLoading, isError, isFetching, refetch } = useOrcamentos();
+  const { data: carregados = [], isLoading, isError, isFetching, refetch } = useOrcamentos();
   const { id } = useParams();
   const [busca, setBusca] = useState('');
+  const { itens: orcamentos, cheia, buscando } = useBuscaCompleta('orcamentos', carregados, busca);
   const [situacao, setSituacao] = useState<Situacao | 'todas'>('todas');
   const visiveis = useMemo(() => filtrarOrcamentos(orcamentos, busca, situacao), [orcamentos, busca, situacao]);
-  const cheia = orcamentos.length >= LIMITES.orcamentos;
   // Contagens seguem a busca, como nas OS, para baterem com a lista.
   const contagem = (valor: Situacao | 'todas') => `${filtrarOrcamentos(orcamentos, busca, valor).length}${cheia ? '+' : ''}`;
 
@@ -40,6 +40,7 @@ export function Orcamentos() {
         ))}
       </div>
 
+      {buscando && <p className="dica-lista" aria-live="polite">Buscando em todos os orçamentos…</p>}
       {isLoading ? (
         <ListaEsqueleto rotulo="Carregando orçamentos" />
       ) : isError ? (

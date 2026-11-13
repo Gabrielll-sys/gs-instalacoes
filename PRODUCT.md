@@ -47,7 +47,12 @@ A sincronização acontece com o app aberto, sempre que há internet. As fotos f
 - OS e fotos guardam quem abriu e quem enviou.
 - Orçamentos e cadastro de clientes, só do gestor e só online, no app e no site. Cliente tem nome, telefone, e-mail, CPF ou CNPJ e endereço; cliente com orçamento não pode ser excluído. Orçamento tem número sequencial, um cliente, de 1 a 100 itens (material, quantidade com até 3 casas, unidade e preço unitário com até 2 casas), forma de pagamento, prazo de execução e observações. Cada linha é arredondada ao centavo e o total soma as linhas, igual no app, no site e no PDF. O PDF sai do servidor com o mesmo cabeçalho de empresa do relatório da OS. Os dados de clientes não ficam gravados no aparelho.
 
-Decisões em aberto: exclusão de OS, numeração de OS (o relatório usa um código derivado do id), tema escuro.
+- A grade de fotos usa miniaturas de 360 px geradas pela API no envio; o visualizador e o relatório usam a foto inteira.
+- A busca das listas procura em todas as OS e orçamentos na API quando a lista carregada não tem tudo.
+- No orçamento, "Enviar ao cliente" gera o PDF e abre o compartilhamento (no site, o do navegador; sem ele, baixa o PDF e oferece a conversa do cliente no WhatsApp).
+- Tema claro ou escuro, conforme a configuração do aparelho ou do navegador. No app, a troca vale na próxima abertura.
+
+Decisões em aberto: numeração de OS (o relatório usa um código derivado do id).
 
 ## Brand Commitments
 

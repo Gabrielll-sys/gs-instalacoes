@@ -20,6 +20,7 @@ export function BotaoPdf({
   tituloEnvio,
   mensagemDoErro,
   onErro,
+  envioDireto = false,
   children,
 }: {
   nome: 'relatório' | 'orçamento';
@@ -28,6 +29,8 @@ export function BotaoPdf({
   tituloEnvio: string;
   mensagemDoErro: (erro: unknown) => string;
   onErro: (mensagem: string) => void;
+  // Orçamento: botão principal que gera o PDF, se preciso, e já abre o compartilhamento para escolher o contato.
+  envioDireto?: boolean;
   children?: ReactNode;
 }) {
   const [gerado, setGerado] = useState<{ pdf: File; conteudo: string } | null>(null);
@@ -46,8 +49,27 @@ export function BotaoPdf({
   const enviar = (arquivo: File) =>
     enviarPdf(arquivo, tituloEnvio).catch(() => onErro(`Não foi possível enviar o ${nome}. Tente de novo.`));
 
+  const enviarAoCliente = async () => {
+    const arquivo = pdf ?? (await criar.mutateAsync().catch(() => null));
+    if (arquivo) await enviar(arquivo);
+  };
+
   return (
     <View style={estilos.bloco}>
+      {envioDireto && (
+        <Button
+          mode="contained"
+          icon="send-outline"
+          buttonColor={cor.dourado}
+          textColor={cor.sobreDourado}
+          onPress={() => void enviarAoCliente()}
+          loading={criar.isPending}
+          disabled={criar.isPending}
+          contentStyle={estilos.botao}
+        >
+          Enviar ao cliente
+        </Button>
+      )}
       {pdf && (
         <>
           <Text variant="bodyMedium" accessibilityLiveRegion="polite">

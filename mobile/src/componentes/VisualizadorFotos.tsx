@@ -101,7 +101,7 @@ export function VisualizadorFotos({
               <Button
                 mode="contained"
                 buttonColor={cor.dourado}
-                textColor={cor.marinho}
+                textColor={cor.sobreDourado}
                 onPress={() => void tentarErrosDeNovo()}
                 style={estilos.repetir}
                 contentStyle={estilos.repetirConteudo}
