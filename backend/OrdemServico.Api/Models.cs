@@ -71,6 +71,8 @@ public class Orcamento
     public string Pagamento { get; set; } = "";
     public string Prazo { get; set; } = "";
     public string Observacoes { get; set; } = "";
+    // Modelo do carro do cliente, como o colaborador digitou; vai no PDF.
+    public string Veiculo { get; set; } = "";
     public DateTimeOffset CriadoEm { get; set; }
     public string? CriadoPor { get; set; }
     public string Situacao { get; set; } = Situacoes.Aberto;
@@ -127,7 +129,7 @@ public record UploadRequest(string? ContentType);
 public record ClienteRequest(string? Nome, string? Telefone, string? Email, string? Documento, string? Endereco);
 public record ItemRequest(string? Descricao, decimal? Quantidade, string? Unidade, decimal? PrecoUnitario);
 public record SituacaoRequest(string? Situacao);
-public record OrcamentoRequest(Guid? ClienteId, List<ItemRequest?>? Itens, string? Pagamento, string? Prazo, string? Observacoes);
+public record OrcamentoRequest(Guid? ClienteId, List<ItemRequest?>? Itens, string? Pagamento, string? Prazo, string? Observacoes, string? Veiculo = null);
 public record FotoRequest(string? Secao, string? ContentType, DateTimeOffset? CriadaEm);
 
 public record FotoDto(Guid Id, Guid OrdemId, string Secao, string Url, DateTimeOffset CriadaEm, string? MiniaturaUrl);
@@ -136,7 +138,7 @@ public record SessaoDto(string Token, string Nome, string Papel, bool TrocarSenh
 public record UsuarioDto(Guid Id, string Login, string Nome, string Papel, bool Ativo, bool TrocarSenha);
 public record ClienteDto(Guid Id, string Nome, string Telefone, string Email, string Documento, string Endereco);
 public record ItemDto(string Descricao, decimal Quantidade, string Unidade, decimal PrecoUnitario, decimal Total);
-public record OrcamentoDto(Guid Id, int Numero, Guid ClienteId, string ClienteNome, DateTimeOffset CriadoEm, List<ItemDto> Itens, decimal Total, string Pagamento, string Prazo, string Observacoes, string Situacao);
+public record OrcamentoDto(Guid Id, int Numero, Guid ClienteId, string ClienteNome, DateTimeOffset CriadoEm, List<ItemDto> Itens, decimal Total, string Pagamento, string Prazo, string Observacoes, string Situacao, string Veiculo);
 
 // Acompanhamento do orçamento depois de montado; não muda nada do que vai no PDF.
 public static class Situacoes

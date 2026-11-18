@@ -846,4 +846,24 @@ public class ApiTests(Api api) : IClassFixture<Api>
         var peloNumero = await gestor.GetFromJsonAsync<JsonElement>($"/api/orcamentos?busca={orcamento.GetProperty("numero").GetInt32():D4}");
         Assert.Contains(peloNumero.EnumerateArray(), o => o.GetProperty("id").GetGuid() == orcamento.GetProperty("id").GetGuid());
     }
+
+    [Fact]
+    public async Task Orcamento_guarda_o_modelo_do_veiculo_e_sai_no_pdf()
+    {
+        var gestor = await api.ClienteGestor();
+        var clienteId = await CriarCliente(gestor, "Dono do Carro");
+        var item = new[] { new { descricao = "Wallbox", quantidade = 1, unidade = "un", precoUnitario = 10m } };
+        var criado = await (await gestor.PostAsJsonAsync("/api/orcamentos", new { clienteId, itens = item, veiculo = "  BYD Dolphin  " })).Content.ReadFromJsonAsync<JsonElement>();
+        Assert.Equal("BYD Dolphin", criado.GetProperty("veiculo").GetString());
+
+        var longo = await gestor.PostAsJsonAsync("/api/orcamentos", new { clienteId, itens = item, veiculo = new string('x', 101) });
+        Assert.Equal(HttpStatusCode.BadRequest, longo.StatusCode);
+
+        // Sem veículo continua valendo, como nos orçamentos de antes.
+        var semVeiculo = await (await gestor.PostAsJsonAsync("/api/orcamentos", new { clienteId, itens = item })).Content.ReadFromJsonAsync<JsonElement>();
+        Assert.Equal("", semVeiculo.GetProperty("veiculo").GetString());
+
+        var pdf = await gestor.GetAsync($"/api/orcamentos/{criado.GetProperty("id").GetGuid()}/pdf");
+        pdf.EnsureSuccessStatusCode();
+    }
 }

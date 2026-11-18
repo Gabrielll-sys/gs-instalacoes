@@ -2,6 +2,7 @@ import {
   mdiAccountOutline,
   mdiCalendarCheckOutline,
   mdiCalendarOutline,
+  mdiCarOutline,
   mdiCashMultiple,
   mdiContentCopy,
   mdiPhoneOutline,
@@ -101,6 +102,11 @@ export function GavetaOrcamento() {
           {cliente?.endereco && (
             <Dado icone={mdiMapMarkerOutline} rotulo="Endereço">
               <span className="observacoes">{cliente.endereco}</span>
+            </Dado>
+          )}
+          {orcamento.veiculo && (
+            <Dado icone={mdiCarOutline} rotulo="Veículo">
+              {orcamento.veiculo}
             </Dado>
           )}
           <Dado icone={mdiCalendarOutline} rotulo="Emitido em">

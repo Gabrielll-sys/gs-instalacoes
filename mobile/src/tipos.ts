@@ -11,6 +11,8 @@ export type DadosOrcamento = {
   pagamento: string;
   prazo: string;
   observacoes: string;
+  // Modelo do carro do cliente; vazio nos orçamentos de antes do campo.
+  veiculo: string;
 };
 export type Orcamento = Omit<DadosOrcamento, 'itens'> & {
   id: string;

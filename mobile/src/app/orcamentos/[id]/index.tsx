@@ -90,6 +90,7 @@ export default function TelaOrcamento() {
         <View style={estilos.bloco}>
           <Dado icone="account-outline" rotulo="Cliente" valor={orcamento.clienteNome + (contato ? `\n${contato}` : '')} />
           {!!cliente?.endereco && <Dado icone="map-marker-outline" rotulo="Endereço" valor={cliente.endereco} />}
+          {!!orcamento.veiculo && <Dado icone="car-outline" rotulo="Veículo" valor={orcamento.veiculo} />}
           <Dado icone="calendar-outline" rotulo="Emitido em" valor={formatarDia(orcamento.criadoEm)} />
           {links && (
             <View style={estilos.contato}>

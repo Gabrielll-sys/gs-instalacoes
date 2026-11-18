@@ -35,6 +35,7 @@ public static class OrcamentoPdf
                     ("Telefone", cliente.Telefone),
                     ("E-mail", cliente.Email),
                     ("CPF ou CNPJ", cliente.Documento),
+                    ("Veículo", orcamento.Veiculo),
                 }.Where(d => d.Item2 != "").ToList();
 
                 if (contato.Count > 0 || cliente.Endereco != "")
@@ -48,8 +49,8 @@ public static class OrcamentoPdf
                             {
                                 row.Spacing(12);
                                 foreach (var (rotulo, valor) in contato) row.RelativeItem().Element(x => Dado(x, rotulo, valor));
-                                // Colunas vazias mantêm cada dado na mesma posição, tenha o cliente um, dois ou três.
-                                for (var i = contato.Count; i < 3; i++) row.RelativeItem();
+                                // Colunas vazias mantêm cada dado na mesma posição, venham um, dois, três ou quatro.
+                                for (var i = contato.Count; i < 4; i++) row.RelativeItem();
                             });
                         }
                         if (cliente.Endereco != "") dados.Item().MaxWidth(360).Element(x => Dado(x, "Endereço", cliente.Endereco));

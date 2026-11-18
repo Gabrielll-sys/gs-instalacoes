@@ -58,11 +58,12 @@ function FormOrcamento({ orcamento, modelo }: { orcamento?: Orcamento; modelo?: 
   const [pagamento, setPagamento] = useState(origem?.pagamento ?? '');
   const [prazo, setPrazo] = useState(origem?.prazo ?? '');
   const [observacoes, setObservacoes] = useState(origem?.observacoes ?? '');
+  const [veiculo, setVeiculo] = useState(origem?.veiculo ?? '');
   const [tentou, setTentou] = useState(false);
   const [saindo, setSaindo] = useState(false);
   const [cadastrando, setCadastrando] = useState(false);
 
-  const retrato = JSON.stringify([clienteId, itens.map((i) => [i.descricao, i.quantidade, i.unidade, i.preco]), pagamento, prazo, observacoes]);
+  const retrato = JSON.stringify([clienteId, itens.map((i) => [i.descricao, i.quantidade, i.unidade, i.preco]), pagamento, prazo, observacoes, veiculo]);
   const [inicial] = useState(retrato);
   // A cópia ainda não existe no servidor: sair dela sem salvar também pergunta.
   useGuardaAlteracoes((retrato !== inicial || !!modelo) && !saindo);
@@ -78,6 +79,7 @@ function FormOrcamento({ orcamento, modelo }: { orcamento?: Orcamento; modelo?: 
     pagamento: pagamento.trim(),
     prazo: prazo.trim(),
     observacoes: observacoes.trim(),
+    veiculo: veiculo.trim(),
   });
 
   const salvar = useMutation({
@@ -150,6 +152,9 @@ function FormOrcamento({ orcamento, modelo }: { orcamento?: Orcamento; modelo?: 
             <SeletorCliente onEscolher={setClienteId} onCadastrar={() => setCadastrando(true)} />
           )}
           {tentou && !clienteId && <p className="erro-texto">Escolha o cliente.</p>}
+          <Campo rotulo="Modelo do veículo">
+            {(props) => <input {...props} value={veiculo} onChange={(e) => setVeiculo(e.target.value)} placeholder="Ex.: BYD Dolphin" maxLength={100} />}
+          </Campo>
         </section>
 
         <section className="bloco-branco formulario" aria-labelledby="titulo-itens-form">

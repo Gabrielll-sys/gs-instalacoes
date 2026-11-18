@@ -25,6 +25,7 @@ export function FormOrcamento({ orcamento, modelo }: { orcamento?: Orcamento; mo
   const [pagamento, setPagamento] = useState(origem?.pagamento ?? '');
   const [prazo, setPrazo] = useState(origem?.prazo ?? '');
   const [observacoes, setObservacoes] = useState(origem?.observacoes ?? '');
+  const [veiculo, setVeiculo] = useState(origem?.veiculo ?? '');
   const [tentou, setTentou] = useState(false);
   const [saindo, setSaindo] = useState(false);
 
@@ -37,7 +38,7 @@ export function FormOrcamento({ orcamento, modelo }: { orcamento?: Orcamento; mo
     setClienteId(clienteNovo);
   }
 
-  const retrato = JSON.stringify([clienteId, itens.map((i) => [i.descricao, i.quantidade, i.unidade, i.preco]), pagamento, prazo, observacoes]);
+  const retrato = JSON.stringify([clienteId, itens.map((i) => [i.descricao, i.quantidade, i.unidade, i.preco]), pagamento, prazo, observacoes, veiculo]);
   const [inicial] = useState(retrato);
 
   const dados = (): DadosOrcamento => ({
@@ -51,6 +52,7 @@ export function FormOrcamento({ orcamento, modelo }: { orcamento?: Orcamento; mo
     pagamento: pagamento.trim(),
     prazo: prazo.trim(),
     observacoes: observacoes.trim(),
+    veiculo: veiculo.trim(),
   });
 
   const salvar = useMutation({
@@ -124,6 +126,16 @@ export function FormOrcamento({ orcamento, modelo }: { orcamento?: Orcamento; mo
             Escolha o cliente.
           </HelperText>
         )}
+        <TextInput
+          label="Modelo do veículo"
+          accessibilityLabel="Modelo do veículo"
+          mode="outlined"
+          value={veiculo}
+          onChangeText={setVeiculo}
+          placeholder="Ex.: BYD Dolphin"
+          maxLength={100}
+          style={estilos.veiculo}
+        />
 
         <Text variant="titleMedium" style={[estilos.secao, estilos.secaoSeguinte]} accessibilityRole="header">
           Itens
@@ -243,6 +255,7 @@ const estilos = StyleSheet.create({
   },
   adicionar: { marginTop: 4 },
   observacoes: { minHeight: 96 },
+  veiculo: { marginTop: 8 },
   erro: { color: cor.erro },
   rodape: {
     flexDirection: 'row',

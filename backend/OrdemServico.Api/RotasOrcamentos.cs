@@ -133,7 +133,7 @@ public static class RotasOrcamentos
     private static OrcamentoDto ParaDto(Orcamento o) => new(
         o.Id, o.Numero, o.ClienteId, o.Cliente.Nome, o.CriadoEm,
         o.Itens.Select(i => new ItemDto(i.Descricao, i.Quantidade, i.Unidade, i.PrecoUnitario, i.Total)).ToList(),
-        o.Total, o.Pagamento, o.Prazo, o.Observacoes, o.Situacao);
+        o.Total, o.Pagamento, o.Prazo, o.Observacoes, o.Situacao, o.Veiculo);
 
     private static string? ProblemaNoCliente(ClienteRequest r) =>
         Limpo(r.Nome) is "" or { Length: > 200 } ? "Informe o nome do cliente (até 200 caracteres)."
@@ -171,6 +171,7 @@ public static class RotasOrcamentos
         if (Limpo(r.Pagamento).Length > 500) return "A forma de pagamento pode ter até 500 caracteres.";
         if (Limpo(r.Prazo).Length > 500) return "O prazo de execução pode ter até 500 caracteres.";
         if (Limpo(r.Observacoes).Length > 5000) return "Observações podem ter até 5000 caracteres.";
+        if (Limpo(r.Veiculo).Length > 100) return "O modelo do veículo pode ter até 100 caracteres.";
         return null;
     }
 
@@ -186,5 +187,6 @@ public static class RotasOrcamentos
         o.Pagamento = Limpo(r.Pagamento);
         o.Prazo = Limpo(r.Prazo);
         o.Observacoes = Limpo(r.Observacoes);
+        o.Veiculo = Limpo(r.Veiculo);
     }
 }
