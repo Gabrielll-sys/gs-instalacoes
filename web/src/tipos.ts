@@ -18,6 +18,7 @@ export type Orcamento = Omit<DadosOrcamento, 'itens'> & {
   id: string;
   numero: number;
   clienteNome: string;
+  clienteTelefone: string;
   criadoEm: string;
   itens: ItemOrcamento[];
   total: number;

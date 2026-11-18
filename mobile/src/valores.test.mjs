@@ -50,10 +50,12 @@ test('busca de cliente e de orçamento ignora acento e acha pelo número', () =>
   assert.deepEqual(buscarClientes(clientes, 'condominio').map((c) => c.nome), ['Condomínio Aurora']);
   assert.deepEqual(buscarClientes(clientes, 'brasil').map((c) => c.nome), ['João Prado']);
   assert.equal(buscarClientes(clientes, '  ').length, 2);
-  const orcamentos = [{ clienteNome: 'João Prado', numero: 7, situacao: 'aprovado' }, { clienteNome: 'Aurora', numero: 12, situacao: 'aberto' }];
+  const orcamentos = [{ clienteNome: 'João Prado', clienteTelefone: '(31) 98765-4321', numero: 7, situacao: 'aprovado' }, { clienteNome: 'Aurora', clienteTelefone: '', numero: 12, situacao: 'aberto' }];
   assert.deepEqual(filtrarOrcamentos(orcamentos, '0007').map((o) => o.numero), [7]);
   assert.deepEqual(filtrarOrcamentos(orcamentos, 'joao').map((o) => o.numero), [7]);
   assert.deepEqual(filtrarOrcamentos(orcamentos, '', 'aberto').map((o) => o.numero), [12]);
+  assert.deepEqual(filtrarOrcamentos(orcamentos, '98765-4321').map((o) => o.numero), [7]);
+  assert.deepEqual(filtrarOrcamentos(orcamentos, '31987654321').map((o) => o.numero), [7]);
 });
 
 test('máscaras só fecham com a quantidade certa de dígitos', () => {

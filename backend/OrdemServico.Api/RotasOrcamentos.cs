@@ -47,16 +47,17 @@ public static class RotasOrcamentos
         var orcamentos = app.MapGroup("/api/orcamentos").RequireAuthorization(p => p.RequireRole(Papeis.Gestor));
 
         // Os mais recentes primeiro; "Mostrar mais" nos clientes pede um limite maior.
-        // Com busca, procura em todos os orçamentos, pelo cliente ou pelo número.
+        // Com busca, procura em todos os orçamentos, pelo nome ou telefone do cliente, ou pelo número.
         orcamentos.MapGet("", async (int? limite, string? busca, AppDb db) =>
         {
             var consulta = db.Orcamentos.AsNoTracking();
             if (!string.IsNullOrWhiteSpace(busca))
             {
-                // shortcut: compara em memória número e cliente de todos; criar coluna normalizada no banco se passar de dezenas de milhares.
+                // shortcut: compara em memória número, nome e telefone do cliente de todos; criar coluna normalizada no banco se passar de dezenas de milhares.
                 var termo = SemAcento(busca.Trim());
-                var achados = (await db.Orcamentos.AsNoTracking().Select(o => new { o.Id, o.Numero, Cliente = o.Cliente.Nome }).ToListAsync())
-                    .Where(o => SemAcento($"{o.Cliente} {o.Numero} {o.Numero:D4}").Contains(termo))
+                var achados = (await db.Orcamentos.AsNoTracking().Select(o => new { o.Id, o.Numero, Cliente = o.Cliente.Nome, o.Cliente.Telefone }).ToListAsync())
+                    // O telefone entra como foi salvo e só com os dígitos: acha "(31) 98888" e "3198888".
+                    .Where(o => SemAcento($"{o.Cliente} {o.Numero} {o.Numero:D4} {o.Telefone} {SoDigitos(o.Telefone)}").Contains(termo))
                     .Select(o => o.Id)
                     .ToList();
                 consulta = consulta.Where(o => achados.Contains(o.Id));
@@ -157,7 +158,7 @@ public static class RotasOrcamentos
     private static OrcamentoDto ParaDto(Orcamento o) => new(
         o.Id, o.Numero, o.ClienteId, o.Cliente.Nome, o.CriadoEm,
         o.Itens.Select(i => new ItemDto(i.Descricao, i.Quantidade, i.Unidade, i.PrecoUnitario, i.Total)).ToList(),
-        o.Total, o.Pagamento, o.Prazo, o.Observacoes, o.Situacao, o.Veiculo, o.FinalizadoEm);
+        o.Total, o.Pagamento, o.Prazo, o.Observacoes, o.Situacao, o.Veiculo, o.FinalizadoEm, o.Cliente.Telefone);
 
     private static string? ProblemaNoCliente(ClienteRequest r) =>
         Limpo(r.Nome) is "" or { Length: > 200 } ? "Informe o nome do cliente (até 200 caracteres)."
@@ -213,4 +214,6 @@ public static class RotasOrcamentos
         o.Observacoes = Limpo(r.Observacoes);
         o.Veiculo = Limpo(r.Veiculo);
     }
+
+    private static string SoDigitos(string texto) => new(texto.Where(char.IsAsciiDigit).ToArray());
 }

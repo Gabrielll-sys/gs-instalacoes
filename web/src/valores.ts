@@ -127,7 +127,8 @@ export const buscarClientes = <T extends ClienteBuscavel>(clientes: T[], busca: 
   return termo ? clientes.filter((c) => semAcento([c.nome, c.telefone, c.documento, c.endereco].join(' ')).includes(termo)) : clientes;
 };
 
-export const filtrarOrcamentos = <T extends { clienteNome: string; numero: number; situacao: string }>(
+// Pelo nome ou telefone do cliente (com ou sem máscara) ou pelo número, como a busca do servidor.
+export const filtrarOrcamentos = <T extends { clienteNome: string; clienteTelefone: string; numero: number; situacao: string }>(
   orcamentos: T[],
   busca: string,
   situacao: Situacao | 'todas' = 'todas',
@@ -136,6 +137,6 @@ export const filtrarOrcamentos = <T extends { clienteNome: string; numero: numbe
   return orcamentos.filter(
     (o) =>
       (situacao === 'todas' || o.situacao === situacao) &&
-      (!termo || semAcento(`${o.clienteNome} ${o.numero} ${numeroDoOrcamento(o.numero)}`).includes(termo)),
+      (!termo || semAcento(`${o.clienteNome} ${o.numero} ${numeroDoOrcamento(o.numero)} ${o.clienteTelefone} ${digitos(o.clienteTelefone)}`).includes(termo)),
   );
 };

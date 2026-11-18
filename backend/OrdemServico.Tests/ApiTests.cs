@@ -845,6 +845,17 @@ public class ApiTests(Api api) : IClassFixture<Api>
         Assert.Equal(orcamento.GetProperty("id").GetGuid(), pelaBusca.EnumerateArray().Single().GetProperty("id").GetGuid());
         var peloNumero = await gestor.GetFromJsonAsync<JsonElement>($"/api/orcamentos?busca={orcamento.GetProperty("numero").GetInt32():D4}");
         Assert.Contains(peloNumero.EnumerateArray(), o => o.GetProperty("id").GetGuid() == orcamento.GetProperty("id").GetGuid());
+
+        // Pelo telefone do cliente, digitado com ou sem máscara.
+        var comTelefone = await (await gestor.PostAsJsonAsync("/api/clientes", new { nome = "Cliente do Telefone", telefone = "(31) 98765-4321", email = "", documento = "", endereco = "" })).Content.ReadFromJsonAsync<JsonElement>();
+        var doTelefone = await (await gestor.PostAsJsonAsync("/api/orcamentos", NovoOrcamento(comTelefone.GetProperty("id").GetGuid(), new { descricao = "Mat", quantidade = 1, unidade = "un", precoUnitario = 1m })))
+            .Content.ReadFromJsonAsync<JsonElement>();
+        Assert.Equal("(31) 98765-4321", doTelefone.GetProperty("clienteTelefone").GetString());
+        foreach (var termo in new[] { "98765-4321", "31987654321" })
+        {
+            var pelofone = await gestor.GetFromJsonAsync<JsonElement>($"/api/orcamentos?busca={Uri.EscapeDataString(termo)}");
+            Assert.Equal(doTelefone.GetProperty("id").GetGuid(), pelofone.EnumerateArray().Single().GetProperty("id").GetGuid());
+        }
     }
 
     [Fact]

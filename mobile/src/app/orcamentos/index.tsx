@@ -75,7 +75,7 @@ export default function Orcamentos() {
         </EstadoVazio>
       );
     if (busca || situacao !== 'todas')
-      return <EstadoVazio titulo="Nenhum orçamento encontrado" texto="Busque pelo nome do cliente ou pelo número, ou mude o filtro." />;
+      return <EstadoVazio titulo="Nenhum orçamento encontrado" texto="Busque pelo nome ou telefone do cliente ou pelo número, ou mude o filtro." />;
     return <EstadoVazio titulo="Nenhum orçamento ainda" texto="Toque em Novo orçamento para montar o primeiro." />;
   };
 
@@ -83,7 +83,7 @@ export default function Orcamentos() {
     <View style={estilos.tela}>
       <View style={estilos.faixa}>
         <Searchbar
-          placeholder="Buscar cliente ou número"
+          placeholder="Buscar cliente, telefone ou número"
           accessibilityLabel="Buscar orçamento"
           clearAccessibilityLabel="Limpar busca"
           value={busca}

@@ -25,7 +25,7 @@ export function Orcamentos() {
         <label className="busca">
           <Icone caminho={mdiMagnify} />
           <span className="so-leitor">Buscar orçamento</span>
-          <input type="search" placeholder="Buscar cliente ou número" value={busca} onChange={(e) => setBusca(e.target.value)} />
+          <input type="search" placeholder="Buscar cliente, telefone ou número" value={busca} onChange={(e) => setBusca(e.target.value)} />
         </label>
         <Link to="/orcamentos/novo" className="botao botao-ouro">
           <Icone caminho={mdiPlus} />
@@ -54,7 +54,7 @@ export function Orcamentos() {
         </EstadoVazio>
       ) : visiveis.length === 0 ? (
         busca || situacao !== 'todas' ? (
-          <EstadoVazio titulo="Nenhum orçamento encontrado" texto="Busque pelo nome do cliente ou pelo número, ou mude o filtro." />
+          <EstadoVazio titulo="Nenhum orçamento encontrado" texto="Busque pelo nome ou telefone do cliente ou pelo número, ou mude o filtro." />
         ) : (
           <EstadoVazio titulo="Nenhum orçamento ainda" texto="Use Novo orçamento para montar o primeiro." />
         )
