@@ -5,7 +5,7 @@ import type { Situacao } from './valores';
 export type Secao = 'antes' | 'depois';
 // miniaturaUrl: versão de 360 px para a grade; nula nas fotos antigas, que mostram a inteira.
 export type Foto = { id: string; ordemId: string; secao: Secao; url: string; criadaEm: string; miniaturaUrl?: string | null };
-export type DadosOrdem = { id: string; cliente: string; responsaveis: string[]; observacoes: string; abertaEm: string };
+export type DadosOrdem = { id: string; cliente: string; responsaveis: string[]; tipos: string[]; observacoes: string; abertaEm: string };
 export type Ordem = DadosOrdem & { fotos: Foto[] };
 export type Conta = { id: string; login: string; nome: string; papel: Papel; ativo: boolean; trocarSenha: boolean };
 export type { Cliente, DadosCliente, DadosOrcamento, ItemOrcamento, Orcamento } from './tipos';
@@ -101,5 +101,7 @@ export const api = {
   criarOrcamento: (orcamento: DadosOrcamento) => chamar<Orcamento>('/orcamentos', 'POST', orcamento),
   salvarOrcamento: (id: string, orcamento: DadosOrcamento) => chamar<Orcamento>(`/orcamentos/${id}`, 'PUT', orcamento),
   excluirOrcamento: (id: string) => chamar(`/orcamentos/${id}`, 'DELETE'),
+  listarLembretes: () => chamar<Orcamento[]>('/orcamentos/lembretes'),
+  resolverLembrete: (id: string) => chamar(`/orcamentos/${id}/lembrete`, 'PUT'),
   gerarPdfOrcamento: (id: string) => baixarPdf(`/orcamentos/${id}/pdf`, 'Orcamento.pdf'),
 };

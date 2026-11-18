@@ -112,6 +112,7 @@ export default function TelaOrdem() {
           )}
           <Dado icone="calendar-clock-outline" rotulo="Aberta em" valor={formatarData(ordem.abertaEm)} />
           <Dado icone="account-group-outline" rotulo="Responsáveis" valor={ordem.responsaveis.join(', ')} />
+          {!!ordem.tipos?.length && <Dado icone="tag-outline" rotulo="Tipo de serviço" valor={ordem.tipos.join(', ')} />}
           {!!ordem.observacoes && <Observacoes texto={ordem.observacoes} />}
           {papel === 'gestor' && <BotaoRelatorio ordem={ordem} onErro={setErro} />}
         </View>

@@ -21,7 +21,7 @@ import { Erro, EstadoVazio } from '../componentes/Estado';
 import { Gaveta } from '../componentes/Gaveta';
 import { Icone } from '../componentes/Icone';
 import { confirmar } from '../confirmar';
-import { queryClient, recarregarOrcamentos, useClientes, useOrcamentos } from '../consultas';
+import { queryClient, recarregarLembretes, recarregarOrcamentos, useClientes, useOrcamentos } from '../consultas';
 import type { Orcamento } from '../tipos';
 import { contatoDoTelefone, formatarDia, formatarMoeda, formatarQuantidade, numeroDoOrcamento, SITUACOES, type Situacao } from '../valores';
 
@@ -45,7 +45,10 @@ export function GavetaOrcamento() {
   const situacao = useMutation({
     mutationFn: (valor: Situacao) => api.mudarSituacao(id!, valor),
     // A resposta já traz o orçamento atualizado: entra na lista sem esperar outra busca.
-    onSuccess: (salvo) => queryClient.setQueryData<Orcamento[]>(['orcamentos'], (lista) => lista?.map((o) => (o.id === salvo.id ? salvo : o))),
+    onSuccess: (salvo) => {
+      queryClient.setQueryData<Orcamento[]>(['orcamentos'], (lista) => lista?.map((o) => (o.id === salvo.id ? salvo : o)));
+      void recarregarLembretes();
+    },
   });
 
   if (!orcamento) {
@@ -142,6 +145,9 @@ export function GavetaOrcamento() {
               </button>
             ))}
           </div>
+          {orcamento.finalizadoEm && (
+            <p className="campo-ajuda">Finalizado em {formatarDia(orcamento.finalizadoEm)}. O lembrete de manutenção aparece 6 meses depois.</p>
+          )}
           {situacao.isError && <Erro>{mensagemDoErro(situacao.error)}</Erro>}
         </fieldset>
         <BotaoPdf

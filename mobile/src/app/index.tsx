@@ -6,6 +6,7 @@ import { Button, FAB, Menu, Searchbar, Text } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AvisoSync } from '../componentes/AvisoSync';
 import { BarraGestor, useBaseDoFab } from '../componentes/BarraGestor';
+import { Lembretes } from '../componentes/Lembretes';
 import { BotaoIcone } from '../componentes/BotaoIcone';
 import { EstadoVazio } from '../componentes/EstadoVazio';
 import { Esqueleto, Filtros, MostrarMais } from '../componentes/Listas';
@@ -138,8 +139,8 @@ export default function Lista() {
           <MenuConta />
         </View>
         <Searchbar
-          placeholder="Buscar cliente ou responsável"
-          accessibilityLabel="Buscar cliente ou responsável"
+          placeholder="Buscar cliente, responsável ou tipo"
+          accessibilityLabel="Buscar cliente, responsável ou tipo de serviço"
           clearAccessibilityLabel="Limpar busca"
           value={busca}
           onChangeText={setBusca}
@@ -148,6 +149,8 @@ export default function Lista() {
           elevation={0}
         />
       </View>
+
+      <Lembretes />
 
       <Filtros
         opcoes={FILTROS.map(({ valor, rotulo }) => ({ valor, rotulo, total: `${contagens[valor]}${cheia ? '+' : ''}` }))}

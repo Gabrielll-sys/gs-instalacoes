@@ -20,6 +20,8 @@ export type DadosOrdem = {
   id: string;
   cliente: string;
   responsaveis: string[];
+  // Opcional: OS guardadas no aparelho antes do campo não têm.
+  tipos?: string[];
   observacoes: string;
   abertaEm: string;
 };
@@ -177,6 +179,6 @@ export function filtrarOrdens(ordens: Ordem[], busca: string, filtro: Filtro) {
   return ordens.filter((o) => {
     if (filtro === 'andamento' && estaConcluida(o)) return false;
     if (filtro === 'concluidas' && !estaConcluida(o)) return false;
-    return !termo || normalizar([o.cliente, ...o.responsaveis].join(' ')).includes(termo);
+    return !termo || normalizar([o.cliente, ...o.responsaveis, ...(o.tipos ?? [])].join(' ')).includes(termo);
   });
 }

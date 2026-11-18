@@ -112,6 +112,12 @@ namespace OrdemServico.Api.Migrations
                     b.Property<string>("CriadoPor")
                         .HasColumnType("TEXT");
 
+                    b.Property<long?>("FinalizadoEm")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long?>("LembreteResolvidoEm")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("Numero")
                         .HasColumnType("INTEGER");
 
@@ -166,6 +172,10 @@ namespace OrdemServico.Api.Migrations
                         .HasColumnType("TEXT");
 
                     b.PrimitiveCollection<string>("Responsaveis")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.PrimitiveCollection<string>("Tipos")
                         .IsRequired()
                         .HasColumnType("TEXT");
 

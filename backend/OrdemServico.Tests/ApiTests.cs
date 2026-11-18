@@ -866,4 +866,60 @@ public class ApiTests(Api api) : IClassFixture<Api>
         var pdf = await gestor.GetAsync($"/api/orcamentos/{criado.GetProperty("id").GetGuid()}/pdf");
         pdf.EnsureSuccessStatusCode();
     }
+
+    [Fact]
+    public async Task Finalizado_ha_6_meses_vira_lembrete_ate_o_gestor_resolver()
+    {
+        var gestor = await api.ClienteGestor();
+        var clienteId = await CriarCliente(gestor, "Lembrete Seis Meses");
+        var item = new { descricao = "Wallbox", quantidade = 1, unidade = "un", precoUnitario = 10m };
+        var orcamento = await (await gestor.PostAsJsonAsync("/api/orcamentos", NovoOrcamento(clienteId, item))).Content.ReadFromJsonAsync<JsonElement>();
+        var id = orcamento.GetProperty("id").GetGuid();
+
+        var finalizado = await (await gestor.PutAsJsonAsync($"/api/orcamentos/{id}/situacao", new { situacao = "finalizado" })).Content.ReadFromJsonAsync<JsonElement>();
+        Assert.Equal(JsonValueKind.String, finalizado.GetProperty("finalizadoEm").ValueKind);
+        async Task<bool> EstaNosLembretes() =>
+            (await gestor.GetFromJsonAsync<JsonElement>("/api/orcamentos/lembretes")).EnumerateArray().Any(o => o.GetProperty("id").GetGuid() == id);
+
+        // Recém-finalizado ainda não lembra.
+        Assert.False(await EstaNosLembretes());
+
+        // Finalizado há 7 meses: lembra.
+        using (var escopo = api.Services.CreateScope())
+        {
+            var db = escopo.ServiceProvider.GetRequiredService<AppDb>();
+            var o = await db.Orcamentos.FindAsync(id);
+            o!.FinalizadoEm = DateTimeOffset.UtcNow.AddMonths(-7);
+            await db.SaveChangesAsync();
+        }
+        Assert.True(await EstaNosLembretes());
+
+        (await gestor.PutAsync($"/api/orcamentos/{id}/lembrete", null)).EnsureSuccessStatusCode();
+        Assert.False(await EstaNosLembretes());
+
+        var tecnico = await api.ClienteLogado();
+        Assert.Equal(HttpStatusCode.Forbidden, (await tecnico.GetAsync("/api/orcamentos/lembretes")).StatusCode);
+    }
+
+    [Fact]
+    public async Task OS_guarda_tipos_validos_na_ordem_da_lista_e_a_busca_acha_por_eles()
+    {
+        var gestor = await api.ClienteGestor();
+        var id = Guid.NewGuid();
+        var corpo = new { cliente = "Tipos de Serviço Teste", responsaveis = new[] { "Ana" }, observacoes = "", abertaEm = DateTimeOffset.UtcNow, tipos = new[] { "Instalação", "Visita técnica" } };
+        (await gestor.PutAsJsonAsync($"/api/ordens/{id}", corpo)).EnsureSuccessStatusCode();
+        var ordem = await BuscarOrdem(gestor, id);
+        Assert.Equal(["Visita técnica", "Instalação"], ordem.GetProperty("tipos").EnumerateArray().Select(t => t.GetString()));
+
+        var achadas = await gestor.GetFromJsonAsync<JsonElement>("/api/ordens?busca=visita%20tecnica");
+        Assert.Contains(achadas.EnumerateArray(), o => o.GetProperty("id").GetGuid() == id);
+
+        // App antigo ou fila antiga do aparelho manda a OS sem o campo: os tipos ficam como estavam.
+        (await gestor.PutAsJsonAsync($"/api/ordens/{id}", new { cliente = "Tipos de Serviço Teste", responsaveis = new[] { "Ana" }, observacoes = "nova", abertaEm = corpo.abertaEm })).EnsureSuccessStatusCode();
+        Assert.Equal(2, (await BuscarOrdem(gestor, id)).GetProperty("tipos").GetArrayLength());
+
+        var invalido = await gestor.PutAsJsonAsync($"/api/ordens/{Guid.NewGuid()}",
+            new { cliente = "X", responsaveis = new[] { "Ana" }, observacoes = "", abertaEm = DateTimeOffset.UtcNow, tipos = new[] { "Pintura" } });
+        Assert.Equal(HttpStatusCode.BadRequest, invalido.StatusCode);
+    }
 }

@@ -23,12 +23,14 @@ const CHAVE_EQUIPE = ['equipe'];
 const CHAVE_CONTAS = ['contas'];
 const CHAVE_CLIENTES = ['clientes'];
 const CHAVE_ORCAMENTOS = ['orcamentos'];
+const CHAVE_LEMBRETES = ['lembretes'];
 
 export const useOrdens = () => useQuery({ queryKey: CHAVE_ORDENS, queryFn: api.listarOrdens });
 export const useEquipe = () => useQuery({ queryKey: CHAVE_EQUIPE, queryFn: api.listarEquipe });
 export const useContas = () => useQuery({ queryKey: CHAVE_CONTAS, queryFn: api.listarContas });
 export const useClientes = (ativo = true) => useQuery({ queryKey: CHAVE_CLIENTES, queryFn: api.listarClientes, enabled: ativo });
 export const useOrcamentos = () => useQuery({ queryKey: CHAVE_ORCAMENTOS, queryFn: api.listarOrcamentos });
+export const useLembretes = (ativo: boolean) => useQuery({ queryKey: CHAVE_LEMBRETES, queryFn: api.listarLembretes, enabled: ativo });
 
 export const recarregarOrdens = () => queryClient.invalidateQueries({ queryKey: CHAVE_ORDENS });
 export const recarregarEquipe = () =>
@@ -43,7 +45,12 @@ export const recarregarClientes = () =>
     queryClient.invalidateQueries({ queryKey: CHAVE_CLIENTES }),
     queryClient.invalidateQueries({ queryKey: CHAVE_ORCAMENTOS }),
   ]);
-export const recarregarOrcamentos = () => queryClient.invalidateQueries({ queryKey: CHAVE_ORCAMENTOS });
+export const recarregarOrcamentos = () =>
+  Promise.all([
+    queryClient.invalidateQueries({ queryKey: CHAVE_ORCAMENTOS }),
+    queryClient.invalidateQueries({ queryKey: CHAVE_LEMBRETES }),
+  ]);
+export const recarregarLembretes = () => queryClient.invalidateQueries({ queryKey: CHAVE_LEMBRETES });
 
 // Pede mais itens da lista à API; a busca e os filtros passam a valer sobre o que veio.
 export const mostrarMais = (lista: keyof typeof LIMITES) => {

@@ -10,6 +10,7 @@ import { Gaveta } from '../componentes/Gaveta';
 import { Icone } from '../componentes/Icone';
 import { recarregarOrdens, useClientes, useEquipe, useOrdens } from '../consultas';
 import { formatarData } from '../regras';
+import { alternarTipo, TIPOS_ORDEM } from '../valores';
 import { useSessao } from '../sessao';
 
 const MAX_RESPONSAVEIS = 20;
@@ -44,12 +45,14 @@ function FormOrdem({ existente }: { existente?: DadosOrdem }) {
         id: crypto.randomUUID(),
         cliente: '',
         responsaveis: conta.papel === 'tecnico' ? [conta.nome] : [],
+        tipos: [],
         observacoes: '',
         abertaEm: new Date().toISOString(),
       },
   );
   const [cliente, setCliente] = useState(inicial.cliente);
   const [responsaveis, setResponsaveis] = useState(inicial.responsaveis);
+  const [tipos, setTipos] = useState(inicial.tipos);
   const [observacoes, setObservacoes] = useState(inicial.observacoes);
   const [tentou, setTentou] = useState(false);
   const [saindo, setSaindo] = useState(false);
@@ -64,7 +67,7 @@ function FormOrdem({ existente }: { existente?: DadosOrdem }) {
   });
 
   const alterado =
-    cliente !== inicial.cliente || observacoes !== inicial.observacoes || responsaveis.join() !== inicial.responsaveis.join();
+    cliente !== inicial.cliente || observacoes !== inicial.observacoes || responsaveis.join() !== inicial.responsaveis.join() || tipos.join() !== inicial.tipos.join();
   useGuardaAlteracoes(alterado && !saindo);
 
   // Soma quem já está na OS: conta desativada ou renomeada não pode sumir ao editar uma OS antiga.
@@ -83,7 +86,7 @@ function FormOrdem({ existente }: { existente?: DadosOrdem }) {
     setTentou(true);
     if (!cliente.trim() || responsaveis.length === 0) return;
     setSaindo(true);
-    salvar.mutate({ ...inicial, cliente: cliente.trim(), responsaveis, observacoes: observacoes.trim() });
+    salvar.mutate({ ...inicial, cliente: cliente.trim(), responsaveis, tipos, observacoes: observacoes.trim() });
   };
 
   return (
@@ -113,6 +116,21 @@ function FormOrdem({ existente }: { existente?: DadosOrdem }) {
         <datalist id="clientes-cadastrados">
           {clientes.data?.map((c) => <option key={c.id} value={c.nome} />)}
         </datalist>
+
+        <fieldset className="campo">
+          <legend>Tipo de serviço</legend>
+          <div className="chips">
+            {TIPOS_ORDEM.map((tipo) => {
+              const marcado = tipos.includes(tipo);
+              return (
+                <button key={tipo} type="button" className={`chip${marcado ? ' marcado' : ''}`} aria-pressed={marcado} onClick={() => setTipos((atual) => alternarTipo(atual, tipo))}>
+                  <Icone caminho={marcado ? mdiCheck : mdiPlus} tamanho={18} />
+                  {tipo}
+                </button>
+              );
+            })}
+          </div>
+        </fieldset>
 
         <fieldset className="campo">
           <legend>Responsáveis</legend>

@@ -34,7 +34,7 @@ A sincronização acontece com o app aberto, sempre que há internet. As fotos f
 
 ## Capabilities and Constraints
 
-- OS com cliente, responsáveis (um ou mais, escolhidos entre os técnicos cadastrados e editáveis depois), observações e abertura automática, que não muda depois de criada.
+- OS com cliente, tipo de serviço (Visita técnica, Manutenção, Manutenção predial, Instalação; um ou mais, opcional, editável depois e achado pela busca), responsáveis (um ou mais, escolhidos entre os técnicos cadastrados e editáveis depois), observações e abertura automática, que não muda depois de criada. O tipo sai no relatório.
 - Seções ANTES e DEPOIS, com fotos da câmera ou da galeria; cada foto pode ser excluída.
 - Cada foto é compactada no aparelho antes do envio, em WebP visualmente sem perda, e não passa de 4 MB. O servidor recusa foto maior.
 - Em tela cheia, deslizar troca de foto dentro da seção; pinça ou toque duplo ampliam para conferir detalhes.
@@ -45,7 +45,7 @@ A sincronização acontece com o app aberto, sempre que há internet. As fotos f
 - Backend em .NET 10 publicado no Railway; app em Expo; site em React com Vite publicado na Vercel; estado em React Query nos dois.
 - Cada pessoa entra com usuário e senha próprios. Papéis: técnico e gestor. Só o gestor gerencia a equipe e gera o relatório. O gestor cria as contas, que nascem com a senha padrão 1234; cada pessoa escolhe outra no primeiro acesso, e o gestor pode voltar a senha para a padrão quando alguém esquecer. O gestor inicial não passa por essa troca. Conta desativada perde o acesso na hora.
 - OS e fotos guardam quem abriu e quem enviou.
-- Orçamentos e cadastro de clientes, só do gestor e só online, no app e no site. Cliente tem nome, telefone, e-mail, CPF ou CNPJ e endereço; cliente com orçamento não pode ser excluído. Orçamento tem número sequencial, um cliente, de 1 a 100 itens (material, quantidade com até 3 casas, unidade e preço unitário com até 2 casas), forma de pagamento, prazo de execução, observações e o modelo do veículo do cliente, que sai no PDF. Cada linha é arredondada ao centavo e o total soma as linhas, igual no app, no site e no PDF. O PDF sai do servidor com o mesmo cabeçalho de empresa do relatório da OS. Os dados de clientes não ficam gravados no aparelho.
+- Orçamentos e cadastro de clientes, só do gestor e só online, no app e no site. Cliente tem nome, telefone, e-mail, CPF ou CNPJ e endereço; cliente com orçamento não pode ser excluído. Orçamento tem número sequencial, um cliente, de 1 a 100 itens (material, quantidade com até 3 casas, unidade e preço unitário com até 2 casas), forma de pagamento, prazo de execução, observações e o modelo do veículo do cliente, que sai no PDF. Situações: em aberto, enviado, aprovado, recusado e finalizado. Seis meses depois de finalizado, o orçamento aparece para o gestor num lembrete de "Agendar manutenção periódica", na lista de OS e na de orçamentos, até ele tocar em "Já agendei". O lembrete é só dentro do app e do site, sem notificação no celular. Cada linha é arredondada ao centavo e o total soma as linhas, igual no app, no site e no PDF. O PDF sai do servidor com o mesmo cabeçalho de empresa do relatório da OS. Os dados de clientes não ficam gravados no aparelho.
 
 - A grade de fotos usa miniaturas de 360 px geradas pela API no envio; o visualizador e o relatório usam a foto inteira.
 - A busca das listas procura em todas as OS e orçamentos na API quando a lista carregada não tem tudo.

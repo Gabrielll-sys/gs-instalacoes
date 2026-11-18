@@ -241,6 +241,7 @@ public static class RelatorioPdf
             row.RelativeItem().Element(x => Dado(x, "Situação", Situacao(antes, depois)));
             row.RelativeItem().Element(x => Dado(x, "Relatório emitido em", $"{FormatarData(agora)}, por {emitidoPor}"));
         });
+        if (ordem.Tipos.Count > 0) coluna.Item().Element(x => Dado(x, "Tipo de serviço", string.Join(", ", ordem.Tipos)));
         // Por último porque pode continuar na página seguinte; a largura limitada mantém a linha fácil de ler.
         if (ordem.Observacoes != "") coluna.Item().EnsureSpace(50).MaxWidth(360).Element(x => Dado(x, "Observações", ordem.Observacoes));
     });

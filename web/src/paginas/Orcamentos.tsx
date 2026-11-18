@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { Link, Outlet, useParams } from 'react-router';
 import { EstadoVazio, ListaEsqueleto, MostrarMais } from '../componentes/Estado';
 import { Icone } from '../componentes/Icone';
+import { Lembretes } from '../componentes/Lembretes';
 import { useBuscaCompleta } from '../buscaCompleta';
 import { mostrarMais, useOrcamentos } from '../consultas';
 import { filtrarOrcamentos, formatarDia, formatarMoeda, numeroDoOrcamento, rotuloDaSituacao, SITUACOES, type Situacao } from '../valores';
@@ -31,6 +32,8 @@ export function Orcamentos() {
           Novo orçamento
         </Link>
       </header>
+
+      <Lembretes />
 
       <div className="filtros" role="group" aria-label="Filtrar por situação">
         {[{ valor: 'todas' as const, rotulo: 'Todos' }, ...SITUACOES].map(({ valor, rotulo }) => (

@@ -18,10 +18,10 @@ public static class RotasOrdens
             var consulta = db.Ordens.AsNoTracking();
             if (!string.IsNullOrWhiteSpace(busca))
             {
-                // shortcut: compara em memória só cliente e responsáveis de todas as OS; criar coluna normalizada no banco se passar de dezenas de milhares.
+                // shortcut: compara em memória cliente, responsáveis e tipos de todas as OS; criar coluna normalizada no banco se passar de dezenas de milhares.
                 var termo = SemAcento(busca.Trim());
-                var achadas = (await db.Ordens.AsNoTracking().Select(o => new { o.Id, o.Cliente, o.Responsaveis }).ToListAsync())
-                    .Where(o => SemAcento($"{o.Cliente} {string.Join(' ', o.Responsaveis)}").Contains(termo))
+                var achadas = (await db.Ordens.AsNoTracking().Select(o => new { o.Id, o.Cliente, o.Responsaveis, o.Tipos }).ToListAsync())
+                    .Where(o => SemAcento($"{o.Cliente} {string.Join(' ', o.Responsaveis)} {string.Join(' ', o.Tipos)}").Contains(termo))
                     .Select(o => o.Id)
                     .ToList();
                 consulta = consulta.Where(o => achadas.Contains(o.Id));
@@ -34,7 +34,8 @@ public static class RotasOrdens
 
             return lista.Select(o => new OrdemDto(
                 o.Id, o.Cliente, o.Responsaveis, o.Observacoes, o.AbertaEm,
-                o.Fotos.Select(f => new FotoDto(f.Id, f.OrdemId, f.Secao, r2.UrlPublica(f.Chave), f.CriadaEm, f.TemMiniatura ? r2.UrlPublica(Fotos.ChaveMiniatura(f.Chave)) : null)).ToList()));
+                o.Fotos.Select(f => new FotoDto(f.Id, f.OrdemId, f.Secao, r2.UrlPublica(f.Chave), f.CriadaEm, f.TemMiniatura ? r2.UrlPublica(Fotos.ChaveMiniatura(f.Chave)) : null)).ToList(),
+                o.Tipos));
         }).ComEtag();
 
         // PUT com id gerado no aparelho: a mesma OS pode ser reenviada pela fila offline sem duplicar.
@@ -43,10 +44,12 @@ public static class RotasOrdens
             var cliente = Limpo(req.Cliente);
             var responsaveis = (req.Responsaveis ?? []).Select(Limpo).Where(r => r != "").Distinct().ToList();
             var observacoes = Limpo(req.Observacoes);
+            var tipos = (req.Tipos ?? []).Select(Limpo).Distinct().ToList();
 
             if (cliente is "" or { Length: > 200 }) return Erro("Informe o nome do cliente (até 200 caracteres).");
             if (responsaveis.Count is 0 or > 20 || responsaveis.Any(r => r.Length > 100)) return Erro("Informe de 1 a 20 responsáveis.");
             if (observacoes.Length > 5000) return Erro("Observações podem ter até 5000 caracteres.");
+            if (tipos.Any(t => !TiposDeServico.Todos.Contains(t))) return Erro("Tipo de serviço inválido.");
 
             var ordem = await db.Ordens.FindAsync(id);
             if (ordem is null)
@@ -56,6 +59,8 @@ public static class RotasOrdens
             }
             ordem.Cliente = cliente;
             ordem.Responsaveis = responsaveis;
+            // Na ordem da lista, não na ordem em que foram marcados. Sem o campo (app antigo, fila antiga do aparelho), mantém os que já tinha.
+            if (req.Tipos is not null) ordem.Tipos = TiposDeServico.Todos.Where(tipos.Contains).ToList();
             ordem.Observacoes = observacoes;
             await db.SaveChangesAsync();
             return Results.NoContent();

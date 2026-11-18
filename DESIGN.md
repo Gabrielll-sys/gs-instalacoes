@@ -310,6 +310,7 @@ Controles Material 3 sem reinvenção, ajustados em altura para mão ocupada.
 
 ### Chips
 - **Filtros:** contorno com fundo branco e texto suave; ativo em marinho com texto branco, sem marca de seleção. Mostram a contagem tabular, que acompanha a busca.
+- **Tipo de serviço:** mesmo seletor dos responsáveis, com as quatro marcações fixas, acima deles. Opcional.
 - **Responsáveis:** seletor com as pessoas cadastradas, sem digitação. Marcada em marinho com visto branco; desmarcada em contorno com ícone de mais. Um toque alterna.
 - **Papel da conta:** Técnico e Gestor, com a mesma aparência dos filtros.
 
@@ -331,7 +332,7 @@ Não há cartões. Os agrupamentos são:
 - **Botão de ícone sobre escuro:** ícone branco de 24dp em área circular de 48dp, ripple branco a 30%.
 
 ### Linha de OS
-Fundo branco, ripple em toda a linha, padding de 16 por 14dp, filete inferior. À esquerda, cliente, data e responsáveis; à direita, a placa ANTES e DEPOIS. Com itens na fila, acrescenta ícone de envio e texto em atenção. O rótulo de acessibilidade lê a linha inteira. No carregamento, o esqueleto repete a estrutura em barras azuladas estáticas, com a forma da placa em 118 por 56dp.
+Fundo branco, ripple em toda a linha, padding de 16 por 14dp, filete inferior. À esquerda, cliente, data, responsáveis e, quando houver, os tipos de serviço; à direita, a placa ANTES e DEPOIS. Com itens na fila, acrescenta ícone de envio e texto em atenção. O rótulo de acessibilidade lê a linha inteira. No carregamento, o esqueleto repete a estrutura em barras azuladas estáticas, com a forma da placa em 118 por 56dp.
 
 ### Placa (assinatura)
 Painel marinho com filete branco interno de 1,5dp, legendas à esquerda e número tabular à direita. Aparece com duas linhas na lista e com uma linha no cabeçalho de cada seção da OS. Quando o total é zero, o losango dourado de 9dp fica ao lado do 0; quando entra a primeira foto, ele some.
@@ -404,3 +405,7 @@ Mesmo mundo no navegador (`web/`), com os tokens de cor, tipo e forma em `web/sr
 - **Don't** usar `marinho` como cor de texto ou ícone sobre superfície: use `realce`, que clareia no escuro. Texto em botão dourado usa `sobreDourado`.
 - **Don't** definir `fontWeight` diferente de `normal` sobre as famílias Overpass no app.
 - **Don't** pintar o número de dourado fora da transição de 0 para mais.
+
+### Lembrete de manutenção
+
+Caixa em Atenção (fundo e texto de atenção, sem dourado) no topo das listas de OS e de orçamentos, só para o gestor e só quando há orçamento finalizado há 6 meses. Cada linha leva ao orçamento e tem "Já agendei" em contorno. O selo Finalizado é contorno em realce, para não se confundir com o Aprovado preenchido.

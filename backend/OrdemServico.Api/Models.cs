@@ -8,6 +8,8 @@ public class Ordem
     public Guid Id { get; set; }
     public required string Cliente { get; set; }
     public List<string> Responsaveis { get; set; } = [];
+    // Visita técnica, Manutenção, Manutenção predial, Instalação: o rótulo é guardado como aparece, e a busca acha por ele.
+    public List<string> Tipos { get; set; } = [];
     public string Observacoes { get; set; } = "";
     public DateTimeOffset AbertaEm { get; set; }
     // Nulo nas OS criadas antes das contas individuais.
@@ -76,6 +78,10 @@ public class Orcamento
     public DateTimeOffset CriadoEm { get; set; }
     public string? CriadoPor { get; set; }
     public string Situacao { get; set; } = Situacoes.Aberto;
+    // Quando o serviço do orçamento foi concluído; 6 meses depois, vira lembrete de manutenção periódica.
+    public DateTimeOffset? FinalizadoEm { get; set; }
+    // Quando o gestor marcou o lembrete como resolvido (manutenção já agendada).
+    public DateTimeOffset? LembreteResolvidoEm { get; set; }
     public decimal Total => Itens.Sum(i => i.Total);
 }
 
@@ -124,7 +130,7 @@ public record LoginRequest(string? Usuario, string? Senha);
 public record TrocaSenhaRequest(string? Atual, string? Nova);
 public record NovoUsuarioRequest(string? Login, string? Nome, string? Papel);
 public record UsuarioRequest(string? Nome, string? Papel, bool Ativo);
-public record OrdemRequest(string? Cliente, List<string?>? Responsaveis, string? Observacoes, DateTimeOffset? AbertaEm);
+public record OrdemRequest(string? Cliente, List<string?>? Responsaveis, string? Observacoes, DateTimeOffset? AbertaEm, List<string?>? Tipos = null);
 public record UploadRequest(string? ContentType);
 public record ClienteRequest(string? Nome, string? Telefone, string? Email, string? Documento, string? Endereco);
 public record ItemRequest(string? Descricao, decimal? Quantidade, string? Unidade, decimal? PrecoUnitario);
@@ -133,12 +139,12 @@ public record OrcamentoRequest(Guid? ClienteId, List<ItemRequest?>? Itens, strin
 public record FotoRequest(string? Secao, string? ContentType, DateTimeOffset? CriadaEm);
 
 public record FotoDto(Guid Id, Guid OrdemId, string Secao, string Url, DateTimeOffset CriadaEm, string? MiniaturaUrl);
-public record OrdemDto(Guid Id, string Cliente, List<string> Responsaveis, string Observacoes, DateTimeOffset AbertaEm, List<FotoDto> Fotos);
+public record OrdemDto(Guid Id, string Cliente, List<string> Responsaveis, string Observacoes, DateTimeOffset AbertaEm, List<FotoDto> Fotos, List<string> Tipos);
 public record SessaoDto(string Token, string Nome, string Papel, bool TrocarSenha);
 public record UsuarioDto(Guid Id, string Login, string Nome, string Papel, bool Ativo, bool TrocarSenha);
 public record ClienteDto(Guid Id, string Nome, string Telefone, string Email, string Documento, string Endereco);
 public record ItemDto(string Descricao, decimal Quantidade, string Unidade, decimal PrecoUnitario, decimal Total);
-public record OrcamentoDto(Guid Id, int Numero, Guid ClienteId, string ClienteNome, DateTimeOffset CriadoEm, List<ItemDto> Itens, decimal Total, string Pagamento, string Prazo, string Observacoes, string Situacao, string Veiculo);
+public record OrcamentoDto(Guid Id, int Numero, Guid ClienteId, string ClienteNome, DateTimeOffset CriadoEm, List<ItemDto> Itens, decimal Total, string Pagamento, string Prazo, string Observacoes, string Situacao, string Veiculo, DateTimeOffset? FinalizadoEm);
 
 // Acompanhamento do orçamento depois de montado; não muda nada do que vai no PDF.
 public static class Situacoes
@@ -147,7 +153,16 @@ public static class Situacoes
     public const string Enviado = "enviado";
     public const string Aprovado = "aprovado";
     public const string Recusado = "recusado";
-    public static bool Valida(string? situacao) => situacao is Aberto or Enviado or Aprovado or Recusado;
+    // Serviço do orçamento concluído: começa a contar os 6 meses até o lembrete de manutenção.
+    public const string Finalizado = "finalizado";
+    public static bool Valida(string? situacao) => situacao is Aberto or Enviado or Aprovado or Recusado or Finalizado;
+
+    public const int MesesAteManutencao = 6;
+}
+
+public static class TiposDeServico
+{
+    public static readonly string[] Todos = ["Visita técnica", "Manutenção", "Manutenção predial", "Instalação"];
 }
 
 public static class Listas

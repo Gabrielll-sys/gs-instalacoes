@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { Link, Outlet, useParams } from 'react-router';
 import { EstadoVazio, ListaEsqueleto, MostrarMais } from '../componentes/Estado';
 import { Icone } from '../componentes/Icone';
+import { Lembretes } from '../componentes/Lembretes';
 import { Placa } from '../componentes/Placa';
 import { useBuscaCompleta } from '../buscaCompleta';
 import { mostrarMais, useOrdens } from '../consultas';
@@ -35,14 +36,16 @@ export function ListaOrdens() {
         <h1>Ordens de serviço</h1>
         <label className="busca">
           <Icone caminho={mdiMagnify} />
-          <span className="so-leitor">Buscar cliente ou responsável</span>
-          <input type="search" placeholder="Buscar cliente ou responsável" value={busca} onChange={(e) => setBusca(e.target.value)} />
+          <span className="so-leitor">Buscar cliente, responsável ou tipo de serviço</span>
+          <input type="search" placeholder="Buscar cliente, responsável ou tipo" value={busca} onChange={(e) => setBusca(e.target.value)} />
         </label>
         <Link to="/ordens/nova" className="botao botao-ouro">
           <Icone caminho={mdiPlus} />
           Nova OS
         </Link>
       </header>
+
+      <Lembretes />
 
       <div className="filtros" role="group" aria-label="Filtrar ordens de serviço">
         {FILTROS.map(({ valor, rotulo }) => (
@@ -77,6 +80,7 @@ export function ListaOrdens() {
                   <span>
                     {formatarData(ordem.abertaEm)}, {ordem.responsaveis.join(', ')}
                   </span>
+                  {ordem.tipos.length > 0 && <span>{ordem.tipos.join(', ')}</span>}
                 </div>
                 <Placa
                   linhas={[

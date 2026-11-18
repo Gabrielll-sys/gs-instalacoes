@@ -10,7 +10,7 @@ import { BotaoIcone } from '../../../componentes/BotaoIcone';
 import { BotaoPdf } from '../../../componentes/BotaoRelatorio';
 import { Dado } from '../../../componentes/Dado';
 import { EstadoVazio } from '../../../componentes/EstadoVazio';
-import { recarregarOrcamentos, useClientes, useOrcamentos } from '../../../orcamentos';
+import { recarregarLembretes, recarregarOrcamentos, useClientes, useOrcamentos } from '../../../orcamentos';
 import { gerarPdfOrcamento, mensagemDoPdf } from '../../../relatorio';
 import { cor, familia } from '../../../tema';
 import { contatoDoTelefone, formatarDia, formatarMoeda, formatarQuantidade, numeroDoOrcamento, SITUACOES, type Situacao } from '../../../valores';
@@ -37,7 +37,10 @@ export default function TelaOrcamento() {
   const situacao = useMutation({
     mutationFn: (valor: Situacao) => api.mudarSituacao(id, valor),
     // A resposta já traz o orçamento atualizado: entra na lista sem esperar outra busca.
-    onSuccess: (salvo) => queryClient.setQueryData<Orcamento[]>(['orcamentos'], (lista) => lista?.map((o) => (o.id === salvo.id ? salvo : o))),
+    onSuccess: (salvo) => {
+      queryClient.setQueryData<Orcamento[]>(['orcamentos'], (lista) => lista?.map((o) => (o.id === salvo.id ? salvo : o)));
+      void recarregarLembretes();
+    },
     onError: (e) => setErro(mensagemDoErro(e)),
   });
 
@@ -127,6 +130,11 @@ export default function TelaOrcamento() {
               );
             })}
           </View>
+          {orcamento.finalizadoEm && (
+            <Text variant="bodySmall" style={estilos.finalizado}>
+              Finalizado em {formatarDia(orcamento.finalizadoEm)}. O lembrete de manutenção aparece 6 meses depois.
+            </Text>
+          )}
           <BotaoPdf
             nome="orçamento"
             conteudo={conteudo}
@@ -197,6 +205,7 @@ const estilos = StyleSheet.create({
   chipAtivo: { backgroundColor: cor.marinho, borderColor: cor.marinho },
   chipTexto: { marginVertical: 10 },
   chipAtivoTexto: { color: cor.branco, marginVertical: 10 },
+  finalizado: { color: cor.textoSuave, marginTop: 8 },
   bloco: { backgroundColor: cor.superficie, paddingHorizontal: 16, paddingVertical: 6 },
   itens: { marginTop: 8, paddingVertical: 14 },
   titulo: { color: cor.realce, paddingBottom: 4 },

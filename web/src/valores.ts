@@ -90,14 +90,22 @@ export function contatoDoTelefone(telefone: string) {
   return nacional ? { ligar: `tel:+55${nacional}`, whatsapp: `https://wa.me/55${nacional}` } : null;
 }
 
-export type Situacao = 'aberto' | 'enviado' | 'aprovado' | 'recusado';
+export type Situacao = 'aberto' | 'enviado' | 'aprovado' | 'recusado' | 'finalizado';
 export const SITUACOES: { valor: Situacao; rotulo: string }[] = [
   { valor: 'aberto', rotulo: 'Em aberto' },
   { valor: 'enviado', rotulo: 'Enviado' },
   { valor: 'aprovado', rotulo: 'Aprovado' },
   { valor: 'recusado', rotulo: 'Recusado' },
+  // Serviço concluído: 6 meses depois, o gestor recebe o lembrete de manutenção periódica.
+  { valor: 'finalizado', rotulo: 'Finalizado' },
 ];
 export const rotuloDaSituacao = (situacao: string) => SITUACOES.find((x) => x.valor === situacao)?.rotulo ?? situacao;
+
+// Marcação da OS, que também serve de busca. Mesma lista e mesma ordem da API.
+export const TIPOS_ORDEM = ['Visita técnica', 'Manutenção', 'Manutenção predial', 'Instalação'];
+// Marca ou desmarca mantendo a ordem da lista, como o servidor guarda.
+export const alternarTipo = (tipos: string[], tipo: string) =>
+  TIPOS_ORDEM.filter((t) => (t === tipo ? !tipos.includes(t) : tipos.includes(t)));
 
 const moeda = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 export const formatarMoeda = (valor: number) => moeda.format(valor);

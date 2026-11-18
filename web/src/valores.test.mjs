@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { arrumarPreco, buscarClientes, contatoDoTelefone, mascararDocumento, mascararTelefone, moverItem, centavosDoItem, centavosDoTotal, formatarCentavos, formatarQuantidade, lerNumero, paraCampo, precoParaCampo, filtrarOrcamentos, problemaNoItem } from './valores.ts';
+import { alternarTipo, arrumarPreco, buscarClientes, contatoDoTelefone, mascararDocumento, mascararTelefone, moverItem, centavosDoItem, centavosDoTotal, formatarCentavos, formatarQuantidade, lerNumero, paraCampo, precoParaCampo, filtrarOrcamentos, problemaNoItem } from './valores.ts';
 
 test('lê números no jeito brasileiro e recusa texto', () => {
   assert.equal(lerNumero('1.234,56'), 1234.56);
@@ -78,4 +78,10 @@ test('contato só para telefone do Brasil com DDD', () => {
 test('mover item troca de lugar e ignora a borda', () => {
   assert.deepEqual(moverItem(['a', 'b', 'c'], 2, 1), ['a', 'c', 'b']);
   assert.deepEqual(moverItem(['a', 'b', 'c'], 0, -1), ['a', 'b', 'c']);
+});
+
+test('tipos da OS ficam na ordem da lista, marcando ou desmarcando', () => {
+  assert.deepEqual(alternarTipo([], 'Instalação'), ['Instalação']);
+  assert.deepEqual(alternarTipo(['Instalação'], 'Visita técnica'), ['Visita técnica', 'Instalação']);
+  assert.deepEqual(alternarTipo(['Visita técnica', 'Instalação'], 'Instalação'), ['Visita técnica']);
 });

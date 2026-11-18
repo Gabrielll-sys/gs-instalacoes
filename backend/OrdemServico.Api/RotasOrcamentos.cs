@@ -107,9 +107,33 @@ public static class RotasOrcamentos
         {
             if (!Situacoes.Valida(req.Situacao)) return Erro("Situação inválida.");
             if (await db.Orcamentos.Include(o => o.Cliente).FirstOrDefaultAsync(o => o.Id == id) is not { } orcamento) return OrcamentoNaoEncontrado();
+            // Finalizar marca a data uma vez; sair de finalizado zera a data e o lembrete.
+            if (req.Situacao == Situacoes.Finalizado) orcamento.FinalizadoEm ??= DateTimeOffset.UtcNow;
+            else (orcamento.FinalizadoEm, orcamento.LembreteResolvidoEm) = (null, null);
             orcamento.Situacao = req.Situacao!;
             await db.SaveChangesAsync();
             return Results.Ok(ParaDto(orcamento));
+        });
+
+        // Orçamentos finalizados há 6 meses ou mais, ainda sem manutenção agendada: o lembrete do gestor.
+        // Vem do servidor, e não da lista, porque os mais antigos podem estar fora dos 200 carregados.
+        orcamentos.MapGet("/lembretes", async (AppDb db) =>
+        {
+            var limite = DateTimeOffset.UtcNow.AddMonths(-Situacoes.MesesAteManutencao);
+            var finalizados = await db.Orcamentos.AsNoTracking().Include(o => o.Cliente)
+                .Where(o => o.Situacao == Situacoes.Finalizado && o.FinalizadoEm != null && o.LembreteResolvidoEm == null)
+                .ToListAsync();
+            // Filtrado em memória porque o SQLite não compara as datas guardadas em binário.
+            return finalizados.Where(o => o.FinalizadoEm <= limite).OrderBy(o => o.FinalizadoEm).Select(ParaDto);
+        }).ComEtag();
+
+        // "Já agendei": o lembrete some até o orçamento ser finalizado de novo.
+        orcamentos.MapPut("/{id:guid}/lembrete", async (Guid id, AppDb db) =>
+        {
+            if (await db.Orcamentos.FindAsync(id) is not { } orcamento) return OrcamentoNaoEncontrado();
+            orcamento.LembreteResolvidoEm = DateTimeOffset.UtcNow;
+            await db.SaveChangesAsync();
+            return Results.NoContent();
         });
 
         orcamentos.MapDelete("/{id:guid}", async (Guid id, AppDb db) =>
@@ -133,7 +157,7 @@ public static class RotasOrcamentos
     private static OrcamentoDto ParaDto(Orcamento o) => new(
         o.Id, o.Numero, o.ClienteId, o.Cliente.Nome, o.CriadoEm,
         o.Itens.Select(i => new ItemDto(i.Descricao, i.Quantidade, i.Unidade, i.PrecoUnitario, i.Total)).ToList(),
-        o.Total, o.Pagamento, o.Prazo, o.Observacoes, o.Situacao, o.Veiculo);
+        o.Total, o.Pagamento, o.Prazo, o.Observacoes, o.Situacao, o.Veiculo, o.FinalizadoEm);
 
     private static string? ProblemaNoCliente(ClienteRequest r) =>
         Limpo(r.Nome) is "" or { Length: > 200 } ? "Informe o nome do cliente (até 200 caracteres)."

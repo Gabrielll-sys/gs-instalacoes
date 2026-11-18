@@ -85,4 +85,6 @@ export const api = {
   criarOrcamento: (orcamento: DadosOrcamento) => chamar<Orcamento>('/orcamentos', 'POST', orcamento),
   salvarOrcamento: (id: string, orcamento: DadosOrcamento) => chamar<Orcamento>(`/orcamentos/${id}`, 'PUT', orcamento),
   excluirOrcamento: (id: string) => chamar(`/orcamentos/${id}`, 'DELETE'),
+  listarLembretes: () => chamar<Orcamento[]>('/orcamentos/lembretes'),
+  resolverLembrete: (id: string) => chamar(`/orcamentos/${id}/lembrete`, 'PUT'),
 };

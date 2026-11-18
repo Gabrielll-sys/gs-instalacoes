@@ -11,13 +11,14 @@ export const LinhaOrdem = memo(function LinhaOrdem({ ordem }: { ordem: Ordem }) 
   const depois = contarFotos(ordem, 'depois');
   const data = formatarData(ordem.abertaEm);
   const responsaveis = ordem.responsaveis.join(', ');
+  const tipos = (ordem.tipos ?? []).join(', ');
   const naFila = descreverFila(ordem.fotosNaFila ?? 0, ordem.alteracoesNaFila ?? 0);
 
   return (
     <TouchableRipple
       onPress={() => router.push(`/ordens/${ordem.id}`)}
       accessibilityRole="button"
-      accessibilityLabel={`${ordem.cliente}, aberta em ${data}, responsáveis ${responsaveis}, ${antes} fotos de antes e ${depois} de depois${naFila ? `, na fila de envio: ${naFila}` : ''}`}
+      accessibilityLabel={`${ordem.cliente}, aberta em ${data}, responsáveis ${responsaveis}${tipos ? `, ${tipos}` : ''}, ${antes} fotos de antes e ${depois} de depois${naFila ? `, na fila de envio: ${naFila}` : ''}`}
       style={estilos.toque}
     >
       <View style={estilos.linha}>
@@ -31,6 +32,11 @@ export const LinhaOrdem = memo(function LinhaOrdem({ ordem }: { ordem: Ordem }) 
           <Text variant="bodyMedium" style={estilos.suave} numberOfLines={1}>
             {responsaveis}
           </Text>
+          {!!tipos && (
+            <Text variant="bodyMedium" style={estilos.suave} numberOfLines={1}>
+              {tipos}
+            </Text>
+          )}
           {!!naFila && (
             <View style={estilos.fila}>
               <Icon source="cloud-upload-outline" size={16} color={cor.atencao} />

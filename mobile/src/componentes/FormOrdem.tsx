@@ -10,7 +10,7 @@ import { useSessao } from '../sessao';
 import { salvarOrdem } from '../ordens';
 import { formatarData, type DadosOrdem } from '../sync/regras';
 import { cor } from '../tema';
-import { buscarClientes } from '../valores';
+import { alternarTipo, buscarClientes, TIPOS_ORDEM } from '../valores';
 
 const MAX_RESPONSAVEIS = 20;
 const ALTURA_BARRA_ANDROID = 56;
@@ -38,6 +38,8 @@ export function FormOrdem({
           .filter((c) => c.nome !== cliente.trim())
           .slice(0, 3);
   const [responsaveis, setResponsaveis] = useState(inicial.responsaveis);
+  const tiposIniciais = inicial.tipos ?? [];
+  const [tipos, setTipos] = useState(tiposIniciais);
   const [observacoes, setObservacoes] = useState(inicial.observacoes);
   const [tentou, setTentou] = useState(false);
 
@@ -48,7 +50,8 @@ export function FormOrdem({
   const alterado =
     cliente !== inicial.cliente ||
     observacoes !== inicial.observacoes ||
-    responsaveis.join() !== inicial.responsaveis.join();
+    responsaveis.join() !== inicial.responsaveis.join() ||
+    tipos.join() !== tiposIniciais.join();
 
   // O Back do Android descartaria em silêncio o que foi digitado no cliente.
   // repeat, e não dispatch da ação: no expo-router do SDK 58, a trava ainda ligada bloquearia a mesma ação de novo.
@@ -85,7 +88,7 @@ export function FormOrdem({
     setTentou(true);
     if (!cliente.trim() || responsaveis.length === 0) return;
     setSaindo(true);
-    salvar.mutate({ ...inicial, cliente: cliente.trim(), responsaveis, observacoes: observacoes.trim() });
+    salvar.mutate({ ...inicial, cliente: cliente.trim(), responsaveis, tipos, observacoes: observacoes.trim() });
   };
 
   return (
@@ -138,6 +141,33 @@ export function FormOrdem({
         </View>
 
         <View>
+          <Text variant="labelLarge" style={estilos.rotulo}>
+            Tipo de serviço
+          </Text>
+          <View style={estilos.chips}>
+            {TIPOS_ORDEM.map((tipo) => {
+              const marcado = tipos.includes(tipo);
+              return (
+                <Chip
+                  key={tipo}
+                  mode="outlined"
+                  icon={() => <Icon source={marcado ? 'check' : 'plus'} size={18} color={marcado ? cor.branco : cor.realce} />}
+                  style={marcado ? estilos.chipSelecionado : estilos.chip}
+                  textStyle={marcado ? estilos.chipSelecionadoTexto : estilos.chipTexto}
+                  hitSlop={ALCANCE_CHIP}
+                  onPress={() => setTipos((atual) => alternarTipo(atual, tipo))}
+                  accessibilityRole="checkbox"
+                  accessibilityState={{ checked: marcado }}
+                  accessibilityLabel={tipo}
+                >
+                  {tipo}
+                </Chip>
+              );
+            })}
+          </View>
+        </View>
+
+        <View style={estilos.depoisDosTipos}>
           <Text variant="labelLarge" style={estilos.rotulo}>
             Responsáveis
           </Text>
@@ -221,6 +251,7 @@ const estilos = StyleSheet.create({
   expande: { flex: 1 },
   suave: { color: cor.textoSuave },
   rotulo: { marginBottom: 8 },
+  depoisDosTipos: { marginTop: 16 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   chip: { backgroundColor: cor.superficie },
   chipTexto: { marginVertical: 10 },

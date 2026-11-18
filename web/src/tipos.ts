@@ -22,6 +22,8 @@ export type Orcamento = Omit<DadosOrcamento, 'itens'> & {
   itens: ItemOrcamento[];
   total: number;
   situacao: Situacao;
+  // Quando foi finalizado; null nas outras situações.
+  finalizadoEm: string | null;
 };
 
 // Quantos itens as listas pedem à API; "Mostrar mais" aumenta. A busca olha só o que já veio.

@@ -13,6 +13,7 @@ export default function NovaOrdem() {
     cliente: '',
     // O técnico abre a OS para si mesmo; o gestor normalmente abre para a equipe e escolhe quem vai.
     responsaveis: conta?.papel === 'tecnico' ? [conta.nome] : [],
+    tipos: [],
     observacoes: '',
     abertaEm: new Date().toISOString(),
   }));

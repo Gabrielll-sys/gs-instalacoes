@@ -5,6 +5,7 @@ import { Button, FAB, Searchbar, Text, TouchableRipple } from 'react-native-pape
 import type { Orcamento } from '../../api';
 import { BarraGestor, useBaseDoFab } from '../../componentes/BarraGestor';
 import { EstadoVazio } from '../../componentes/EstadoVazio';
+import { Lembretes } from '../../componentes/Lembretes';
 import { Esqueleto, Filtros, MostrarMais } from '../../componentes/Listas';
 import { Selo } from '../../componentes/Selo';
 import { useBuscaCompleta } from '../../buscaCompleta';
@@ -98,6 +99,7 @@ export default function Orcamentos() {
         renderItem={({ item }) => <LinhaOrcamento orcamento={item} />}
         ListHeaderComponent={
           <>
+            <Lembretes />
             <Filtros opcoes={filtros} valor={situacao} aoMudar={setSituacao} />
             {buscando && (
               <Text variant="bodyMedium" style={estilos.buscando} accessibilityLiveRegion="polite">
