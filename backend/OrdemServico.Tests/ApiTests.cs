@@ -907,6 +907,9 @@ public class ApiTests(Api api) : IClassFixture<Api>
 
         (await gestor.PutAsync($"/api/orcamentos/{id}/lembrete", null)).EnsureSuccessStatusCode();
         Assert.False(await EstaNosLembretes());
+        // O card passa a dizer que a manutenção foi agendada.
+        var lista = await gestor.GetFromJsonAsync<JsonElement>("/api/orcamentos?busca=lembrete%20seis");
+        Assert.Equal(JsonValueKind.String, lista.EnumerateArray().Single().GetProperty("lembreteResolvidoEm").ValueKind);
 
         var tecnico = await api.ClienteLogado();
         Assert.Equal(HttpStatusCode.Forbidden, (await tecnico.GetAsync("/api/orcamentos/lembretes")).StatusCode);

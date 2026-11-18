@@ -101,6 +101,35 @@ export const SITUACOES: { valor: Situacao; rotulo: string }[] = [
 ];
 export const rotuloDaSituacao = (situacao: string) => SITUACOES.find((x) => x.valor === situacao)?.rotulo ?? situacao;
 
+// Seis meses depois de finalizado, como o lembrete do servidor. Conta dias do calendário, sem a hora:
+// no próprio dia já diz "a agendar", mesmo que o lembrete do servidor só apareça na hora exata.
+const MESES_ATE_MANUTENCAO = 6;
+// Como o AddMonths do .NET: 31 de agosto + 6 meses vira 28 de fevereiro.
+const somarMeses = (data: Date, meses: number) => {
+  const ultimoDia = new Date(data.getFullYear(), data.getMonth() + meses + 1, 0).getDate();
+  return new Date(data.getFullYear(), data.getMonth() + meses, Math.min(data.getDate(), ultimoDia));
+};
+const diaDoCalendario = (data: Date) => new Date(data.getFullYear(), data.getMonth(), data.getDate());
+const quantos = (n: number, um: string, varios: string) => `${n} ${n === 1 ? um : varios}`;
+
+export type PrazoDaManutencao = { texto: string; estado: 'falta' | 'vencida' | 'agendada' };
+export function prazoDaManutencao(
+  o: { situacao: string; finalizadoEm: string | null; lembreteResolvidoEm: string | null },
+  agora = new Date(),
+): PrazoDaManutencao | null {
+  if (o.situacao !== 'finalizado' || !o.finalizadoEm) return null;
+  if (o.lembreteResolvidoEm) return { texto: 'Manutenção agendada', estado: 'agendada' };
+  const hoje = diaDoCalendario(agora);
+  const alvo = somarMeses(diaDoCalendario(new Date(o.finalizadoEm)), MESES_ATE_MANUTENCAO);
+  if (alvo <= hoje) return { texto: 'Manutenção a agendar', estado: 'vencida' };
+  let meses = 0;
+  while (somarMeses(hoje, meses + 1) <= alvo) meses++;
+  // round: a troca de horário de verão deixaria o dia com 23 ou 25 horas.
+  const dias = Math.round((alvo.getTime() - somarMeses(hoje, meses).getTime()) / 86_400_000);
+  const partes = [meses ? quantos(meses, 'mês', 'meses') : '', dias ? quantos(dias, 'dia', 'dias') : ''].filter(Boolean);
+  return { texto: `${(meses || dias) === 1 ? 'Falta' : 'Faltam'} ${partes.join(' e ')}`, estado: 'falta' };
+}
+
 // Marcação da OS, que também serve de busca. Mesma lista e mesma ordem da API.
 export const TIPOS_ORDEM = ['Visita técnica', 'Manutenção', 'Manutenção predial', 'Instalação'];
 // Marca ou desmarca mantendo a ordem da lista, como o servidor guarda.

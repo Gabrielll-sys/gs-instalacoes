@@ -23,7 +23,7 @@ import { Icone } from '../componentes/Icone';
 import { confirmar } from '../confirmar';
 import { queryClient, recarregarLembretes, recarregarOrcamentos, useClientes, useOrcamentos } from '../consultas';
 import type { Orcamento } from '../tipos';
-import { contatoDoTelefone, formatarDia, formatarMoeda, formatarQuantidade, numeroDoOrcamento, SITUACOES, type Situacao } from '../valores';
+import { contatoDoTelefone, formatarDia, formatarMoeda, formatarQuantidade, numeroDoOrcamento, prazoDaManutencao, SITUACOES, type Situacao } from '../valores';
 
 export function GavetaOrcamento() {
   const { id } = useParams();
@@ -31,6 +31,7 @@ export function GavetaOrcamento() {
   const { data: orcamentos, isLoading } = useOrcamentos();
   const { data: clientes } = useClientes();
   const orcamento = orcamentos?.find((o) => o.id === id);
+  const prazo = orcamento ? prazoDaManutencao(orcamento) : null;
   const cliente = clientes?.find((c) => c.id === orcamento?.clienteId);
   const fechar = () => navigate('/orcamentos');
 
@@ -145,8 +146,11 @@ export function GavetaOrcamento() {
               </button>
             ))}
           </div>
-          {orcamento.finalizadoEm && (
-            <p className="campo-ajuda">Finalizado em {formatarDia(orcamento.finalizadoEm)}. O lembrete de manutenção aparece 6 meses depois.</p>
+          {prazo && (
+            <p className="campo-ajuda">
+              Finalizado em {formatarDia(orcamento.finalizadoEm!)}. {prazo.texto}
+              {prazo.estado === 'falta' ? ' para a manutenção' : ''}.
+            </p>
           )}
           {situacao.isError && <Erro>{mensagemDoErro(situacao.error)}</Erro>}
         </fieldset>

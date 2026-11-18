@@ -6,7 +6,7 @@ import { Icone } from '../componentes/Icone';
 import { Lembretes } from '../componentes/Lembretes';
 import { useBuscaCompleta } from '../buscaCompleta';
 import { mostrarMais, useOrcamentos } from '../consultas';
-import { filtrarOrcamentos, formatarDia, formatarMoeda, numeroDoOrcamento, rotuloDaSituacao, SITUACOES, type Situacao } from '../valores';
+import { filtrarOrcamentos, formatarDia, prazoDaManutencao, formatarMoeda, numeroDoOrcamento, rotuloDaSituacao, SITUACOES, type Situacao } from '../valores';
 
 export function Orcamentos() {
   const { data: carregados = [], isLoading, isError, isFetching, refetch } = useOrcamentos();
@@ -60,22 +60,26 @@ export function Orcamentos() {
         )
       ) : (
         <ul className="lista">
-          {visiveis.map((orcamento) => (
-            <li key={orcamento.id}>
-              <Link to={`/orcamentos/${orcamento.id}`} className={`linha${orcamento.id === id ? ' selecionada' : ''}`}>
-                <div className="info">
-                  <strong>{orcamento.clienteNome}</strong>
-                  <span className="numero">
-                    Nº {numeroDoOrcamento(orcamento.numero)} – {formatarDia(orcamento.criadoEm)}
-                  </span>
-                </div>
-                <div className="valor-e-situacao">
-                  <span className="valor-linha">{formatarMoeda(orcamento.total)}</span>
-                  <span className={`situacao situacao-${orcamento.situacao}`}>{rotuloDaSituacao(orcamento.situacao)}</span>
-                </div>
-              </Link>
-            </li>
-          ))}
+          {visiveis.map((orcamento) => {
+            const prazo = prazoDaManutencao(orcamento);
+            return (
+              <li key={orcamento.id}>
+                <Link to={`/orcamentos/${orcamento.id}`} className={`linha${orcamento.id === id ? ' selecionada' : ''}`}>
+                  <div className="info">
+                    <strong>{orcamento.clienteNome}</strong>
+                    <span className="numero">
+                      Nº {numeroDoOrcamento(orcamento.numero)} – {formatarDia(orcamento.criadoEm)}
+                    </span>
+                    {prazo && <span className={prazo.estado === 'vencida' ? 'atencao-texto' : undefined}>{prazo.texto}</span>}
+                  </div>
+                  <div className="valor-e-situacao">
+                    <span className="valor-linha">{formatarMoeda(orcamento.total)}</span>
+                    <span className={`situacao situacao-${orcamento.situacao}`}>{rotuloDaSituacao(orcamento.situacao)}</span>
+                  </div>
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       )}
       {!isLoading && <MostrarMais cheia={cheia} carregando={isFetching} aoPedir={() => void mostrarMais('orcamentos')} />}

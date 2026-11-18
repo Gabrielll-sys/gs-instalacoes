@@ -144,7 +144,7 @@ public record SessaoDto(string Token, string Nome, string Papel, bool TrocarSenh
 public record UsuarioDto(Guid Id, string Login, string Nome, string Papel, bool Ativo, bool TrocarSenha);
 public record ClienteDto(Guid Id, string Nome, string Telefone, string Email, string Documento, string Endereco);
 public record ItemDto(string Descricao, decimal Quantidade, string Unidade, decimal PrecoUnitario, decimal Total);
-public record OrcamentoDto(Guid Id, int Numero, Guid ClienteId, string ClienteNome, DateTimeOffset CriadoEm, List<ItemDto> Itens, decimal Total, string Pagamento, string Prazo, string Observacoes, string Situacao, string Veiculo, DateTimeOffset? FinalizadoEm, string ClienteTelefone);
+public record OrcamentoDto(Guid Id, int Numero, Guid ClienteId, string ClienteNome, DateTimeOffset CriadoEm, List<ItemDto> Itens, decimal Total, string Pagamento, string Prazo, string Observacoes, string Situacao, string Veiculo, DateTimeOffset? FinalizadoEm, string ClienteTelefone, DateTimeOffset? LembreteResolvidoEm);
 
 // Acompanhamento do orçamento depois de montado; não muda nada do que vai no PDF.
 public static class Situacoes

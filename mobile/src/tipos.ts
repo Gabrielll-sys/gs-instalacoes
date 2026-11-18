@@ -25,6 +25,8 @@ export type Orcamento = Omit<DadosOrcamento, 'itens'> & {
   situacao: Situacao;
   // Quando foi finalizado; null nas outras situações.
   finalizadoEm: string | null;
+  // Quando o gestor tocou em "Já agendei"; null enquanto a manutenção não foi agendada.
+  lembreteResolvidoEm: string | null;
 };
 
 // Quantos itens as listas pedem à API; "Mostrar mais" aumenta. A busca olha só o que já veio.

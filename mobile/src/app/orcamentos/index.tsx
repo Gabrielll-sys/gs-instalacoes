@@ -11,17 +11,18 @@ import { Selo } from '../../componentes/Selo';
 import { useBuscaCompleta } from '../../buscaCompleta';
 import { mostrarMais, useOrcamentos } from '../../orcamentos';
 import { cor, familia, temaFab } from '../../tema';
-import { filtrarOrcamentos, formatarDia, formatarMoeda, numeroDoOrcamento, rotuloDaSituacao, SITUACOES, type Situacao } from '../../valores';
+import { filtrarOrcamentos, formatarDia, prazoDaManutencao, formatarMoeda, numeroDoOrcamento, rotuloDaSituacao, SITUACOES, type Situacao } from '../../valores';
 
 function LinhaOrcamento({ orcamento }: { orcamento: Orcamento }) {
   const numero = numeroDoOrcamento(orcamento.numero);
   const total = formatarMoeda(orcamento.total);
   const dia = formatarDia(orcamento.criadoEm);
+  const prazo = prazoDaManutencao(orcamento);
   return (
     <TouchableRipple
       onPress={() => router.push(`/orcamentos/${orcamento.id}`)}
       accessibilityRole="button"
-      accessibilityLabel={`Orçamento ${numero}, ${orcamento.clienteNome}, ${total}, ${rotuloDaSituacao(orcamento.situacao)}, emitido em ${dia}`}
+      accessibilityLabel={`Orçamento ${numero}, ${orcamento.clienteNome}, ${total}, ${rotuloDaSituacao(orcamento.situacao)}, emitido em ${dia}${prazo ? `, ${prazo.texto}` : ''}`}
       style={estilos.linha}
     >
       <View style={estilos.linhaConteudo}>
@@ -32,6 +33,11 @@ function LinhaOrcamento({ orcamento }: { orcamento: Orcamento }) {
           <Text variant="bodyMedium" style={[estilos.suave, estilos.tabular]}>
             Nº {numero} – {dia}
           </Text>
+          {prazo && (
+            <Text variant="bodyMedium" style={prazo.estado === 'vencida' ? estilos.atencao : estilos.suave}>
+              {prazo.texto}
+            </Text>
+          )}
         </View>
         <View style={estilos.direita}>
           <Text style={estilos.valor}>{total}</Text>
@@ -145,6 +151,7 @@ const estilos = StyleSheet.create({
   linhaConteudo: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   expande: { flex: 1 },
   suave: { color: cor.textoSuave },
+  atencao: { color: cor.atencao },
   tabular: { fontVariant: ['tabular-nums'] },
   buscando: { color: cor.textoSuave, paddingHorizontal: 16, paddingVertical: 8 },
   direita: { alignItems: 'flex-end', gap: 4 },

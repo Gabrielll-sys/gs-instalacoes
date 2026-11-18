@@ -13,7 +13,7 @@ import { EstadoVazio } from '../../../componentes/EstadoVazio';
 import { recarregarLembretes, recarregarOrcamentos, useClientes, useOrcamentos } from '../../../orcamentos';
 import { gerarPdfOrcamento, mensagemDoPdf } from '../../../relatorio';
 import { cor, familia } from '../../../tema';
-import { contatoDoTelefone, formatarDia, formatarMoeda, formatarQuantidade, numeroDoOrcamento, SITUACOES, type Situacao } from '../../../valores';
+import { contatoDoTelefone, formatarDia, formatarMoeda, formatarQuantidade, numeroDoOrcamento, prazoDaManutencao, SITUACOES, type Situacao } from '../../../valores';
 
 export default function TelaOrcamento() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -23,6 +23,7 @@ export default function TelaOrcamento() {
   const [erro, setErro] = useState('');
 
   const orcamento = orcamentos.data?.find((o) => o.id === id);
+  const prazo = orcamento ? prazoDaManutencao(orcamento) : null;
   const cliente = clientes.data?.find((c) => c.id === orcamento?.clienteId);
 
   const excluir = useMutation({
@@ -130,9 +131,10 @@ export default function TelaOrcamento() {
               );
             })}
           </View>
-          {orcamento.finalizadoEm && (
+          {prazo && (
             <Text variant="bodySmall" style={estilos.finalizado}>
-              Finalizado em {formatarDia(orcamento.finalizadoEm)}. O lembrete de manutenção aparece 6 meses depois.
+              Finalizado em {formatarDia(orcamento.finalizadoEm!)}. {prazo.texto}
+              {prazo.estado === 'falta' ? ' para a manutenção' : ''}.
             </Text>
           )}
           <BotaoPdf
