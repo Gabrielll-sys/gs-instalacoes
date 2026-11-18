@@ -11,7 +11,7 @@ export type Conta = { id: string; login: string; nome: string; papel: Papel; ati
 export type { Cliente, DadosCliente, DadosOrcamento, ItemOrcamento, Orcamento } from './tipos';
 export type Pdf = { url: string; nome: string };
 
-export const API_URL: string = import.meta.env.VITE_API_URL ?? 'http://localhost:5202';
+export const API_URL: string = import.meta.env.API_URL ?? 'http://localhost:5202';
 const TEMPO_LIMITE_MS = 20_000;
 // Gerar o PDF lê todas as fotos da OS no armazenamento: leva bem mais do que as outras chamadas.
 const TEMPO_LIMITE_RELATORIO_MS = 3 * 60_000;

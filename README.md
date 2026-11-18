@@ -111,7 +111,7 @@ Trocar `Auth__JwtKey` encerra a sessão de todos os aparelhos; a fila de cada um
 ### Site na Vercel
 
 1. Importe o repositório com Root Directory `web`. A Vercel reconhece o Vite: build `npm run build`, saída `dist`.
-2. Em Environment Variables, defina `VITE_API_URL` com o domínio da API no Railway, sem barra no fim, ex.: `https://sua-api.up.railway.app`. A variável entra no build, então mudar exige novo deploy.
+2. Em Environment Variables, defina `API_URL` com o domínio da API no Railway, sem barra no fim, ex.: `https://sua-api.up.railway.app`. A variável entra no build, então mudar exige novo deploy.
 3. Depois do primeiro deploy, coloque o domínio do site em `Cors__Origens` no Railway e na política CORS do bucket.
 
 O `web/vercel.json` manda toda rota para o `index.html`, para que links como `/ordens/…` abram direto. Os deploys de prévia da Vercel ganham endereços próprios: só funcionam se também estiverem em `Cors__Origens` e no CORS do bucket.

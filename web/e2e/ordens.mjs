@@ -32,7 +32,7 @@ const vite = spawn('npx vite --port 5173 --strictPort', {
   cwd: `${raiz}/web`,
   shell: true,
   stdio: 'ignore',
-  env: { ...process.env, VITE_API_URL: 'http://localhost:5299' },
+  env: { ...process.env, API_URL: 'http://localhost:5299' },
 });
 
 const navegador = await puppeteer.launch({
