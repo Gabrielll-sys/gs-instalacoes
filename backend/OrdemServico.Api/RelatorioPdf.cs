@@ -72,9 +72,6 @@ public static class RelatorioPdf
                 if (nasProximas > 0)
                     c.Item().PaddingTop(10).Text(nasProximas == 1 ? "Mais 1 foto na página seguinte." : $"Mais {nasProximas} fotos nas páginas seguintes.").FontFamily(Extra).FontColor(Marinho);
 
-                // Junto das fotos que explica: depois dos dados, poderia sobrar sozinha numa página.
-                c.Item().PaddingTop(4).Text("Horários de Brasília. A data sobre cada foto é quando ela foi adicionada à OS.").FontSize(8.5f).FontColor(TextoSuave);
-
                 if (semImagem > 0)
                 {
                     c.Item().PaddingTop(10).Background(AtencaoFundo).CornerRadius(4).Padding(8)
