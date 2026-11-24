@@ -27,10 +27,12 @@ import { GavetaOrdem } from './paginas/GavetaOrdem';
 import { ListaOrdens } from './paginas/ListaOrdens';
 import { Login } from './paginas/Login';
 import { Orcamentos } from './paginas/Orcamentos';
+import { Privacidade } from './paginas/Privacidade';
 import { TrocarSenha } from './paginas/TrocarSenha';
 
 const router = createBrowserRouter([
   { path: '/login', element: <Login /> },
+  { path: '/privacidade', element: <Privacidade /> },
   {
     element: <Protegido />,
     children: [

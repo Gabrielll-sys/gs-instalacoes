@@ -259,3 +259,27 @@
   margin: 32px auto;
   padding: 0 16px;
 }
+
+/* Texto corrido, como a política de privacidade: coluna mais larga, para ler sem cansar. */
+.pagina-simples-corpo.documento {
+  max-width: 720px;
+  line-height: 1.6;
+}
+
+.documento h2 {
+  margin: 24px 0 8px;
+  font-weight: 800;
+  font-size: 18px;
+}
+
+.documento ul {
+  padding-left: 20px;
+}
+
+.documento li + li {
+  margin-top: 6px;
+}
+
+.documento a {
+  color: var(--realce);
+}
