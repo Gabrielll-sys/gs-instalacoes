@@ -118,6 +118,19 @@ O `web/vercel.json` manda toda rota para o `index.html`, para que links como `/o
 
 O relatório da OS e o orçamento em PDF usam o QuestPDF na licença Community, gratuita para empresas com receita bruta anual de até US$ 1 milhão.
 
+### App na Play Store
+
+O app sai pelo EAS (projeto `@gabs1999/gs-instalacoes-os`) para o teste interno do Play Console (`br.com.gsinstalacoes.os`), igual ao MasterERP e ao BarberFinance. O `mobile/eas.json` aponta o perfil `production` para a API do Railway e envia para a faixa `internal`; o `versionCode` fica no EAS e sobe sozinho a cada build.
+
+```bash
+cd mobile
+npm run deploy:android
+```
+
+Gera o AAB e envia direto ao teste interno. O envio usa a chave da conta de serviço do Google `gen-lang-client-0562884019-d11b6fda3988.json` em `mobile/`, a mesma dos outros dois projetos e fora do git; em outra máquina, copie o arquivo para lá. A conta de serviço tem acesso ao app em Play Console > Usuários e permissões.
+
+Para um APK de teste fora da loja: `npm run build:android:preview`.
+
 ## Testes
 
 ```bash

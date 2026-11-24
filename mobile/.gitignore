@@ -39,3 +39,6 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# chave da conta de serviço do Google Play (envio automático do EAS)
+gen-lang-client-*.json

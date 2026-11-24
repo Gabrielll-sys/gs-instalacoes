@@ -47,7 +47,9 @@
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
     "test": "node --experimental-strip-types --test src/sync/regras.test.mjs src/componentes/zoom.test.mjs src/valores.test.mjs",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "build:android:preview": "eas build --platform android --profile preview",
+    "deploy:android": "eas build --platform android --profile production --auto-submit"
   },
   "private": true
 }

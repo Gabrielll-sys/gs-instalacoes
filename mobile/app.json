@@ -41,6 +41,12 @@
           "imageWidth": 288
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "b7ed87df-4d3d-4784-8f58-9dca23c0ca83"
+      }
+    },
+    "owner": "gabs1999"
   }
 }
