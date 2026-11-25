@@ -14,7 +14,6 @@ RUN apt-get update \
 WORKDIR /app
 COPY --from=build /app .
 ENV ASPNETCORE_ENVIRONMENT=Production
-# O banco SQLite fica no volume do Railway montado em /data; sem volume, ele some a cada deploy.
-ENV ConnectionStrings__Db="Data Source=/data/ordens.db"
 # O Railway informa a porta em PORT.
-CMD ["sh", "-c", "mkdir -p /data && ASPNETCORE_HTTP_PORTS=${PORT:-8080} exec dotnet OrdemServico.Api.dll"]
+# O banco é o MySQL do projeto no Railway, pelas variáveis MYSQL*.
+CMD ["sh", "-c", "ASPNETCORE_HTTP_PORTS=${PORT:-8080} exec dotnet OrdemServico.Api.dll"]

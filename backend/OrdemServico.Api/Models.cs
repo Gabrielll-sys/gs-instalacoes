@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace OrdemServico.Api;
@@ -111,17 +114,42 @@ public class AppDb(DbContextOptions<AppDb> options) : DbContext(options)
     public DbSet<Orcamento> Orcamentos => Set<Orcamento>();
     public DbSet<Contador> Contadores => Set<Contador>();
 
+    // O ToJson do SQLite gravava os números como texto ("20.0"): a leitura aceita os dois jeitos.
+    private static readonly JsonSerializerOptions JsonItens = new() { NumberHandling = JsonNumberHandling.AllowReadingFromString };
+
     protected override void OnModelCreating(ModelBuilder b)
     {
+        // MySQL só indexa texto com tamanho definido.
+        b.Entity<Usuario>().Property(u => u.Login).HasMaxLength(100);
         b.Entity<Usuario>().HasIndex(u => u.Login).IsUnique();
+        b.Entity<Contador>().Property(c => c.Nome).HasMaxLength(50);
         b.Entity<Orcamento>().HasIndex(o => o.Numero).IsUnique();
         b.Entity<Contador>().HasKey(c => c.Nome);
-        b.Entity<Orcamento>().OwnsMany(o => o.Itens, i => i.ToJson());
+        // Itens do orçamento em JSON numa coluna de texto, no mesmo formato do ToJson que o SQLite usava:
+        // o provedor oficial do MySQL não tem coluna JSON automática.
+        b.Entity<Orcamento>().Property(o => o.Itens).HasConversion(
+            new ValueConverter<List<ItemOrcamento>, string>(
+                v => JsonSerializer.Serialize(v, JsonItens),
+                v => JsonSerializer.Deserialize<List<ItemOrcamento>>(v, JsonItens) ?? new List<ItemOrcamento>()),
+            new ValueComparer<List<ItemOrcamento>>(
+                (a, b) => JsonSerializer.Serialize(a, JsonItens) == JsonSerializer.Serialize(b, JsonItens),
+                v => JsonSerializer.Serialize(v, JsonItens).GetHashCode(),
+                v => JsonSerializer.Deserialize<List<ItemOrcamento>>(JsonSerializer.Serialize(v, JsonItens), JsonItens)!));
+        // Listas de texto viram JSON numa coluna só: o provedor do MySQL não mapeia listas sozinho, e o SQLite já guardava assim.
+        var lista = new ValueConverter<List<string>, string>(
+            v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
+            v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions?)null) ?? new List<string>());
+        var comparaLista = new ValueComparer<List<string>>(
+            (a, b) => a!.SequenceEqual(b!),
+            v => v.Aggregate(0, (h, x) => HashCode.Combine(h, x.GetHashCode())),
+            v => v.ToList());
+        b.Entity<Ordem>().Property(o => o.Responsaveis).HasConversion(lista, comparaLista);
+        b.Entity<Ordem>().Property(o => o.Tipos).HasConversion(lista, comparaLista);
         // Cliente com orçamento não some: a API recusa a exclusão antes.
         b.Entity<Orcamento>().HasOne(o => o.Cliente).WithMany().OnDelete(DeleteBehavior.Restrict);
     }
 
-    // SQLite não ordena DateTimeOffset nativamente.
+    // SQLite não ordena DateTimeOffset nativamente; no MySQL o mesmo formato mantém as datas iguais nos dois bancos.
     protected override void ConfigureConventions(ModelConfigurationBuilder b) =>
         b.Properties<DateTimeOffset>().HaveConversion<DateTimeOffsetToBinaryConverter>();
 }

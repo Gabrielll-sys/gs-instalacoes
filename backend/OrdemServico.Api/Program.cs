@@ -27,10 +27,20 @@ if (chaveJwt.KeySize < 256) throw new InvalidOperationException("Auth:JwtKey pre
 var autenticacao = new Autenticacao(chaveJwt);
 
 builder.Services.AddSingleton(autenticacao);
-builder.Services.AddDbContext<AppDb>(o => o.UseSqlite(cfg.GetConnectionString("Db")));
+// Produção usa o MySQL do projeto no Railway, pelas variáveis MYSQL* que ele cria; no computador e nos testes, SQLite.
+// AllowPublicKeyRetrieval: a rede interna do Railway não usa TLS, e o MySQL 8+ pede a chave para conferir a senha.
+var mysql = cfg["MYSQLHOST"] is { Length: > 0 } hostMysql
+    ? $"Server={hostMysql};Port={cfg["MYSQLPORT"] ?? "3306"};Database={Obrigatorio("MYSQLDATABASE")};User ID={Obrigatorio("MYSQLUSER")};Password={Obrigatorio("MYSQLPASSWORD")};AllowPublicKeyRetrieval=True"
+    : null;
+// Em produção o SQLite ficaria dentro do contêiner e sumiria a cada deploy: melhor não subir do que perder dados.
+if (mysql is null && builder.Environment.IsProduction())
+    throw new InvalidOperationException("Configure MYSQLHOST, MYSQLPORT, MYSQLUSER, MYSQLPASSWORD e MYSQLDATABASE com o MySQL do Railway.");
+builder.Services.AddDbContext<AppDb>(o =>
+{
+    if (mysql is null) o.UseSqlite(cfg.GetConnectionString("Db"));
+    else o.UseMySQL(mysql);
+});
 builder.Services.AddSingleton<IR2Storage, R2Storage>();
-builder.Services.AddSingleton<BackupDiario>();
-builder.Services.AddHostedService(sp => sp.GetRequiredService<BackupDiario>());
 builder.Services.AddCors();
 builder.Services.AddMemoryCache();
 // JSON das listas encolhe 70% a 80% comprimido: menos dados no 4G do técnico e menos banda no Railway.
@@ -91,7 +101,9 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDb>();
-    db.Database.Migrate();
+    // As migrações são do MySQL; o SQLite local e o dos testes nascem direto do modelo.
+    if (db.Database.IsSqlite()) db.Database.EnsureCreated();
+    else db.Database.Migrate();
 
     // Sem nenhuma conta, ninguém conseguiria entrar para criar as outras.
     if (!db.Usuarios.Any())

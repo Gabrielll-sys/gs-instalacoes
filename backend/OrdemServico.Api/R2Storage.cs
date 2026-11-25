@@ -13,10 +13,6 @@ public interface IR2Storage
     Task<long?> TamanhoAsync(string chave, CancellationToken ct);
     Task EnviarAsync(string chave, byte[] dados, string contentType, CancellationToken ct);
 
-    // Backup do banco: num bucket privado à parte, porque o das fotos é público.
-    Task<bool> BackupExisteAsync(string chave, CancellationToken ct);
-    Task EnviarBackupAsync(string chave, string arquivo, CancellationToken ct);
-    Task ExcluirBackupAsync(string chave);
 }
 
 public sealed class R2Storage(IConfiguration cfg) : IR2Storage, IDisposable
@@ -94,31 +90,6 @@ public sealed class R2Storage(IConfiguration cfg) : IR2Storage, IDisposable
             DisablePayloadSigning = true,
         }, ct);
     }
-
-    public async Task<bool> BackupExisteAsync(string chave, CancellationToken ct)
-    {
-        try
-        {
-            await _client.Value.GetObjectMetadataAsync(Obrigatorio(cfg, "BucketBackup"), chave, ct);
-            return true;
-        }
-        catch (AmazonS3Exception e) when (e.StatusCode == HttpStatusCode.NotFound)
-        {
-            return false;
-        }
-    }
-
-    public Task EnviarBackupAsync(string chave, string arquivo, CancellationToken ct) =>
-        _client.Value.PutObjectAsync(new PutObjectRequest
-        {
-            BucketName = Obrigatorio(cfg, "BucketBackup"),
-            Key = chave,
-            FilePath = arquivo,
-            DisablePayloadSigning = true,
-        }, ct);
-
-    public Task ExcluirBackupAsync(string chave) =>
-        _client.Value.DeleteObjectAsync(Obrigatorio(cfg, "BucketBackup"), chave);
 
     public void Dispose()
     {

@@ -4,7 +4,7 @@ Ordens de serviço para instalação de carregadores de carro elétrico, com fot
 
 À parte das OS, o gestor monta orçamentos em PDF para os clientes e mantém o cadastro de clientes. Essa parte é só online, no app (menu da conta) e no site (trilho lateral).
 
-- `backend/`: API em .NET 10, SQLite e Cloudflare R2, publicada no Railway
+- `backend/`: API em .NET 10, MySQL (SQLite no computador) e Cloudflare R2, publicada no Railway
 - `mobile/`: app Expo (SDK 58) com Expo Router, React Query e Material 3
 - `web/`: site em React 19, Vite, React Router e React Query, publicado na Vercel
 
@@ -86,7 +86,7 @@ O app nativo não precisa de CORS, mas o site envia as fotos direto do navegador
 O `backend/Dockerfile` publica a API em Release na imagem `aspnet:10.0`, com a biblioteca de fontes que o PDF usa, e escuta na porta que o Railway passa em `PORT`.
 
 1. Crie um serviço a partir do repositório com Root Directory `backend`. O `backend/railway.json` manda usar o Dockerfile.
-2. Adicione um volume montado em `/data`. O banco SQLite fica em `/data/ordens.db`; sem o volume, cada deploy apaga tudo. Mantenha uma única réplica, porque o SQLite não é compartilhado entre instâncias.
+2. No mesmo projeto, crie um MySQL só para o GS (+ New > Database > MySQL). No serviço da API, adicione as variáveis `MYSQLHOST`, `MYSQLPORT`, `MYSQLUSER`, `MYSQLPASSWORD` e `MYSQLDATABASE` como referência às do MySQL (ex.: `${{MySQL.MYSQLHOST}}`). Com elas, a API usa o MySQL e cria as tabelas sozinha ao subir; sem elas, a API de produção se recusa a subir, para não gravar num SQLite que sumiria a cada deploy. No computador e nos testes o banco continua SQLite (`ordens.db`), criado direto do modelo.
 3. Preencha as variáveis abaixo e gere o domínio em Settings > Networking.
 
 Obrigatório, sem valor padrão:
@@ -96,15 +96,14 @@ Auth__GestorInicial__Usuario  usuário do primeiro gestor, usado só enquanto n�
 Auth__GestorInicial__Senha    senha dele; o app não obriga a trocar, use uma senha forte
 Auth__JwtKey                  ao menos 32 bytes aleatórios
 CloudflareR2__AccountId, AccessKey, SecretKey, BucketName e PublicUrl, como na seção do R2
-CloudflareR2__BucketBackup    bucket privado, só para o backup do banco; sem ele, não há backup
 Cors__Origens                 endereço do site, ex.: https://seu-site.vercel.app; vários separados por vírgula
 ```
 
-**Backup.** Uma vez por dia a API copia o banco para o `CloudflareR2__BucketBackup`, como `ordens-AAAA-MM-DD.db`, e apaga as cópias com mais de 30 dias. Use um bucket **sem acesso público**, separado do das fotos: o banco tem endereços, telefones e senhas cifradas. As mesmas chaves do R2 servem, desde que tenham acesso aos dois buckets. Para restaurar, baixe a cópia do dia no painel do R2, pare o serviço, troque o `/data/ordens.db` por ela e suba de novo.
+**Backup.** O banco fica no MySQL do Railway: ative o backup do volume do MySQL no painel do Railway (Backups), conforme o plano.
 
-**Economia no plano de US$ 5.** O `backend/railway.json` liga a suspensão sem tráfego: a API dorme quando ninguém usa e acorda no primeiro pedido, com alguns segundos de espera nesse primeiro acesso. O backup roda sempre que ela acorda. A API usa o coletor de memória de estação de trabalho, mais enxuto num contêiner pequeno, e o relatório baixa 3 fotos por vez, já reduzidas a 1600 px, para não estourar a memória com OS cheias de fotos. As respostas saem comprimidas, as listas respondem 304 sem corpo quando nada mudou (o app e o navegador reaproveitam a última), a conta de quem pede fica 5 minutos em memória em vez de ser lida do banco a cada pedido, e em produção o log só registra avisos e erros.
+**Economia no plano de US$ 5.** O `backend/railway.json` liga a suspensão sem tráfego: a API dorme quando ninguém usa e acorda no primeiro pedido, com alguns segundos de espera nesse primeiro acesso. A API usa o coletor de memória de estação de trabalho, mais enxuto num contêiner pequeno, e o relatório baixa 3 fotos por vez, já reduzidas a 1600 px, para não estourar a memória com OS cheias de fotos. As respostas saem comprimidas, as listas respondem 304 sem corpo quando nada mudou (o app e o navegador reaproveitam a última), a conta de quem pede fica 5 minutos em memória em vez de ser lida do banco a cada pedido, e em produção o log só registra avisos e erros.
 
-`ConnectionStrings__Db` já vem no Dockerfile como `Data Source=/data/ordens.db`. Fora do Railway, aponte para um volume persistente. Sem `Cors__Origens`, a API de produção recusa o site; o app nativo não depende dela.
+As migrações em `backend/OrdemServico.Api/Migrations` são do MySQL: depois de mudar o modelo, rode `dotnet ef migrations add Nome --project OrdemServico.Api` em `backend` (não precisa de MySQL rodando). Sem `Cors__Origens`, a API de produção recusa o site; o app nativo não depende dela.
 
 Trocar `Auth__JwtKey` encerra a sessão de todos os aparelhos; a fila de cada um continua guardada. O app precisa de `EXPO_PUBLIC_API_URL` apontando para a API em HTTPS na hora do build.
 

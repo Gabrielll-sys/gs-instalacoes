@@ -33,18 +33,6 @@ public sealed class FakeR2 : IR2Storage
         Arquivos[chave] = dados;
         return Task.CompletedTask;
     }
-    public Dictionary<string, byte[]> Backups { get; } = [];
-    public Task<bool> BackupExisteAsync(string chave, CancellationToken ct) => Task.FromResult(Backups.ContainsKey(chave));
-    public Task EnviarBackupAsync(string chave, string arquivo, CancellationToken ct)
-    {
-        Backups[chave] = File.ReadAllBytes(arquivo);
-        return Task.CompletedTask;
-    }
-    public Task ExcluirBackupAsync(string chave)
-    {
-        Backups.Remove(chave);
-        return Task.CompletedTask;
-    }
 }
 
 public sealed class Api : WebApplicationFactory<Program>
@@ -754,23 +742,6 @@ public class ApiTests(Api api) : IClassFixture<Api>
         Assert.Null(RelatorioPdf.Reduzir(null));
         byte[] ilegivel = [1, 2, 3];
         Assert.Same(ilegivel, RelatorioPdf.Reduzir(ilegivel));
-    }
-
-    [Fact]
-    public async Task Backup_sai_uma_vez_por_dia_e_apaga_o_de_mais_de_30_dias()
-    {
-        var backup = api.Services.GetRequiredService<BackupDiario>();
-        var agora = new DateTimeOffset(2026, 11, 13, 15, 0, 0, TimeSpan.Zero);
-        var velho = BackupDiario.Chave(new DateTime(2026, 10, 10));
-        api.R2.Backups[velho] = [1];
-
-        Assert.True(await backup.FazerSeFaltar(agora, CancellationToken.None));
-        var copia = api.R2.Backups[BackupDiario.Chave(new DateTime(2026, 11, 13))];
-        Assert.Equal("SQLite format 3", System.Text.Encoding.ASCII.GetString(copia, 0, 15));
-        Assert.DoesNotContain(velho, api.R2.Backups.Keys);
-
-        // No mesmo dia não repete.
-        Assert.False(await backup.FazerSeFaltar(agora.AddHours(6), CancellationToken.None));
     }
 
     [Fact]
