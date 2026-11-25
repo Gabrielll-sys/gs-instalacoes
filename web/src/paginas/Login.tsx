@@ -59,6 +59,9 @@ export function Login() {
         <button type="submit" className="botao botao-ouro botao-largo" disabled={entrar.isPending}>
           {entrar.isPending ? 'Entrando…' : 'Entrar'}
         </button>
+        <a className="link-privacidade" href="/privacidade">
+          Política de privacidade
+        </a>
       </form>
     </div>
   );

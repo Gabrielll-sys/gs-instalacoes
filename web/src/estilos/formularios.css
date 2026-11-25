@@ -229,6 +229,14 @@
   background: var(--superficie);
 }
 
+/* A Google Play exige o link da política acessível no app; fica discreto, abaixo do Entrar. */
+.link-privacidade {
+  align-self: center;
+  padding: 8px;
+  color: var(--texto-suave);
+  font-size: 14px;
+}
+
 /* Troca de senha: página simples com faixa marinho. */
 .faixa-simples {
   display: flex;

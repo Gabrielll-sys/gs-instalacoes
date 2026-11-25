@@ -1,13 +1,16 @@
 import { useMutation } from '@tanstack/react-query';
 import { Image } from 'expo-image';
 import { useState } from 'react';
-import { KeyboardAvoidingView, ScrollView, StyleSheet, View } from 'react-native';
+import { KeyboardAvoidingView, Linking, ScrollView, StyleSheet, View } from 'react-native';
 import { Button, HelperText, Text, TextInput } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { api } from '../api';
 import { sessao } from '../sessao';
 import { ErroApi } from '../sync/regras';
 import { cor } from '../tema';
+
+// A Google Play exige o link da política dentro do app; a página fica no site, sem login.
+const POLITICA = 'https://gs-instalacoes.vercel.app/privacidade';
 
 function mensagemDeErro(erro: unknown) {
   if (!(erro instanceof ErroApi)) return 'Sem conexão com o servidor. O primeiro acesso precisa de internet.';
@@ -108,6 +111,9 @@ export default function Login() {
             contentStyle={estilos.botao}
           >
             Entrar
+          </Button>
+          <Button mode="text" textColor={cor.textoSuave} onPress={() => void Linking.openURL(POLITICA)} accessibilityRole="link">
+            Política de privacidade
           </Button>
         </View>
       </ScrollView>
