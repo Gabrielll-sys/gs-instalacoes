@@ -42,7 +42,7 @@ export function Visualizador({
         src: foto.url,
         alt: `Foto ${i + 1} de ${fotos.length} de ${rotulo.toLowerCase()}`,
         title: `${rotulo} ${i + 1} de ${fotos.length}`,
-        description: `Adicionada em ${formatarData(foto.criadaEm)}`,
+        description: `Adicionada em ${formatarData(foto.criadaEm)}${foto.enviadaPor ? ` por ${foto.enviadaPor}` : ''}`,
       }))}
       toolbar={{
         buttons: [

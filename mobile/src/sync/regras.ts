@@ -11,6 +11,8 @@ export type Foto = {
   miniaturaUrl?: string | null;
   // Quando foi adicionada à OS, no aparelho. É a única data que a foto mostra.
   criadaEm: string;
+  // Nome de quem adicionou; só vem do servidor (a foto ainda na fila é de quem está com o aparelho).
+  enviadaPor?: string | null;
   // Só existem enquanto a foto está na fila do aparelho.
   envio?: 'pendente' | 'erro';
   erro?: string;
@@ -26,7 +28,7 @@ export type DadosOrdem = {
   abertaEm: string;
 };
 
-export type Ordem = DadosOrdem & { fotos: Foto[]; fotosNaFila?: number; alteracoesNaFila?: number };
+export type Ordem = DadosOrdem & { fotos: Foto[]; abertaPor?: string | null; fotosNaFila?: number; alteracoesNaFila?: number };
 
 export type FotoNaFila = {
   id: string;

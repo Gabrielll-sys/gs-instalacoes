@@ -34,8 +34,8 @@ public static class RotasOrdens
 
             return lista.Select(o => new OrdemDto(
                 o.Id, o.Cliente, o.Responsaveis, o.Observacoes, o.AbertaEm,
-                o.Fotos.Select(f => new FotoDto(f.Id, f.OrdemId, f.Secao, r2.UrlPublica(f.Chave), f.CriadaEm, f.TemMiniatura ? r2.UrlPublica(Fotos.ChaveMiniatura(f.Chave)) : null)).ToList(),
-                o.Tipos));
+                o.Fotos.Select(f => new FotoDto(f.Id, f.OrdemId, f.Secao, r2.UrlPublica(f.Chave), f.CriadaEm, f.TemMiniatura ? r2.UrlPublica(Fotos.ChaveMiniatura(f.Chave)) : null, f.EnviadaPor)).ToList(),
+                o.Tipos, o.AbertaPor));
         }).ComEtag();
 
         // PUT com id gerado no aparelho: a mesma OS pode ser reenviada pela fila offline sem duplicar.

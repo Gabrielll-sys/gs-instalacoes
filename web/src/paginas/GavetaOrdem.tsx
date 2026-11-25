@@ -1,4 +1,4 @@
-import { mdiAccountGroupOutline, mdiCalendarClockOutline, mdiNoteTextOutline,
+import { mdiAccountGroupOutline, mdiAccountOutline, mdiCalendarClockOutline, mdiNoteTextOutline,
   mdiTagOutline, mdiPencilOutline, mdiTrashCanOutline } from '@mdi/js';
 import { useMutation } from '@tanstack/react-query';
 import { Link, useNavigate, useParams } from 'react-router';
@@ -76,6 +76,11 @@ export function GavetaOrdem() {
           <Dado icone={mdiCalendarClockOutline} rotulo="Aberta em">
             {formatarData(ordem.abertaEm)}
           </Dado>
+          {ordem.abertaPor && (
+            <Dado icone={mdiAccountOutline} rotulo="Aberta por">
+              {ordem.abertaPor}
+            </Dado>
+          )}
           <Dado icone={mdiAccountGroupOutline} rotulo="Responsáveis">
             {ordem.responsaveis.join(', ')}
           </Dado>

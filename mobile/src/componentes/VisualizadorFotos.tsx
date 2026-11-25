@@ -62,7 +62,7 @@ export function VisualizadorFotos({
             <FotoAmpliavel
               id={item.id}
               url={item.url}
-              rotulo={`Foto de ${TEXTOS[item.secao].rotulo.toLowerCase()}, adicionada em ${formatarData(item.criadaEm)}`}
+              rotulo={`Foto de ${TEXTOS[item.secao].rotulo.toLowerCase()}, adicionada em ${formatarData(item.criadaEm)}${item.enviadaPor ? ` por ${item.enviadaPor}` : ''}`}
               tela={{ largura: width, altura: height }}
               onTravarDeslize={setAmpliada}
             />
@@ -87,6 +87,7 @@ export function VisualizadorFotos({
           </Text>
           <Text variant="labelLarge" style={estilos.dourado}>
             Adicionada em {formatarData(foto.criadaEm)}
+            {foto.enviadaPor ? ` por ${foto.enviadaPor}` : ''}
           </Text>
           {foto.envio === 'pendente' && (
             <Text variant="bodyMedium" style={estilos.situacao}>

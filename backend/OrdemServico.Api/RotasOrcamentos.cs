@@ -158,7 +158,7 @@ public static class RotasOrcamentos
     private static OrcamentoDto ParaDto(Orcamento o) => new(
         o.Id, o.Numero, o.ClienteId, o.Cliente.Nome, o.CriadoEm,
         o.Itens.Select(i => new ItemDto(i.Descricao, i.Quantidade, i.Unidade, i.PrecoUnitario, i.Total)).ToList(),
-        o.Total, o.Pagamento, o.Prazo, o.Observacoes, o.Situacao, o.Veiculo, o.FinalizadoEm, o.Cliente.Telefone, o.LembreteResolvidoEm);
+        o.Total, o.Pagamento, o.Prazo, o.Observacoes, o.Situacao, o.Veiculo, o.FinalizadoEm, o.Cliente.Telefone, o.LembreteResolvidoEm, o.CriadoPor);
 
     private static string? ProblemaNoCliente(ClienteRequest r) =>
         Limpo(r.Nome) is "" or { Length: > 200 } ? "Informe o nome do cliente (até 200 caracteres)."

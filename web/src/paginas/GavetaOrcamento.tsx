@@ -113,6 +113,11 @@ export function GavetaOrcamento() {
               {orcamento.veiculo}
             </Dado>
           )}
+          {orcamento.criadoPor && (
+            <Dado icone={mdiAccountOutline} rotulo="Criado por">
+              {orcamento.criadoPor}
+            </Dado>
+          )}
           <Dado icone={mdiCalendarOutline} rotulo="Emitido em">
             {formatarDia(orcamento.criadoEm)}
           </Dado>

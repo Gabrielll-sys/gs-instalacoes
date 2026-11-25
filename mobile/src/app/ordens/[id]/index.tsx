@@ -111,6 +111,7 @@ export default function TelaOrdem() {
             <Dado icone="account-outline" rotulo="Cliente" valor={ordem.cliente} />
           )}
           <Dado icone="calendar-clock-outline" rotulo="Aberta em" valor={formatarData(ordem.abertaEm)} />
+          {!!ordem.abertaPor && <Dado icone="account-outline" rotulo="Aberta por" valor={ordem.abertaPor} />}
           <Dado icone="account-group-outline" rotulo="Responsáveis" valor={ordem.responsaveis.join(', ')} />
           {!!ordem.tipos?.length && <Dado icone="tag-outline" rotulo="Tipo de serviço" valor={ordem.tipos.join(', ')} />}
           {!!ordem.observacoes && <Observacoes texto={ordem.observacoes} />}

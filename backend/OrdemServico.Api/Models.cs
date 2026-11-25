@@ -166,13 +166,13 @@ public record SituacaoRequest(string? Situacao);
 public record OrcamentoRequest(Guid? ClienteId, List<ItemRequest?>? Itens, string? Pagamento, string? Prazo, string? Observacoes, string? Veiculo = null);
 public record FotoRequest(string? Secao, string? ContentType, DateTimeOffset? CriadaEm);
 
-public record FotoDto(Guid Id, Guid OrdemId, string Secao, string Url, DateTimeOffset CriadaEm, string? MiniaturaUrl);
-public record OrdemDto(Guid Id, string Cliente, List<string> Responsaveis, string Observacoes, DateTimeOffset AbertaEm, List<FotoDto> Fotos, List<string> Tipos);
+public record FotoDto(Guid Id, Guid OrdemId, string Secao, string Url, DateTimeOffset CriadaEm, string? MiniaturaUrl, string? EnviadaPor);
+public record OrdemDto(Guid Id, string Cliente, List<string> Responsaveis, string Observacoes, DateTimeOffset AbertaEm, List<FotoDto> Fotos, List<string> Tipos, string? AbertaPor);
 public record SessaoDto(string Token, string Nome, string Papel, bool TrocarSenha);
 public record UsuarioDto(Guid Id, string Login, string Nome, string Papel, bool Ativo, bool TrocarSenha);
 public record ClienteDto(Guid Id, string Nome, string Telefone, string Email, string Documento, string Endereco);
 public record ItemDto(string Descricao, decimal Quantidade, string Unidade, decimal PrecoUnitario, decimal Total);
-public record OrcamentoDto(Guid Id, int Numero, Guid ClienteId, string ClienteNome, DateTimeOffset CriadoEm, List<ItemDto> Itens, decimal Total, string Pagamento, string Prazo, string Observacoes, string Situacao, string Veiculo, DateTimeOffset? FinalizadoEm, string ClienteTelefone, DateTimeOffset? LembreteResolvidoEm);
+public record OrcamentoDto(Guid Id, int Numero, Guid ClienteId, string ClienteNome, DateTimeOffset CriadoEm, List<ItemDto> Itens, decimal Total, string Pagamento, string Prazo, string Observacoes, string Situacao, string Veiculo, DateTimeOffset? FinalizadoEm, string ClienteTelefone, DateTimeOffset? LembreteResolvidoEm, string? CriadoPor);
 
 // Acompanhamento do orçamento depois de montado; não muda nada do que vai no PDF.
 public static class Situacoes

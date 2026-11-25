@@ -907,4 +907,19 @@ public class ApiTests(Api api) : IClassFixture<Api>
             new { cliente = "X", responsaveis = new[] { "Ana" }, observacoes = "", abertaEm = DateTimeOffset.UtcNow, tipos = new[] { "Pintura" } });
         Assert.Equal(HttpStatusCode.BadRequest, invalido.StatusCode);
     }
+
+    [Fact]
+    public async Task OS_e_orcamento_dizem_quem_abriu_e_quem_criou()
+    {
+        var gestor = await api.ClienteGestor();
+        var id = Guid.NewGuid();
+        (await gestor.PutAsJsonAsync($"/api/ordens/{id}", new { cliente = "Autor da OS", responsaveis = new[] { "Ana" }, observacoes = "", abertaEm = DateTimeOffset.UtcNow })).EnsureSuccessStatusCode();
+        var abertaPor = (await BuscarOrdem(gestor, id)).GetProperty("abertaPor").GetString();
+        Assert.False(string.IsNullOrWhiteSpace(abertaPor));
+
+        var clienteId = await CriarCliente(gestor, "Autor do Orçamento");
+        var item = new { descricao = "Wallbox", quantidade = 1, unidade = "un", precoUnitario = 10m };
+        var orcamento = await (await gestor.PostAsJsonAsync("/api/orcamentos", NovoOrcamento(clienteId, item))).Content.ReadFromJsonAsync<JsonElement>();
+        Assert.Equal(abertaPor, orcamento.GetProperty("criadoPor").GetString());
+    }
 }

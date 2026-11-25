@@ -4,9 +4,9 @@ import type { Situacao } from './valores';
 
 export type Secao = 'antes' | 'depois';
 // miniaturaUrl: versão de 360 px para a grade; nula nas fotos antigas, que mostram a inteira.
-export type Foto = { id: string; ordemId: string; secao: Secao; url: string; criadaEm: string; miniaturaUrl?: string | null };
+export type Foto = { id: string; ordemId: string; secao: Secao; url: string; criadaEm: string; miniaturaUrl?: string | null; enviadaPor?: string | null };
 export type DadosOrdem = { id: string; cliente: string; responsaveis: string[]; tipos: string[]; observacoes: string; abertaEm: string };
-export type Ordem = DadosOrdem & { fotos: Foto[] };
+export type Ordem = DadosOrdem & { fotos: Foto[]; abertaPor?: string | null };
 export type Conta = { id: string; login: string; nome: string; papel: Papel; ativo: boolean; trocarSenha: boolean };
 export type { Cliente, DadosCliente, DadosOrcamento, ItemOrcamento, Orcamento } from './tipos';
 export type Pdf = { url: string; nome: string };

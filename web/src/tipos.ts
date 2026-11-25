@@ -27,6 +27,8 @@ export type Orcamento = Omit<DadosOrcamento, 'itens'> & {
   finalizadoEm: string | null;
   // Quando o gestor tocou em "Já agendei"; null enquanto a manutenção não foi agendada.
   lembreteResolvidoEm: string | null;
+  // Nome de quem criou; nulo nos orçamentos de antes do registro.
+  criadoPor: string | null;
 };
 
 // Quantos itens as listas pedem à API; "Mostrar mais" aumenta. A busca olha só o que já veio.
